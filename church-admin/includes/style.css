@@ -1,0 +1,290 @@
+.form-table{border-collapse: collapse; margin-top: .5em;width: 100%; clear: both;}
+.form-table th{vertical-align: top;text-align: left;padding: 20px 10px 20px 0;width: 200px;line-height: 1.3;font-weight: 600;border:none!important}
+.form-table td{margin-bottom: 9px;padding: 15px 10px;line-height: 1.3;vertical-align: middle;border:none!important}
+#filtered-response{clear:left}
+.filterblock{border:1px solid #CCC; border-radius:3px;margin:5px;float:left;}
+.filterblock p{margin:5px;}
+.filterblock span{width:150px;overflow:hidden;display:inline-block}
+.filterblock label{font-size: 14px; padding: 8px 12px;margin: 0;line-height: 1.4;border-bottom: 1px solid #ccc;display: block;
+    font-weight: 600;}
+.alignleft{float:left;margin-right:10px;}
+.ca-comment{border:1px solid #ccc;border-radius:3px;width:100%;margin-top:10px;padding:10px;background:#FFF}
+.ca-reply{margin-left:50px;max-width:90%}
+.ca-comment-meta{font-weight: bold;line-height:50px;}
+.ca-comment-meta img{vertical-align:middle;margin-right:5px;}
+
+.ca-private td,.ca-private{background:#FF731E!important}
+.ca-deactivated td{color:#CCC!important;}
+
+.to{width:90%}
+.ca-item-detail{float:left;margin-left:5px;}
+
+.church_admin label{float:left;width:200px;font-weight:700;}
+
+.church_admin_photos{height:75px;margin-bottom:5px;}
+.church_admin_address{text-align:left;border-radius:4px;-moz-border-radius:4px;border:1px solid #E3E3E3;margin:8px 0px;padding:6px;position:relative;}
+.church_admin_name_address{display:block;float:left;width:32.26%;}
+.church_admin_phone_email{display:block;float:left;margin:0;width:32.26%;}
+.church_admin_phone_email a{color:#000!important}
+.church_admin_address_map{display:block;float:left;text-align:right;width:32.26%;}
+
+@media only screen and (max-width:480px)  {.church_admin_name_address,.church_admin_phone_email,.church_admin_address_map{width:100%;height:auto;text-align:left}}
+.church_admin_address:before,.church_admin_address:after{content:"";display:table;}
+.church_admin_address_map:after,.church_admin_address:after{clear:both;}
+.church-admin-sermons-widget .audiojs{overflow:hidden;width:90%}
+.church-map{height:auto;display:block}
+#admin_map{width:1000px;height:250px;margin-bottom:10px}
+table.church_admin,table.church_admin_calendar{empty-cells:show;table-layout:fixed;font-size:10pt;border-collapse:collapse;margin-bottom:5px;}
+
+.church_admin th,.church_admin td,.church_admin_calendar td{border:1px solid gray;border-collapse:collapse;padding:3px !important;vertical-align:top}
+.church_admin th{font-weight:bold;}
+.church_admin tr,.church_admin_calendar tr{vertical-align:top}
+/*.calendar-date-switcher{text-align:center;border:1px solid #D6DED5;background-color:#E4EBE3;}
+.calendar-date-switcher form{margin:0;padding:0;}
+.calendar-date-switcher input{border:1px #D6DED5 solid;font-size:10pt;}
+.calendar-date-switcher select{border:1px #D6DED5 solid;}*/
+
+
+.ca_event_detail{display:table-cell;padding-left:10px;}
+.church-admin-calendar-widget-item img{display:table-cell;margin-right:10px;vertical-align:middle;}
+.calendar-heading{height:25px;text-align:center;border:1px solid #D6DED5;background-color:#E4EBE3;}
+.church_admin_tooltip{position:absolute;z-index:1000;color:#000;padding:3px;width:250px;display:none;box-shadow: 5px 5px 5px #ccc;
+line-height: 1.5em;}
+.church_admin_cal_item{margin-bottom:5px;line-height: 1.3em;}
+.church_admin_empty_cell{background:#E4EBE3;}
+.ca-images{float:left;width:45%;}
+.Postit{width:90%;background-color:#FFFFB3;border-right:3px solid #BBBBBB;border-bottom:3px solid #BBBBBB;border-left:1px solid #DDDDDD;border-top:1px solid #DDDDDD;color:#666666;padding:5px;margin:5px;}
+.Postit h1,.Postit h2{padding:0 0px;font-weight:bold;font-size:1.2em;}
+.Postit ul{margin:0;font-size:0.75em;list-style:none;padding:0em;}
+.Postit a{text-indent:0;padding:0;}
+.Postit li{text-indent:0;padding:0 0 10px 0;margin:0!important;list-style:none;border-bottom:none !important;}
+.church_admin_calendar td{width:14.28%}
+div.pagination{padding:3px;margin:3px;text-align:center;}
+div.pagination a{padding:2px 5px 2px 5px;margin-right:2px;border:1px solid #9aafe5;text-decoration:none;color:#2e6ab1;}
+div.pagination a:hover, div.pagination a:active{border:1px solid #2b66a5;color:#000;background-color:lightyellow;}
+div.pagination span.current{padding:2px 5px 2px 5px;margin-right:2px;border:1px solid navy;font-weight:bold;background-color:#2e6ab1;color:#FFF;}
+div.pagination span.disabled{padding:2px 5px 2px 5px;margin-right:2px;border:1px solid #929292;color:#929292;}
+#map{width:600px;height:500px;margin-right:5px;}
+
+.church_admin_main_menu h2{padding-top:0px;}
+.church_admin_left{width:45%;height:300px;border:1px solid #CCC;background:#FEB801;border-radius:5px;margin:0px 10px 10px 0px;padding:5px 10px;text-align:left;float:left;overflow:auto;}
+.church_admin_left img{max-width:90%;}
+@media only screen and (max-width:480px)  {.church_admin_left{width:95%; margin:0 auto;float:none;}}
+#smallgroup{display:none;}
+ #member_type{display:none;}
+ #individuals{display:none;}
+
+
+#church-admin .red{border:1px solid #f00!important;}
+#church-admin .roles{display:inline-block;}
+#church-admin form li {width:700px;}
+#church-admin label{width:200px; float:left;font-weight:bold;}
+#church-admin input[type="text"]{width:300px;}
+.note{display:inline-block;height: 100%;}
+   
+#church_admin_whoto {position:relative; top:55px;left:10px;width:130px;}
+.church_admin_regular{background:#E6E6E6;}
+#church_admin_message{position:relative;top:60px;left:10px; }
+.sms {width:135px; height:100px;background:transparent;border:1px solid orange;}
+#church_admin_number {position:relative;top:35px;left:10px;}
+#church_admin_number input{width:135px;background:transparent;border:1px solid orange;}
+#church_admin_submit{position:relative;top:95px;left:20px;}  
+.clonedInput {margin-bottom:10px;padding:10px 5px ;}
+#formWrap { padding:10px; position:absolute; float:left; background-color:#000; background:rgba(0,0,0,.5); -moz-border-radius:10px; -webkit-border-radius:10px; border-radius:10px; }
+
+.friends { width:274px; padding:3px 3px 0; margin:0 auto; border:1px solid #aaa; background-color:#fff; cursor:text; }
+.friends span{ display:block !important; width:auto!important; margin:0 3px 3px 0 !important; padding:3px 20px 4px 8px !important; position:relative !important; float:left !important; text-indent:0; background-color:#eee; border:1px solid #333; -moz-border-radius:7px; -webkit-border-radius:7px; border-radius:7px; color:#333; font:normal 11px Verdana, Sans-serif; }
+.friends span a{ position:absolute !important; right:8px !important; top:2px !important; color:#666 !important;  text-decoration:none; }
+.friends span a:hover{ color:#ff0000 !important; }
+.ui-menu .ui-menu-item { white-space:nowrap; padding:0 10px 0 0; }
+
+#map img{max-width:none}
+#iphone{background:url("../images/iphone5.png");width:632px;height:1247px;position:relative}
+.demo-app{position:absolute;left:75px;top:200px}
+.ca-calendar{margin:20px 0;}
+.ca-cal{margin:0 auto;}
+.ca-cal table{margin: 0 0 15px 0;border: 1px solid #eee;text-align: center;}
+.ca-cal th, .ca-cal td {margin: 0 0 15px 0;border: 1px solid #eee;text-align: center;padding: 6px 12px;}
+
+.ca-chosen,.ca-event{color:#F00}
+.ca-chosen{background:#EEE;}
+.ca-today{background:#CCC}
+.ca-date-display{width:50%;position:relative;}
+
+.ca-day-item{width:100%;border-top:1px solid #CCC;border-bottom:1px solid #CCC;padding:10px;margin-top:2px;}
+.ca-day-title{float:left}
+.ca-day-time{width:50%;float:right;text-align:right;color:#000;}
+.ca-day-description{clear:left;color:#b2b2b2;text-align:left;}
+.ca-day-location{clear:left;color:#000;text-align:left;}
+
+
+
+
+
+
+/* New styles */
+
+
+/* Address List */
+.fa-address-card:before{content:"\f2bb";}
+.fa a{text-decoration:none}
+.church-admin-new-directory{width:100%;border:1px #EEE;border-radius:10px;display:table;margin-bottom:20px}
+.church-admin-letters{width:20%;display: table-cell;vertical-align: top;margin: 1px .2em 0 0;font-weight: 400; padding: 0 ;color: #080808;margin-top: 1px;border: 1px solid #eee;border-top-left-radius: 5px;border-bottom-left-radius: 5px;}
+.church-admin-letter{    background-color: #f9f9f9;
+    border-top: 1px solid #d7d7d7;
+    border-bottom: 1px solid #d7d7d7;
+    z-index: 1;}
+.church-admin-address-entry{width:78%; display: table-cell;vertical-align: top;margin: 1px .2em 0 0;font-weight: 400; padding: 0 20px;color: #080808;border: 1px solid #eee;border-top-right-radius: 5px;border-bottom-right-radius: 5px;}
+.church-admin-address-entry label{width:100px;}
+.church-admin-highlighted{background: #eee}
+.church-admin-highlighted-name{    background-color: #d8eefa;}
+.church-admin-item{margin-left:15px; padding:10px 0;}
+.church-admin-name-item{margin-left:15px; padding:10px 15px;}
+.church-admin-household-image{float:right;margin:0 20px;}
+.church-admin-person-image{float:left;margin-right:10px;}
+.church-admin-clearright:after { 
+   content: "."; 
+   visibility: hidden; 
+   display: block; 
+   height: 0; 
+   clear: left;
+}
+/* Attendance */
+
+/* Calendar List */
+table .church_admin_calendar,table .ca-calendar-list-chooser,table .ca-calendar-list{width: 100%; margin: 0 0 15px 0;text-align: left;border-spacing: 0; border-collapse: collapse;}
+
+.ca-calendar-list-chooser td{vertical-align:middle;text-align:center;padding: 6px 24px;}
+.ca-calendar-list-prev,.ca-calendar-list-next{ width:25%}
+.ca-calendar-list-current{width:50%}
+.ca-calendar-list td,.ca-calendar-list th{vertical-align:top;padding: 6px 24px; border: 1px solid #eee;}
+.ca-list-date{width:20%}
+.ca-list-time{width:20%}
+.ca-list-event{width:60%}
+
+/* Podcast */
+.ca-podcast{display:block;position:relative;box-shadow: 0 0 0.5em rgba(2, 2, 2, 0.18);margin-top:10px; }
+.ca-podcast-left-column {
+    width: 57%;
+    float: left;
+    margin-right: 3%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    box-shadow: 0 0 0.5em rgba(2, 2, 2, 0.18);
+}
+.ca-podcast-current h3 {
+	font-style:italic;
+}
+.ca-podcast-list h6 {
+	font-style:italic;
+	text-transform:uppercase;
+}
+.ca-play{position:absolute;top:40%;right:5%;font-size:50px;}
+.ca-podcast-list{width:40%;overflow:auto;margin-bottom:10px;float:left; padding:0 10px;  border: 1px solid #eee;border-radius:5px;box-shadow: 0 0 0.5em rgba(2, 2, 2, 0.18); }
+ul.ca-podcast-tabs{margin-bottom:0;}
+.ca-podcast-tabs{list-style-type:none;background:transparent; border: none;padding: .2em 0 0 0;}
+.ca-podcast-tab-active	{display:block;margin: 1px .2em 0 0;float:left;font-weight: 600; padding: 0 10px;background: #fff;color: #080808;margin-top: 1px;border: 1px solid #eee;border-radius: 4px;border-bottom: #fff;border-bottom-left-radius: 0;border-bottom-right-radius: 0;}
+.ca-podcast-tab	{list-style-type:none;display:block;margin: 1px .2em 0 0;float:left;font-weight: 400; padding: 0 10px;background: #eee;color: #080808;margin-top: 1px;border: 1px solid #eee;border-radius: 4px;border-bottom: #fff;border-bottom-left-radius: 0;border-bottom-right-radius: 0;}
+.ca-podcast-tab-content,.ca-podcast-playing-content{clear:left;border: 1px solid #eee;margin-top:-1px ;margin-bottom:5px;padding:5px;}
+.ca-media-list-item{position:relative}
+.ca-media-list-item h3{font-weight:bold}
+.ca-media-list-item:nth-child(even),.ca-series-list-item:nth-child(even) {background-color: #f8f8f8;border-color: #f8f8f8;}
+.ca-media-list-item,.ca-series-list-item{padding:10px;line-height:1.3;cursor:pointer;    -webkit-margin-before: 0px;
+    -webkit-margin-after:0px;margin:0}
+.ca-media-series-list,.ca-podcast-notes-content,.ca-podcast-bible-content,.ca-series-sermons-list{display:none;}
+.sermonmp3{max-width:100%}
+@media(max-width:450px) 
+{
+	.ca-podcast-left-column,.ca-podcast-list{width:100%;float:none;}
+}
+.ca-merge,ca-add{text-decoration:underline;}
+.ca-bible-date{margin:10px auto;text-align:center}
+.ca-bible-reading{width:280px;margin:0 auto;}  
+.ca-bible-reading a{display:block; border: 1px solid #CF2022; text-align: center;color: #CF2022;text-decoration: none;font-size: 1.4em;padding: 10px;margin: 30px auto 40px auto}
+.ca-bible-reading a:hover{color:#FFF;background:#CF2022}
+.ca_create_user,.ca_connect_user{text-decoration:underline;}
+
+.form-group {
+    margin-bottom: 15px;
+}
+.form-control {
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+.checkbox, .radio {
+    position: relative;
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.ca-active{text-decoration:underline}
+
+/* The Modal (background) */
+.ca-modal {
+  display: block; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.ca-modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button */
+.ca-close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.ca-close:hover,
+.ca-close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+#church-admin-mobile-menu{display:none;}
+@media only screen and (max-width:480px)  {
+#church-admin-menu{
+  display:none;
+}
+#church-admin-mobile-menu{display:block}
+.church-admin-content{flex: 0 0 100%;}
+}
+.wa_box{
+  width:80%;
+  border:1px solid grey;
+  border-radius:3px; 
+  padding:5px;
+}
+

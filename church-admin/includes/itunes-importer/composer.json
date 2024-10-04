@@ -1,0 +1,5 @@
+{
+    "require": {
+        "lukaswhite/podcast-feed-parser": "^1.2"
+    }
+}
