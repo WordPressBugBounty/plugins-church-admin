@@ -1,7 +1,7 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit('You need Jesus!'); // Exit if accessed directly
 
-function ca_podcast_settings()
+function church_admin_podcast_settings()
 {
 /**
  *
@@ -13,12 +13,12 @@ function ca_podcast_settings()
  * @version  0.1
  * 
  */
-$settings=get_option('ca_podcast_settings');
+$settings=get_option('church_admin_podcast_settings');
 $upload_dir = wp_upload_dir();
 $path=$upload_dir['basedir'].'/sermons/';
 $url=$upload_dir['baseurl'].'/sermons/';
     
-    global $wpdb,$ca_podcast_settings;
+    global $wpdb,$church_admin_podcast_settings;
     echo'<h2>'.esc_html( __('Podcast Settings for RSS file','church-admin' ) ).'</h2>';
     if(!empty( $settings )){echo'<p><a href="'.$url.'podcast.xml">Podcast RSS file</a></p>';}
    
@@ -238,8 +238,8 @@ $url=$upload_dir['baseurl'].'/sermons/';
                 case 'yes':$xml['explicit']='yes';break;
                 default:$xml['explicit']='no';
             }
-            $image=wp_get_attachment_image_src( church_admin_sanitize($_POST['image_id']),'full' );
-            //church_admin_debug(print_r( $image,TRUE) );
+            $image=wp_get_attachment_image_src( church_admin_premium_sanitize($_POST['image_id']),'full' );
+            //church_admin_premium_debug(print_r( $image,TRUE) );
             if(!empty( $image) )  {$image_path=$image[0];}else{$image_path="";}
             //only allow valid category
             if(in_array( $_POST['category'],$cats) )  {$xml['category']=sanitize_text_field( stripslashes($_POST['category'] ) );}else{$xml['category']='Religion &amp; Spirituality -Christianity';}
@@ -256,7 +256,7 @@ $url=$upload_dir['baseurl'].'/sermons/';
                 'summary'=>$xml['summary'],
                 'description'=>$xml['description'],
                 'owner_name'=>$xml['owner_name'],
-                'owner_email'=>church_admin_sanitize( $_POST['owner_email'] ),
+                'owner_email'=>church_admin_premium_sanitize( $_POST['owner_email'] ),
                 'image_id'=>$xml['image_id'],
                 'image'=>$image_path,
                 'category'=>$xml['category'],
@@ -271,11 +271,11 @@ $url=$upload_dir['baseurl'].'/sermons/';
             
             );
             
-            update_option('ca_podcast_settings',$new_settings);
+            update_option('church_admin_podcast_settings',$new_settings);
             
             echo'<div class="notice notice-success inline"><p><strong>Podcast Settings Updated<br><a href="'.$url.'podcast.xml">Check Podcast RSS file</a></p></div>';
             require_once(plugin_dir_path(dirname(__FILE__) ).'includes/sermon-podcast.php');
-            ca_podcast_xml();
+            church_admin_podcast_xml();
             
         }//end process
         else

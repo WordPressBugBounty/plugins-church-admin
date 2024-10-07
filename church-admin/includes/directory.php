@@ -168,34 +168,7 @@ function church_admin_view_person( $people_id=NULL)
 		if(!empty( $data->mobile) )echo'<tr><th scope="row">'.esc_html( __( 'Mobile','church-admin') ).'</th><td><a href="call:'.esc_html( $data->mobile ).'">'.esc_html( $data->mobile).'</a></td></tr>';
 		if(!empty( $data->email) )echo'<tr><th scope="row">'.esc_html( __( 'Email','church-admin') ).'</th><td><a href="call:'.esc_html( $data->email ).'">'.esc_html( $data->email).'</a></td></tr>';
 		echo'</table>';
-		echo'<h3>'.esc_html( __( 'Church Metadata','church-admin') ).'</h3>';
-		echo'<table class="form-table">';
-		//site
-		if(!empty( $data->site_id) )$site_details=$wpdb->get_var('SELECT venue FROM '.$wpdb->prefix.'church_admin_sites WHERE site_id="'.intval( $data->site_id).'"');
-		if(!empty( $site_details) )echo'<tr><th scope="row">'.esc_html( __( 'Site attended','church-admin') ).'</th><td>'.esc_html( $site_details).'</td></tr>';
-		//small groups
-		$groupIDs=church_admin_get_people_meta( $people_id,'smallgroup');
-
-		if(!empty( $groupIDs) )
-		{
-			foreach( $groupIDs AS $groupID)	$group[]=$wpdb->get_var('SELECT group_name FROM '.$wpdb->prefix.'church_admin_smallgroup WHERE id="'.(int) $groupID.'"');
-			if(!empty( $group) )echo'<tr><th scope="row">'.esc_html( __( 'Small group','church-admin') ).'</th><td>'.esc_html( implode( ", ", $group ) ).'</td></tr>';
-		}
-		//ministries
-		$mins=array();//temp stor for person'sministries
-		$ministries=church_admin_ministries();
-
-		$person_ministries=$wpdb->get_results('SELECT ID FROM '.$wpdb->prefix.'church_admin_people_meta WHERE people_id="'.(int)$people_id .'" AND meta_type="ministry"');
-
-		if(!empty( $person_ministries) )
-		{
-			foreach( $person_ministries AS $person_ministry)$mins[]=$ministries[$person_ministry->ID];
-			echo'<tr><th scope="row">'.esc_html( __( 'Ministries','church-admin') ).'</th><td>'.esc_html( implode(", ",$mins) ).'</td></tr>';
-		}
 		
-		
-		echo'</table>';
-
 		$others=$wpdb->get_results('SELECT *,CONCAT_WS(" ",first_name,prefix,last_name) AS name FROM '.$wpdb->prefix.'church_admin_people WHERE household_id="'.intval( $data->household_id).'" AND people_id!="'.(int)$people_id.'" ORDER BY people_order ASC');
 		if(!empty( $others) )
 		{
@@ -453,7 +426,7 @@ function church_admin_address_list( $member_type_id=0)
 function church_admin_edit_household( $household_id=NULL)
 {
 
-    global $wpdb,$church_admin_version;
+    global $wpdb;
 	$member_type=church_admin_member_types_array();
     if(is_user_logged_in() )$user=wp_get_current_user();
     
@@ -552,9 +525,9 @@ function church_admin_edit_people( $people_id=NULL,$household_id=NULL)
 	church_admin_debug('*** church admin edit people ****');
 	church_admin_debug(func_get_args());
 	$onboarding = !empty($people_id) ? 0 : 1; //set onboarding if no people id
-    global $wpdb,$people_type,$ministries,$current_user;
+    global $wpdb,$people_type,$current_user;
 	$member_type=church_admin_member_types_array();
-	$ministries=church_admin_ministries();
+	
 	$church_admin_marital_status=get_option('church_admin_marital_status');
 	if ( empty( $church_admin_marital_status) )
 	{
@@ -594,27 +567,6 @@ function church_admin_edit_people( $people_id=NULL,$household_id=NULL)
     	$output=church_admin_save_person(1,$people_id,$household_id,$onboarding);
         update_option('addressUpdated',time() );
 
-		//new small group
-		if(!empty( $_POST['group_name'] ) )
-		{
-			$check=$wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'church_admin_smallgroup WHERE group_name="'.$sql['group_name'].'" AND whenwhere="'.$sql['when'].'" AND address="'.$sql['where'].'"');
-
-			if(!empty( $check) )
-			{//update
-				$ldrs=esc_sql(serialize(array(1=>$people_id) ));
-				$query='UPDATE '.$wpdb->prefix.'church_admin_smallgroup SET leadership="'.$ldrs.'",group_name="'.$sql['group_name'].'",whenwhere="'.$sql['when'].'" AND address="'.$sql['where'].'" WHERE id="'.esc_sql( $check->id).'"';
-				$wpdb->query( $query);
-				$sg_id=$check->id;
-			}//end update
-			else
-			{//insert
-				$leaders=maybe_serialize(array(1=>array(1=>$people_id) )) ;
-				$query='INSERT INTO  '.$wpdb->prefix.'church_admin_smallgroup (group_name,leadership,whenwhere,address) VALUES("'.$sql['group_name'].'","'.esc_sql($leaders).'","'.$sql['when'].'","'.$sql['where'].'")';
-				$wpdb->query( $query);
-				$sg_id=$wpdb->insert_id;
-			}//insert
-			church_admin_update_people_meta( $sg_id,$people_id,'smallgroup');
-		}
 
 
 		church_admin_head_of_household_tidy( $household_id);
@@ -677,8 +629,7 @@ function church_admin_edit_people( $people_id=NULL,$household_id=NULL)
 
 
 		echo'<table class=form-table"><tr><th scope="row"><input type="hidden" name="edit_people" value="yes" /><input class="button-primary" type="submit" value="'.esc_html( __( 'Save Details','church-admin') ).'&raquo;" /></td></tr></tbody></table></form>';
-		require_once(plugin_dir_path(dirname(__FILE__) ).'includes/comments.php');
-		if(!empty( $people_id) )church_admin_show_comments('people',(int)$people_id);
+		
 	}//form
     
 
@@ -1450,40 +1401,8 @@ function church_admin_search( $search)
 
 	$people_id=church_admin_get_one_id( $search);
 	$serial='s:'.strlen( $people_id).':"'.$people_id.'";';
-	$serviceResults=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_services');
-	if(!empty( $serviceResults) )
-	{
-		$services=array();
-		foreach( $serviceResults AS $serviceRow)$services[$serviceRow->service_id]=$serviceRow->service_name;
-	}
-	/**********************************
-	*
-	* Search rota
-	*
-	***********************************/
- 	if(!empty( $people_ids) )  {
-		foreach( $people_ids AS $key=>$people_id)
-		{
-		$sql='SELECT a.service_name,a.service_time, b.rota_task,c.rota_date,a.service_id,c.people_id FROM '.$wpdb->prefix.'church_admin_services a, '.$wpdb->prefix.'church_admin_rota_settings b, '.$wpdb->prefix.'church_admin_new_rota c WHERE a.service_id=c.service_id AND c.mtg_type="service" AND c.rota_task_id=b.rota_id  AND c.people_id="'.(int)$people_id.'" AND c.rota_date>=CURDATE() ORDER BY c.rota_date ASC';
-
-		$dateResults=$wpdb->get_results( $sql);
-		if(!empty( $dateResults) )
-		{
-			echo'<h2>'.esc_html( __( 'Schedule results for ','church-admin') ).esc_html( $search).'</h2>';
-			echo'<table class="widefat striped">';
-			$thead='<tr><th>'.esc_html( __( 'Date','church-admin') ).'</th><th>'.esc_html( __( 'Service','church-admin') ).'</th><th>'.esc_html( __( 'Name','church-admin') ).'</th><th>'.esc_html( __( 'Job','church-admin') ).'</th></tr>';
-			echo'<thead>'.$thead.'</thead><tbody>';
-			foreach( $dateResults AS  $dateRow)
-			{
-					$edit_url=wp_nonce_url('admin.php?page=church_admin/index.php&section=rota&action=edit-rota&rota_date='.esc_html( $dateRow->rota_date).'&amp;service_id='.intval( $dateRow->service_id).'&amp;mtg_type=service','edit-rota');
-				echo'<tr><td><a href="'.$edit_url.'">'.mysql2date(get_option('date_format'),$dateRow->rota_date).'</a></td><td>'.esc_html( $dateRow->service_name.' '.$dateRow->service_time).'</td><td class="ca-names">'.esc_html(church_admin_get_person( $dateRow->people_id) ).'</td><td>'.esc_html( $dateRow->rota_task).'</td></tr>';
-
-			}
-
-				echo'</tbody><tfoot>'.$thead.'</tfoot></table>';
-		}
-	}
-	}
+	
+	
 	//search podcast
 
 	$results=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_sermon_files WHERE file_title LIKE "%'.esc_sql($s).'%" OR file_description LIKE "%'.esc_sql($s).'%" OR speaker LIKE "%'.esc_sql( $serial).'%" OR speaker LIKE "%'.esc_sql($s).'%" ORDER BY pub_date DESC');
@@ -1707,11 +1626,11 @@ function church_admin_import_csv()
 					case'city':$city=$column;break;
 					case'state':$state=$column;break;
 					case'zip_code':$zipcode=$column;break;
-					case'small_group':$small_group=$column;break;
+					
 					case'member_type':$member_type=$column;break;
 					case'people_type':$people_type=$column;break;
 					case'people_order':$people_order=$column;break;
-					case'ministries':$ministries=$column;break;
+					
 					case 'custom1':$custom1=$column;break;
 					case 'custom2':$custom2=$column;break;
 					case 'custom3':$custom3=$column;break;
@@ -1905,7 +1824,7 @@ function church_admin_import_csv()
 				if(!isset( $custom8)||empty( $data[$custom8] ) )  {$data['custom8']=NULL;}else{$data['custom8']=$data[$custom8];}
 				if(!isset( $custom9)||empty( $data[$custom9] ) )  {$data['custom9']=NULL;}else{$data['custom9']=$data[$custom9];}
 				if(!isset( $custom10)||empty( $data[$custom10] ) )  {$data['custom10']=NULL;}else{$data['custom10']=$data[$custom10];}
-                if(!isset( $small_group)||empty( $data[$small_group] ) )  {$data['small_group']=1;}else{$data['small_group']=$data[$small_group];} 
+                
                 if(!isset( $mail_send)||empty( $data[$mail_send] ) )  {$data['mail_send']=0;}else{$data['mail_send']=1;} 
                 if(!isset( $email_send)||empty( $data[$email_send] ) )  {$data['email_send']=0;}else{$data['email_send']=1;} 
 				if(!isset( $news_send)||empty( $data[$news_send] ) )  {$data['news_send']=0;}else{$data['news_send']=1;} 
@@ -1945,55 +1864,8 @@ function church_admin_import_csv()
 				}
 				//news send
 				church_admin_update_people_meta(NULL,$people_id,'posts',date('Y-m-d'));
-                //small group
-                //quick check to see if there is an unattached group
-                $check=$wpdb->get_var('SELECT group_name FROM '.$wpdb->prefix.'church_admin_smallgroup WHERE group_name="'.esc_sql( __( 'Unattached','church-admin') ).'" AND id=1');
-                if ( empty( $check) )$wpdb->query('INSERT INTO '.$wpdb->prefix.'church_admin_smallgroup (group_name, group_day,id)VALUES("'.esc_sql( __( 'Unattached','church-admin') ).'",1,1)');    
-                if( $data['small_group']==1)
-                {
-                    church_admin_update_people_meta(1,$people_id,'smallgroup');
-                }
-                else
-                {
-                    $smallGroupID=$wpdb->get_var('SELECT id FROM '.$wpdb->prefix.'church_admin_smallgroup WHERE   group_name="'.esc_sql( $data['small_group'] ).'"');
-                    if(!empty( $smallGroupID) )
-                    {
-                        church_admin_update_people_meta(intval( $smallGroupID),$people_id,'smallgroup');
-                    }
-                    else
-                    {
-                        $wpdb->query('INSERT INTO '.$wpdb->prefix.'church_admin_smallgroup (group_name,group_day)VALUES("'.esc_sql( $data['small_group'] ).'",0)');
-                        $smallGroupID=$wpdb->insert_id;
-                        church_admin_update_people_meta(intval( $smallGroupID),$people_id,'smallgroup');
-                    }
-                }
-				//Ministries
-
-				if(isset( $ministries) && !empty( $data[$ministries] ) )
-				{
-					$temp = $data[$ministries];
-					//echo '<br> ministries= '.$temp;
-					$ministryarray=explode(";",$temp);
-					foreach( $ministryarray AS $key)
-					{
-						//echo '<br> ministry= '.$key;
-						$sql='SELECT ID FROM '.$wpdb->prefix.'church_admin_ministries WHERE ministry="'.esc_sql(ucwords($key)).'"';
-						//echo '<br> sql= '.$sql;
-						$id=$wpdb->get_var( $sql);
-						if(empty($id)){
-							//add ministry
-							$wpdb->query('INSERT INTO '.$wpdb->prefix.'church_admin_ministries (ministry,safeguarding,parentID,volunteer)VALUES("'.esc_sql(ucwords($key)).'",0,NULL,1)');
-							$id=$wpdb->insert_id;
-						}
-						if(!empty( $id) )
-						{
-							//echo '<br> ministry id for '.$key.' is '.$id;
-							$sql='INSERT INTO '.$wpdb->prefix.'church_admin_people_meta (people_id,ID,meta_type)VALUES("'.(int)$people_id.'","'.esc_sql( $id).'","ministry")';
-							$wpdb->query( $sql);
-						}
-
-					}
-				}
+                
+				
 				if(isset( $data['custom1'] ) )
 				{
 
@@ -2186,9 +2058,9 @@ function church_admin_import_csv()
 				echo'<option value="city">'.esc_html( __( 'City','church-admin') ).'</option>';
 				echo'<option value="state">'.esc_html( __( 'State','church-admin') ).'</option>';
 				echo'<option value="zip_code">'.esc_html( __( 'Zip Code','church-admin') ).'</option>';
-				echo'<option value="small_group">'.esc_html( __( 'Small Group','church-admin') ).'</option>';
+				
 				echo'<option value="member_type">'.esc_html( __( 'Member Type','church-admin') ).'</option>';
-				echo'<option value="ministries">'.esc_html( __( 'Ministries','church-admin') ).'</option>';
+				
 				echo'<option value="people_type">'.esc_html( __( 'People Type','church-admin') ).'</option>';
 				echo'<option value="show_me">'.esc_html( __( 'Show me (1 or 0)','church-admin') ).'</option>';
 				echo'<option value="custom1">'.esc_html( __( 'Custom field 1','church-admin') ).'</option>';
@@ -2444,7 +2316,7 @@ function church_admin_save_household( $member_type_id,$exclude,$household_id,$on
 function church_admin_edit_people_form( $x=1,$data=null,$exclude=array(),$onboarding=0 )
 {
 	//initialise variables and arrays
-	global $wpdb,$people_type,$current_user,$ministries;
+	global $wpdb,$people_type,$current_user;
 	church_admin_debug('**** church_admin_edit_people_form ****');
 	if ( empty( $exclude) ){
 		$exclude=array();
@@ -2459,6 +2331,7 @@ function church_admin_edit_people_form( $x=1,$data=null,$exclude=array(),$onboar
 	$church_admin_marital_status= get_option('church_admin_marital_status');
 
 	$member_type=church_admin_member_types_array();
+	
 	$people_type=get_option('church_admin_people_type');
 	$name= !empty($data) ? church_admin_formatted_name( $data): '';
 	
@@ -2761,89 +2634,12 @@ function church_admin_edit_people_form( $x=1,$data=null,$exclude=array(),$onboar
 			$out.='<input type="hidden" data-name="member_type_id"  name="member_type_id'.(int)$x.'" value="'.$member_type_id.'" />';
 		
 	}
-   	//small groups
-	if(!in_array('small-groups',$exclude) )
-	{
-		$out.='<h3>'.esc_html( __( 'Small Group','church-admin') ).'</h3>';
-		$smallgroups=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_smallgroup');
-		if(!empty( $smallgroups) )
-		{
-			if(!empty( $data->people_id) )$dataSmallGroups=church_admin_get_people_meta( $data->people_id,'smallgroup');
-			foreach( $smallgroups AS $smallgroup)
-			{
-				$out.='<div class="checkbox"><label><input type="checkbox" data-name="smallgroup_id"  name="smallgroup_id'.(int)$x.'[]" value="'.intval( $smallgroup->id).'" ';
-				if(!empty( $dataSmallGroups) && in_array( $smallgroup->id,$dataSmallGroups) ) $out.=' checked="checked" ';
-				$out.='/> '.esc_html( $smallgroup->group_name).'</label></div>'."\r\n";
-			}
-			
-		}
-		
-		$out.='<div class="church-admin-form-group"><label>'.esc_html( __( 'Or add a new small group','church-admin') ).'</label><input id="smallgroup'.(int)$x.'" data-name="smallgroup" class="church-admin-form-control" type="text" name="smallgroup'.(int)$x.'" placeholder="'.esc_html( __( 'Add New Small Group','church-admin') ).'" />';
-		$out.= '</div>';
-	}
+ 
 
-	if(!in_array('classes',$exclude) )
-	{
-		//classes
-		$classes=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_classes WHERE end_date>NOW()');
-		if(!empty( $classes) )
-		{
-			$out.='<h3>'.esc_html( __( 'Classes','church-admin') ).'</h3>';
-			if(!empty( $data->people_id) )$dataClasses=church_admin_get_people_meta( $data->people_id,'classes');
 
-			foreach( $classes AS $class)
-			{
-				$out.='<div class="checkbox"><label><input type="checkbox" data-name="class_id"  name="class_id'.(int)$x.'[]" value="'.(int)$class->class_id.'" ';
-				if(!empty( $dataClasses) && in_array( $class->class_id,$dataClasses) ) $out.=' checked="checked" ';
-				$out.='/> '.esc_html(sprintf(__( '%1$s starting %2$s','church-admin' ) ,$class->name,mysql2date(get_option('date_format'),$class->next_start_date) ) ).'</label></div>'."\r\n";
-			}
-			
-		}
-	}
 	
 
 	
-	/*************************************
-	*
-	*	Ministries, for authorised users
-	*
-	*************************************/
-	//These next two lines  needed for prayer and bible readings
-	if(!empty( $data->people_id) )$personsMinistries=church_admin_get_people_meta( $data->people_id,'ministry');
-	
-	if( $directory_permission&&!in_array('ministries',$exclude) ){
-		//ministries if allowed
-
-		$out.='<h3 >'.esc_html( __( 'Ministries','church-admin') ).'</h3>';
-		foreach( $ministries AS $ministry_id=>$ministry)
-		{
-			$out.='<div class="checkbox"><label><input type="checkbox" data-name="ministry_id" name="ministry_id'.(int)$x.'[]" value="'.intval( $ministry_id).'" ';
-			if(!empty( $personsMinistries) && in_array( $ministry_id,$personsMinistries) ) $out.=' checked="checked" ';
-			$out.='/>&nbsp;'.esc_html( $ministry).'</label></div>';
-
-		}
-		
-	}
-
-	//site
-	$sites=$wpdb->get_results('SELECT venue,site_id FROM '.$wpdb->prefix.'church_admin_sites ORDER BY venue ASC');
-	if( $wpdb->num_rows>1){
-		$out.='<div class="church-admin-form-group"><label >'.esc_html( __( 'Site','church-admin') ).'</label> <select name="site_id'.(int)$x.'" data-name="site_id" class="church-admin-form-control">';
-		$current_site_id = !empty($data->site_id)?$data->site_id:null;
-		foreach( $sites AS $site)
-		{
-			if(!empty($site->site_id)){
-				$out.='<option value="'.(int)$site->site_id.'" '.selected($current_site_id,$site->site_id,FALSE).'>'.esc_html( $site->venue).'<option>';
-			}
-		}
-		$out.='</select></div>';
-    }
-    else{
-        if(!empty( $sites[0]->venue) )  {$site=esc_html( $sites[0]->venue);}else{$site='&nbsp;';}
-        if(!empty( $sites[0]->site_id) )  {$site_id=intval( $sites[0]->site_id);}else{$site_id=1;}
-		
-    	$out.='<input type="hidden" data-name="site_id" name="site_id'.(int)$x.'" value="'.$site_id.'" />';
-    }
 
     
 
@@ -3517,15 +3313,7 @@ function church_admin_save_person( $x=1,$people_id=NULL,$household_id=NULL,$excl
 		if(!empty( $_POST['prayer_chain'.$x] ) )  {church_admin_update_people_meta(1,$people_id,"prayer-requests",date('Y-m-d'));}
 		if(!empty( $_POST['bible_readings'.$x] ) )  {church_admin_update_people_meta(1,$people_id,"bible-readings",date('Y-m-d'));}
 		
-		$wpdb->query('DELETE FROM '.$wpdb->prefix.'church_admin_people_meta WHERE people_id="'.(int)$people_id.'" AND meta_type="ministry"');
-		if(!empty( $_POST['ministry_id'.$x] ) ){
-
-			foreach( $_POST['ministry_id'.$x] AS $key=>$id)
-			{
-					church_admin_update_people_meta( $id,$people_id,"ministry");
-			}
-
-		}
+		
 
 		
 		/********************************************************
@@ -3842,14 +3630,9 @@ function church_admin_bulk_geocode()
 			echo'<p><button class="button-primary btn btn-info" id="geocode_address">'.esc_html( __( 'Step 1 Click to batch geocode household addresses','church-admin') ).'</button></p>';
 			echo '<p><input type="hidden" name="batch_geocode" value="TRUE" /><input type="submit" id="submit_batch_geocode" disabled="disabled" value="'.esc_html( __( 'Step 2 - Save batched geocode','church-admin') ).'" /></p>';
 			echo'<div id="map" style="width:500px;height:500px"></div>';
-            $site=$wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'church_admin_sites LIMIT 1');
-            if(!empty($site->lat) && !empty($site->lng) )
-            {
-                echo'<script>var beginLat = '.esc_html( $site->lat).';var beginLng = '.esc_html( $site->lng).';</script>';
-            }
-            else{
+            
 				echo'<script>var beginLat = 51.50351129583287;var beginLng = -0.148193359375;</script>';
-			}
+			
 				foreach( $results AS $row)
 				{
 					echo '<p >'.esc_html( $row->address).'<input type="hidden" id="'.(int)$row->household_id.'" class="address" value="'.esc_html( $row->address).'" /></p>';
@@ -3882,28 +3665,47 @@ function church_admin_bulk_not_private()
 
 function church_admin_potential_duplicates()
 {
+	echo'<h2>'.esc_html( __( 'Check for duplicate entries','church-admin') ).'</h2>';
     global $wpdb;
     $nameResults=$wpdb->get_results('SELECT CONCAT_WS(" ",first_name,last_name) AS name, COUNT(CONCAT_WS(" ",first_name,last_name) ) AS count FROM '.$wpdb->prefix.'church_admin_people GROUP BY CONCAT_WS(" ",first_name,last_name) HAVING COUNT(name)>1');
     if(!empty( $nameResults) )
     {
-        echo'<h2>'.esc_html( __( 'Here are some potential duplicate entries','church-admin') ).'</h2>';
+        echo'<h3>'.esc_html( __( 'Here are some potential duplicate entries','church-admin') ).'</h3>';
         echo '<p><strong>'.esc_html( sprintf( __( '%1$s people duplicated', 'church-admin' ), $wpdb->num_rows) ).'</strong></p>';
         echo'<p>'.esc_html( __( 'Carefully check the results to see which one to keep!','church-admin') ).'</p>';
         foreach( $nameResults AS $nameRow)
         {
             echo'<h2>'.esc_html( $nameRow->name).' x'.intval( $nameRow->count).'</h2>';
-            $householdResults=$wpdb->get_results('SELECT household_id FROM '.$wpdb->prefix.'church_admin_people WHERE CONCAT_WS(" ",first_name,last_name)="'.esc_sql( $nameRow->name).'"');
+            $householdResults=$wpdb->get_results('SELECT a.*,b.* FROM '.$wpdb->prefix.'church_admin_people a, '.$wpdb->prefix.'church_admin_household b WHERE a.household_id=b.household_id AND CONCAT_WS(" ",a.first_name,a.last_name)="'.esc_sql( $nameRow->name).'"');
             if(!empty( $householdResults) )
-            foreach( $householdResults AS $householdRow)
             {
-                
-                 echo church_admin_new_household_display( $householdRow->household_id);
-            }
-            echo'<hr style="border:10px solid #CCC;border-radius:5px" />';
+				echo'<table class="widefat"><thead><tr><th>'.esc_html(__('Delete','church-admin')).'</th><th>'.esc_html(__('Name','church-admin')).'</th><th>'.esc_html(__('Cell','church-admin')).'</th><th>'.esc_html(__('Address','church-admin')).'</th><th>'.esc_html(__('Others in household','church-admin')).'</th></tr></thead><tbody>';
+				foreach( $householdResults AS $householdRow)
+            	{
+					$others=array();
+					$othersRes=$wpdb->get_results('SELECT *,CONCAT_WS(" ",first_name,prefix,last_name) AS name FROM '.$wpdb->prefix.'church_admin_people WHERE household_id="'.(int)$householdRow->household_id.'" AND people_id!="'.(int)$householdRow->people_id.'" ORDER BY people_order ASC');
+					if(!empty($othersRes)){
+						foreach($othersRes AS $othersRow){
+							$others[]=$othersRow->name;
+						}
+						
+					}
+					$othersOutput = !empty($others) ? implode(',',$others) : '';
+               		$delete = '<a href="'.wp_nonce_url('admin.php?page=church_admin/index.php&action=delete_people&people_id='.(int)$householdRow->people_id,'delete_people').'">'.esc_html(__('Delete','church-admin')).'</a>';
+					$address = !empty($householdRow->address) ? $householdRow->address :'';
+					$name = church_admin_formatted_name($householdRow);
+					$cell = !empty($householdRow->mobile) ? $householdRow->mobile :'';
+					echo'<tr><td>'.$delete.'</td><td>'.esc_html($name).'</td><td>'.esc_html($mobile).'</td><td>'.esc_html($address).'</td><td>'.esc_html($othersOutput).'</td></tr>';
+       			}	
+				echo'</tbody></table>';
+			}
+            
         }
         
     }
-    
+	else{
+		echo'<p>'.__('There are no duplicates','church-admin').'</p>';
+	}
     
 }
 
@@ -4013,13 +3815,7 @@ function church_admin_new_household_display( $household_id)
 		return;
     }
 	
-	/****************
-	 * Search form
-	 ***************/
-	echo'<h2>'.__('People Section').'</h2>';
-	church_admin_module_dropdown('people');
-	church_admin_search_form();
-
+	
     echo'<div class="church-admin-household">';
     /************************************************
      * Output Household Address details
@@ -4048,29 +3844,7 @@ function church_admin_new_household_display( $household_id)
 		echo'</select>';
 		echo'<input type="submit" class="button-secondary" value="'.esc_html( __( 'Move','church-admin') ).'"></p></form></div>';
 		
-		//move people to site
-		$sites=$wpdb->get_results('SELECT venue,site_id FROM '.$wpdb->prefix.'church_admin_sites ORDER BY venue ASC');
-		if( $wpdb->num_rows>1)
-		{
-			echo '<div class="church-admin-household-site"><form action="admin.php?page=church_admin/index.php&amp;section=people&amp;action=display-household&household_id='.(int)$household_id.'&section=people" method="POST" />';
-			wp_nonce_field('display-household');
-			echo '<input type="hidden" name="move_site_id" value="'.(int)$household_id.'" />';
-			echo '<p>'.esc_html( __( 'Move household to site','church-admin') ).'</label> <select name="site_id" data-name="site_id" >';
-			$first=$option='';
-			foreach( $sites AS $site)
-			{
-				if(!empty( $data->site_id)&& $data->site_id==$site->site_id)
-				{
-					$first.='<option value="'.(int)$site->site_id .'" selected="selected">'.esc_html( $site->venue).'<option>';
-				}
-				else
-				{
-					$option.='<option value="'.(int)$site->site_id .'">'.esc_html( $site->venue).'<option>';
-				}
-			}
-			echo $first.$option.'</select>';
-			echo'<input type="submit" class="button-secondary" value="'.esc_html( __( 'Move','church-admin') ).'"></p></form></div>';
-		}
+		
 	
 		/*************************************
 		 * Head of household
@@ -4222,6 +3996,7 @@ function church_admin_new_household_display( $household_id)
      * People
      ************************************/
 	$member_type=church_admin_member_types_array();
+	
     foreach ( $people as $person) 
 	{
         echo'<div class="church-admin-person-details">';
@@ -4614,10 +4389,7 @@ function church_admin_merge_people( $person1_id,$person2_id)
 					$first=esc_html( $marital_status[$data1->$fieldName] );
 					$second=esc_html( $marital_status[$data2->$fieldName] );
 				break;
-				case 'site':
-					if( $data1->$fieldName!=0)  {$first=$wpdb->get_var('SELECT venue FROM '.$wpdb->prefix.'church_admin_sites WHERE site_id="'.esc_sql( $data1->$fieldName).'"');}else{$first='';}
-					if( $data2->$fieldName!=0)  {$second=$wpdb->get_var('SELECT venue FROM '.$wpdb->prefix.'church_admin_sites WHERE site_id="'.esc_sql( $data2->$fieldName).'"');}else{$secnd='';}
-				break;
+				
 				case 'member_type':
 					$first=esc_html( $member_type[$data1->$fieldName] );
 					$second=esc_html( $member_type[$data2->$fieldName] );
@@ -4927,11 +4699,11 @@ function church_admin_bulk_edit_custom_field(){
 		switch($custom_field_data['section']){
 
 			case 'people':
-				$sql='SELECT a.*, b.data FROM '.$wpdb->prefix.'church_admin_people a LEFT JOIN '.$wpdb->prefix.'church_admin_custom_fields_meta b ON a.people_id = b.people_id AND b.section="people" AND b.custom_id="'.(int)$custom_id.'"';
+				$sql='SELECT a.*, b.data FROM '.$wpdb->prefix.'church_admin_people a LEFT JOIN '.$wpdb->prefix.'church_admin_custom_fields_meta b ON a.people_id = b.people_id AND b.section="people" AND b.custom_id="'.(int)$custom_id.'" ORDER BY a.last_name,a.first_name';
 
 			break;
 			case 'household':
-				$sql='SELECT a.*,b.data FROM '.$wpdb->prefix.'church_admin_people a LEFT JOIN '.$wpdb->prefix.'church_admin_custom_fields_meta b ON a.household_id=b.household_id AND b.section="household" AND b.custom_id="6" WHERE a.head_of_household=1;';
+				$sql='SELECT a.*,b.data FROM '.$wpdb->prefix.'church_admin_people a LEFT JOIN '.$wpdb->prefix.'church_admin_custom_fields_meta b ON a.household_id=b.household_id AND b.section="household" AND b.custom_id="6" WHERE a.head_of_household=1 ORDER BY a.last_name,a.first_name;';
 			
 			break;
 

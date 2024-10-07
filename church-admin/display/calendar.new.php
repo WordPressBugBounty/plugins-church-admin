@@ -14,11 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) exit('You need Jesus!'); // Exit if accessed direc
  
 function church_admin_display_new_calendar($cat_id,$fac_ids)
 {
-    $licence =get_option('church_admin_app_new_licence');
-    if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-        return '<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-        
-    }
+   
     $out='';
     $out.='<script>var cat_id="'.esc_attr($cat_id).'";var facilities_ids="'.esc_attr($fac_ids).'";</script>';
     
@@ -56,7 +52,7 @@ function church_admin_calendar_container($cat_id,$fac_ids)
     $todayEvents='<li>'.wp_kses_post(implode('<br>',array_filter( $events) )).'</li>';
     
     $display_categories = $display_facilities = array();
-    $facilities=church_admin_calendar_facilities_array();
+    
 	$categories=church_admin_calendar_categories_array();
     if(!empty($cat_id))
     {
@@ -291,7 +287,7 @@ function church_admin_day_events_array( $date,$cat_id,$fac_ids)
     global $wpdb;
 
 
-    $facilities=church_admin_calendar_facilities_array();
+    
 	$categories=church_admin_calendar_categories_array();
 
 

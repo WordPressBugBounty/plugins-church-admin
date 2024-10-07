@@ -232,6 +232,11 @@ function church_admin_shortcode_generator()
                         'options'=>array('admin_email'),
                         'type'=>'no-content'
                 ),
+        'toilet-message'=>array('title'=>esc_html( __('Toilet messaging','church-admin' ) ),
+                        'description'=>esc_html( __('For childrens workers to SMS a parent when a child needs taking to the toilet. Choose the right ministry to restrict access!','church-admin' ) ),
+                        'options'=>array('ministry_id' ),
+                        'type'=>'no-content'
+                ),
         'unit'=>array('title'=>esc_html( __('Units','church-admin' ) ),
                         'description'=>esc_html( __('Displays details for a unit','church-admin' ) ),
                         'options'=>array('unit_id' ),
@@ -333,6 +338,11 @@ function church_admin_shortcode_generator()
                                 sort($mts);
                                 $options[]='member_type_id="'.esc_attr(implode(',',$mts)).'"';
                             }
+                        break;
+                        case 'ministry_id':
+                            $mins = array();
+                            $value=!empty($postedoption )? $postedoption:'';
+                            $options[]='ministry_id="'.(int)$value.'"';
                         break;
                         case 'save_as_member_type_id':
                             $value=!empty($postedoption )? $postedoption:1;
@@ -556,6 +566,7 @@ function church_admin_shortcode_generator()
     }
     else{
         $js=$description='';
+        //translators: %1$s is a number
         $out.='<p><strong>'.esc_html( sprintf( __( 'There are %1$s shortcodes to choose from. Some will display a list of various optional options.','church-admin' ) ,count($shortcodes))).'</strong></p>'."\r\n";
         $out.='<form action="" method="POST">'."\r\n";
         $out.='<div ><label>'.esc_html( __('Choose shortcode','church-admin' ) ).'</label>'."\r\n";
@@ -734,6 +745,8 @@ function church_admin_shortcode_generator()
             $out.='<p><input type="radio"  name="save_as_member_type_id" value="'.(int)$id.'" /><label> '.esc_html( $type ).'</label></p>';
         }
         $out.='</div>'."\r\n";
+
+    
         //people types
         $out.='<div class="church-admin-form-group shortcode-option" id="people_type_id" ><h3>'.esc_html( __('People Types','church-admin' ) ).'</h3>';
         foreach( $people_types AS $id => $type ){
@@ -917,7 +930,7 @@ function church_admin_shortcode_generator()
         $out.='</div>'."\r\n";
 
         //submit
-        $out.='<p><input type="hidden" name="create-shortcode" value="yes" /><input type="submit" class="church-admin-form-groupbutton-primary" /></p></form>'."\r\n";
+        $out.='<p><input class="button-primary" type="hidden" name="create-shortcode" value="yes" /><input type="submit" class="church-admin-form-groupbutton-primary" /></p></form>'."\r\n";
     }
  return $out;
 }

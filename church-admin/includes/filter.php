@@ -22,17 +22,9 @@ function church_admin_directory_filter( $JSUse=TRUE,$email=FALSE)
 		$disabled='disabled = "disabled" ';
 		$message= ' <a href="'.wp_nonce_url($church_admin_url.'&action=app','app').'">'. esc_html( __('This is a premium feature, please upgrade','church-admin' ) ).'</a>';
 	}
-	echo'<div class="church-admin-form-group"><label>'.esc_html( __( 'Select everyone in the address list (ignores all other choices)' , 'church-admin' ) ). $message .'</label> &nbsp;';
-	echo '<input type="checkbox" ';
-	if(!empty($premium)){echo 'name="send-to-all" value="yes"   id="send-to-all" ';}else echo $disabled;
-	echo'/>';
-	echo'</div>';
 
 
-	echo'<div class="church-admin-form-group"><label>'.esc_html( __( 'Exclude people from results (comma separated)' , 'church-admin' ) ). $message .'</label>';
-	echo church_admin_autocomplete('exclude','exclude','to',null);
-	//echo '<input type="text" name="exclude" class="church-admin-form-control" '.$disabled.' id="exclude" />';
-	echo'</div>';
+
 
 	
 	
@@ -41,12 +33,26 @@ function church_admin_directory_filter( $JSUse=TRUE,$email=FALSE)
 	if ( empty( $email) )  {echo'<form action="admin.php?page=church_admin%2Findex.php" method="POST"><div id="filters" class="ca-box">';}else{echo'<div id="filters1" class="ca-box">';}
 	$class='category';
     
-	$whichFilters=get_option('church-admin-which-filters');
+	$whichFilters= array(
+	
+		'show-me'=>esc_html( __('Shown in directory','church-admin' ) ),
+		'address'=>esc_html( __('Address','church-admin' ) ),
+		
+		"genders"=>esc_html( __('Genders','church-admin' ) ),
+		'photo-permission'=>esc_html( __('Photo permission','church-admin' ) ),
+		'user-accounts'=>esc_html( __('User accounts','church-admin' ) ),
+		'email-addresses'=>esc_html( __('Email address','church-admin' ) ),
+		'phone-calls'=>esc_html(__("Receive phone calls",'church-admin' ) ),
+		
+		'gdpr'=>esc_html( __('Data protection confirmed','church-admin' ) ),
+		'people_types'=>esc_html( __('People types','church-admin' ) ),
+		'active'=>esc_html( __('Active','church-admin' ) ),
+		'marital'=>esc_html( __('Marital Status','church-admin' ) ),
+		'email-send'=>esc_html( __('Email Permission','church-admin') ),
+		);
 	//church_admin_debug($whichFilters);
 	//gender
-	if(!empty( $whichFilters['genders'] ) )
-    {
-        $genders=get_option('church_admin_gender');
+	$genders=get_option('church_admin_gender');
         echo'<div class="filterblock"><label>'.esc_html( __('Gender','church-admin' ) ).'</label>';
         foreach( $genders AS $key=>$gender)
         {
@@ -54,11 +60,9 @@ function church_admin_directory_filter( $JSUse=TRUE,$email=FALSE)
             echo'<p><input type="checkbox" name="check[]" class="'.$class.' gender" value="ge/'.sanitize_title( $gender).'" />'.esc_html( $gender).' ('.(int)$count.')</p>';
         }
         echo'</div>';
-    }
+    
     //address
-	if(!empty( $whichFilters['address'] ) )
-    {
-        
+	  
         echo'<div class="filterblock"><label>'.esc_html( __('Address','church-admin' ) ).'</label>';
 		$noAddressCount=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_household'. ' WHERE  address="" ');
 		$addressCount=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_household'. ' WHERE  address!="" ');
@@ -66,10 +70,9 @@ function church_admin_directory_filter( $JSUse=TRUE,$email=FALSE)
 		echo'<p><input type="checkbox" name="check[]" class="'.$class.' email" value="ad/yes" />'.esc_html( __("Has address",'church-admin' ) ).' ('.(int)$addressCount.')</p>';
 
 	   echo'</div>';
-    }
+    
 	//email
-	if(!empty( $whichFilters['email-addresses'] ) )
-    {
+	
 		echo'<div class="filterblock"><label>'.esc_html( __('Email Address','church-admin' ) ).'</label>';
 		$noEmailCount=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people'. ' WHERE  email="" ');
 		$emailCount=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people'. ' WHERE  email!="" ');
@@ -77,9 +80,8 @@ function church_admin_directory_filter( $JSUse=TRUE,$email=FALSE)
 		echo'<p><input type="checkbox" name="check[]" class="'.$class.' email" value="em/yes" />'.esc_html( __("Has email address",'church-admin' ) ).' ('.(int)$emailCount.')</p>';
 
 	   echo'</div>';
-    }
-	if(!empty( $whichFilters['email-send'] ) )
-    {
+    
+	
 		echo'<div class="filterblock"><label>'.esc_html( __('Email send permission','church-admin' ) ).'</label>';
 		$noPermission=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people'. ' WHERE  email_send=0 ');
 		$emailCount=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people'. ' WHERE  email_send=1 and email!=""');
@@ -87,22 +89,11 @@ function church_admin_directory_filter( $JSUse=TRUE,$email=FALSE)
 		echo'<p><input type="checkbox" name="check[]" class="'.$class.' email_send" value="se/1" />'.esc_html( __("Email send permission and an email address",'church-admin' ) ).' ('.(int)$emailCount.')</p>';
 
 	   echo'</div>';
-    }
     
-	//cell
-	if(!empty( $whichFilters['cell'] ) )
-    {
-        echo'<div class="filterblock"><label>'.esc_html( __('Cell phone','church-admin' ) ).'</label>';
-		$noMobileCount=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people'. ' WHERE  mobile="" ');
-		$mobileCount=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people'. ' WHERE  mobile!="" ');
-		echo'<p><input type="checkbox" name="check[]" class="'.$class.' mobile" value="ce/no" />'.esc_html( __("No cell phone",'church-admin' ) ).' ('.(int)$noMobileCount.')</p>';
-		echo'<p><input type="checkbox" name="check[]" class="'.$class.' mobile" value="ce/yes" />'.esc_html( __("Has cell phone",'church-admin' ) ).' ('.(int)$mobileCount.')</p>';
-
-	   echo'</div>';
-    }
+    
+	
 	//photo-permission
-	if(!empty( $whichFilters['photo-permission'] ) )
-    {
+	
         echo'<div class="filterblock"><label>'.esc_html( __('Photo permission','church-admin' ) ).'</label>';
 		$noPhotoPermissionCount=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people'. ' WHERE  photo_permission=0 ');
 		$PhotoPermissionCount=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people'. ' WHERE  photo_permission=1');
@@ -110,10 +101,9 @@ function church_admin_directory_filter( $JSUse=TRUE,$email=FALSE)
 		echo'<p><input type="checkbox" name="check[]" class="'.$class.' photo-permission" value="pp/1" />'.esc_html( __("Photo permission",'church-admin' ) ).' ('.(int)$PhotoPermissionCount.')</p>';
 
 	   echo'</div>';
-    }
+    
 	//show-me
-	if(!empty( $whichFilters['show-me'] ) )
-    {
+	
         echo'<div class="filterblock"><label>'.esc_html( __('Visible in directory','church-admin' ) ).'</label>';
 		$noShowCount=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people'. ' WHERE  show_me=0 ');
 		church_admin_debug($wpdb->last_query);
@@ -123,30 +113,27 @@ function church_admin_directory_filter( $JSUse=TRUE,$email=FALSE)
 		echo'<p><input type="checkbox" name="check[]" class="'.$class.' show-me" value="sm/1" />'.esc_html( __("Shown in directory",'church-admin' ) ).' ('.(int)$showCount.')</p>';
 
 	   echo'</div>';
-    }
+    
 	//user account
-	if(!empty( $whichFilters['user-accounts'] ) )
-    {	echo'<div class="filterblock"><label>'.esc_html( __('Connected User account','church-admin' ) ).'</label>';
+	echo'<div class="filterblock"><label>'.esc_html( __('Connected User account','church-admin' ) ).'</label>';
 		$noUserCount=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people'. ' WHERE  user_id="" ');
 		$userCount=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people'. ' WHERE  user_id!="" ');
 		echo'<p><input type="checkbox" name="check[]" class="'.$class.' user" value="us/no" />'.esc_html( __("No connected user account",'church-admin' ) ).' ('.(int)$noUserCount.')</p>';
 		echo'<p><input type="checkbox" name="check[]" class="'.$class.' user" value="us/yes" />'.esc_html( __("Connect user account",'church-admin' ) ).' ('.(int)$userCount.')</p>';
 
 	   echo'</div>';
-    }
+    
 	//data protection
-	if(!empty( $whichFilters['gdpr'] ) )
-    {
+	
         echo'<div class="filterblock"><label>'.esc_html( __('Personal Data','church-admin' ) ).'</label>';
         $notCount=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people'. ' WHERE  gdpr_reason IS NULL OR gdpr_reason="" ');
         $count=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people'. ' WHERE  gdpr_reason IS NOT NULL OR gdpr_reason!="" ');
         echo'<p><input type="checkbox" name="check[]" class="'.$class.' gdpr" value="da/1" />'.esc_html( __('Confirmed','church-admin' ) ).' ('.(int)$count.')</p>';
         echo'<p><input type="checkbox" name="check[]" class="'.$class.' gdpr" value="da/0" />'.esc_html( __('Not Confirmed','church-admin' ) ).' ('.(int)$notCount.')</p>';
         echo'</div>';
-    }
+    
 	//people types
-    if(!empty( $whichFilters['people_types'] ) )
-    {
+    
 	   $people_types=get_option('church_admin_people_type');
         if(!empty( $people_types) )
         {
@@ -160,22 +147,10 @@ function church_admin_directory_filter( $JSUse=TRUE,$email=FALSE)
             }
             echo'</div>';
         }
-    }
-	if(!empty( $whichFilters['spiritual-gifts'] ) )
-	{
-		echo'<div class="filterblock"><label>'.esc_html( __('Spiritual gifts','church-admin' ) ).'</label>';
-		$count=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people');
-        echo'<p><input type="checkbox" name="check[]" class="all '.$class.'" data-id="people" value="all" /><strong>'.esc_html( __('All','church-admin' ) ).' ('.(int)$count.')</strong></p>';
-        foreach( $church_admin_spiritual_gifts AS $giftID=>$gift)
-		{
-			$count=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people_meta WHERE meta_type="spiritual_gifts" AND ID="'.(int)$giftID.'"');
-			echo'<p><input type="checkbox" name="check[]" class="'.$class.' people" value="sp/'.(int)$giftID.'" />'.esc_html( $gift).' ('.(int)$count.')</p>';
-            }
-            echo'</div>'; 
-	}
+    
+	
     //phone calls
-    if(!empty( $whichFilters['phone-calls'] ) )
-    {
+    
 	   $phoneCallsCount=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people'. ' WHERE  phone_calls="1" ');
         $noPhoneCallsCount=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people'. ' WHERE  phone_calls="0" ');
         
@@ -186,20 +161,17 @@ function church_admin_directory_filter( $JSUse=TRUE,$email=FALSE)
         echo'<p><input  type="checkbox" name="check[]" class="'.$class.' phone-calls" value="pc/0" />'.esc_html( __('No phone calls permission','church-admin' ) ).' ('.(int)$noPhoneCallsCount.')</p>';
             echo'</div>';
        
-    }
+    
 	//active
-	 if(!empty( $whichFilters['active'] ) )
-    {
-        echo'<div class="filterblock"><label>'.esc_html( __('Active/Deactivated','church-admin' ) ).'</label>';
+	  echo'<div class="filterblock"><label>'.esc_html( __('Active/Deactivated','church-admin' ) ).'</label>';
         $count=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people'. ' WHERE  active="1" ');
         echo'<p><input  type="checkbox" name="check[]" class="'.$class.' marital" value="ac/1" />'.esc_html( __('Active','church-admin' ) ).' ('.(int)$count.')</p>';
         $count=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people'. ' WHERE  active="0" ');
         echo'<p><input  type="checkbox" name="check[]" class="'.$class.' marital" value="ac/0" />'.esc_html( __('Inactive','church-admin' ) ).' ('.(int)$count.')</p>';
         echo'</div>';
-    }
+
 	//marital status
-	 if(!empty( $whichFilters['marital'] ) )
-    {
+	
         echo'<div class="filterblock"><label>'.esc_html( __('Marital Status','church-admin' ) ).'</label>';
         foreach( $church_admin_marital_status AS $key=>$status)
         {
@@ -208,28 +180,10 @@ function church_admin_directory_filter( $JSUse=TRUE,$email=FALSE)
         }
         echo'</div>';
     
-    }
-	//Sites
-     if(!empty( $whichFilters['sites'] ) )
-    {
-            $results=$wpdb->get_results('SELECT venue,site_id FROM '.$wpdb->prefix.'church_admin_sites ORDER BY venue ASC');
-        if(!empty( $results) )
-        {
-            echo'<div class="filterblock"><label>'.esc_html( __('Sites','church-admin' ) ).'</label>';
-            echo'<p><input type="checkbox" name="check[]" class="all '.$class.'" data-id="sites" value="all" /><strong>'.esc_html( __('All','church-admin' ) ).'</strong></p>';
-
-            foreach( $results AS $row)
-            {
-                    $count=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people'. ' WHERE  site_id="'.esc_sql( $row->site_id).'" ');
-                    echo'<p><input type="checkbox" name="check[]" class="'.$class.' sites" value="si/'.sanitize_title( $row->venue).'" />'.esc_html( $row->venue).' ('.(int)$count.')</p>';
-
-            }
-                    echo'</div>';
-        }
-    }
+    
+	
 	//Member Types
-	 if(!empty( $whichFilters['member_types'] ) )
-    {
+
         $results=$wpdb->get_results('SELECT member_type_id,member_type FROM '.$wpdb->prefix.'church_admin_member_types ORDER BY member_type_order ASC');
         if(!empty( $results) )
         {
@@ -242,93 +196,12 @@ function church_admin_directory_filter( $JSUse=TRUE,$email=FALSE)
             }
             echo'</div>'."\r\n";
         }
-    }
-	//Small Groups
-    if(!empty( $whichFilters['small-groups'] ) )
-    {
-    $results=$wpdb->get_results('SELECT id, group_name FROM '.$wpdb->prefix.'church_admin_smallgroup ORDER BY group_name ASC');
-	if(!empty( $results) )
-	{
+ 
+	
+   
 
-		echo'<div class="filterblock"><label>'.esc_html( __('Small Groups','church-admin' ) ).'</label>';
-		echo'<p><input type="checkbox" name="check[]" class="all '.$class.'" data-id="groups" value="all" /><strong>'.esc_html( __('All','church-admin' ) ).'</strong></p>';
-		echo'<p><input type="checkbox" name="check[]" class="'.$class.'" value="gp/no-group" /><strong>'.esc_html( __('Not in a group (overrides other small group selections)','church-admin' ) ).'</strong></p>';
-		echo'<p>';
-
-			foreach( $results AS $row)
-			{
-				$count=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people_meta WHERE ID="'.(int)$row->id.'" AND meta_type="smallgroup"');
-
-				echo'<span ><input type="checkbox" name="check[]" class="'.$class.' groups" value="gp/'.sanitize_title( $row->group_name).'" />'.esc_html( $row->group_name).' ('.(int)$count.')</span><br>';
-
-			}
-		}
-
-				echo'</p></div>'."\r\n";
-    }
-	//Classes
-    if(!empty( $whichFilters['classes'] ) )
-    {
-		$results=$wpdb->get_results('SELECT class_id, name FROM '.$wpdb->prefix.'church_admin_classes ORDER BY name ASC');
-		if(!empty( $results) )
-		{
-
-			echo'<div class="filterblock"><label>'.esc_html( __('Classes','church-admin' ) ).'</label>';
-			echo'<p><input type="checkbox" name="check[]" class="all '.$class.'" data-id="classes" value="all" /><strong>'.esc_html( __('All','church-admin' ) ).'</strong></p>';
-			
-			echo'<p>';
-
-			foreach( $results AS $row)
-			{
-				$count=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people_meta WHERE ID="'.(int)$row->class_id.'" AND meta_type="class"');
-
-				echo'<span ><input type="checkbox" name="check[]" class="'.$class.' classes" value="cl/'.sanitize_title( $row->name).'" />'.esc_html( $row->name).' ('.(int)$count.')</span><br>';
-
-			}
-			echo'</p></div>'."\r\n";
-		}
-
-		
-    }
-	//Ministries
-     if(!empty( $whichFilters['ministries'] ) )
-    {
-        $results=$wpdb->get_results('SELECT ministry,ID FROM '.$wpdb->prefix.'church_admin_ministries ORDER BY ministry ASC');
-        if(!empty( $results) )
-        {
-            echo'<div class="filterblock"><label>'.esc_html( __('Ministries','church-admin' ) ).'</label>';
-            echo'<p><input type="checkbox" name="check[]" class="all '.$class.'" data-id="ministries" value="all" /><strong>'.esc_html( __('All','church-admin' ) ).'</strong></p>';
-
-             echo '<p>';
-            foreach( $results AS $row)
-            {
-                $count=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people_meta WHERE ID="'.(int)$row->ID.'" AND meta_type="ministry"');
-
-                echo'<span ><input type="checkbox" name="check[]" class="'.$class.' ministries" value="mi/'.sanitize_title( $row->ministry).'" />'.esc_html( $row->ministry).' ('.(int)$count.')</span><br>';
-
-            }
-                    echo'</p></div>'."\r\n";
-        }
-    }
-		//Bible readings
-		if(!empty( $whichFilters['bible-readings'] ) )
-		{
-			
-			
-			echo'<div class="filterblock"><label>'.esc_html( __('Bible Readings','church-admin' ) ).'</label>';
-			echo '<p>';
-		
-			$count=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people a, '.$wpdb->prefix.'church_admin_people_meta b WHERE a.people_id=b.people_id AND b.meta_type="bible-readings"');
-			
-			echo'<span ><input type="checkbox" name="check[]" class="'.$class.' bible-readings" value="br/1" />'.esc_html( __('Receive Bible readings','church-admin')).' ('.(int)$count.')</span><br>';
-					
-			echo'</p></div>'."\r\n";
-			
-		}
 	//year of birth
-	 if(!empty( $whichFilters['birth-year'] ) )
-    {
-
+	
         $years=$wpdb->get_results('SELECT YEAR(date_of_birth) AS year FROM '.$wpdb->prefix.'church_admin_people WHERE date_of_birth!="0000-00-00" GROUP BY YEAR(date_of_birth) ORDER BY YEAR(date_of_birth) ASC');
         if(!empty( $years) )
         {
@@ -342,9 +215,8 @@ function church_admin_directory_filter( $JSUse=TRUE,$email=FALSE)
                 }
                 echo'</ul></div>'."\r\n";
         }
-    }
-     if(!empty( $whichFilters['birth-month'] ) )
-    {
+    
+   
         $months=$wpdb->get_results('SELECT MONTH(date_of_birth) AS month FROM '.$wpdb->prefix.'church_admin_people WHERE date_of_birth!="0000-00-00" GROUP BY MONTH(date_of_birth) ORDER BY MONTH(date_of_birth) ASC');
         if(!empty( $months) )
         {
@@ -358,44 +230,10 @@ function church_admin_directory_filter( $JSUse=TRUE,$email=FALSE)
                 }
                 echo'</p></div>'."\r\n";
         }
-    }
-	//parents
-     if(!empty( $whichFilters['parents'] ) )
-    {
-        $results=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_kidswork ORDER BY youngest');
-        if(!empty( $results) )
-        {
-            echo'<div class="filterblock"><label>'.esc_html( __('Parents with children in...','church-admin' ) ).'</label>';
-            echo'<p><input type="checkbox" name="check[]" class="all '.$class.'" data-id="parents" value="all" /><strong>'.esc_html( __('All','church-admin' ) ).'</strong></p>';
-            echo '<p>';
-            foreach( $results AS $row)
-            {
+   
 
-                echo'<span ><input type="checkbox" name="check[]" class="'.$class.' parents" value="pa/'.sanitize_title( $row->id).'" />'.esc_html( $row->group_name).'</span>';
-                echo'<br>';
-            }
-            echo'<p></div>'."\r\n";
-        }
-    }
-	//
-	//age-related-ministry
-	if(!empty( $whichFilters['age-related'] ) )
-    {
-        $results=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_kidswork ORDER BY youngest');
-        if(!empty( $results) )
-        {
-            echo'<div class="filterblock"><label>'.esc_html( __('People in age related group','church-admin' ) ).'</label>';
-            echo'<p><input type="checkbox" name="check[]" class="all '.$class.'" data-id="age-related" value="all" /><strong>'.esc_html( __('All','church-admin' ) ).'</strong></p>';
-            echo '<p>';
-            foreach( $results AS $row)
-            {
 
-                echo'<span ><input type="checkbox" name="check[]" class="'.$class.' age-related" value="ar/'.sanitize_title( $row->id).'" />'.esc_html( $row->group_name).'</span>';
-                echo'<br>';
-            }
-            echo'<p></div>'."\r\n";
-        }
-    }
+	
 	/********************************************************
 	*
 	* Custom Fields
@@ -1076,183 +914,11 @@ function church_admin_build_filter_sql( $input,$type=NULL)
 			}
 		}//end people type section
 
-		//sites
 
-		if(!empty( $sites)&&is_array( $sites) )
-		{
-			if(!in_array('all',$sites) )//only do if all not selected
-			{
-				$campuses=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_sites');
+	
+	
+	
 
-				if(!empty( $campuses) )
-				{
-					foreach( $campuses AS $campus)
-					{
-						if(in_array(sanitize_title( $campus->venue),$sites) )
-						{
-							$sitesSQL[]='(a.site_id="'.(int)$campus->site_id.'")';
-							$filteredby[]=$campus->venue;
-						}
-					}
-				}
-			}
-		}//end sites
-		//Parents
-		//$parents is array of kidswork group_id we are looking for parents of!
-
-		$kidsworkData=church_admin_whosin_kidswork_array();
-		
-		$kidsworkSQL=array();
-		if(!empty( $parents) && is_array( $parents) )
-		{
-			church_admin_debug('Kidswork Data Array');
-			church_admin_debug($kidsworkData);
-			church_admin_debug('Parents of these groups...');
-			church_admin_debug($parents);
-
-
-			foreach( $parents AS $id=>$kidswork_group_id)
-			{
-				church_admin_debug('Adding for kidswork group '.$kidswork_group_id);
-				if(!empty( $kidsworkData[$kidswork_group_id]['children'] ) )
-				{
-					
-						foreach( $kidsworkData[$kidswork_group_id]['children'] AS $key=>$moreData)
-						{
-							if(!empty($moreData['parents'])){
-								foreach($moreData['parents'] AS $key=>$parent_id){
-									$kidsworkSQL[]='(a.people_id="'.(int)$parent_id.'")';
-								}
-							}
-						}
-				}
-			}
-			church_admin_debug('KIDSWORK SQL');
-			church_admin_debug($kidsworkSQL);
-		}
-		//age related ministry is old kidswork table with gender column added null is mixed, 0,1 etc are genders.
-		$age_relatedSQL=array();
-		if(!empty( $age_related) && is_array( $age_related) )
-		{
-				foreach( $age_related AS $key=>$id)
-				{
-					$row= $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'church_admin_kidswork WHERE id="'.(int)$id.'"');
-					if(empty($row)){continue;}
-					$genSQL='';
-					if(isset($row->gender)){
-						switch($row->gender){
-							case '0':$genSQL =' AND a.sex=0';break;
-							case '1':$genSQL =' AND a.sex=1';break; 
-						}
-					}
-					$age_relatedSQL[] = 'a.date_of_birth IS NOT NULL AND a.kidswork_override="'.(int)$id.'" OR (date_of_birth<"'.$row->youngest.'" AND date_of_birth>"'.$row->oldest.'") '.$genSQL;
-					
-
-				}
-			//church_admin_debug($age_relatedSQL);
-		}
-		//spiritual gifts
-
-		if(!empty( $spiritual_gifts)&&is_array( $spiritual_gifts) )
-		{
-
-			if(!in_array('all',$spiritual_gifts) )//only do if all not selected
-			{
-				
-				if(!empty( $church_admin_spiritual_gifts) )
-				{
-					foreach( $church_admin_spiritual_gifts AS $gift_id=>$gift)
-					{
-
-						if(in_array(sanitize_title( $gift_id),$spiritual_gifts) )
-						{
-							$spiritual_giftsSQL[]='a.people_id=(SELECT c.people_id FROM '.$wpdb->prefix.'church_admin_people_meta c WHERE  c.ID="'.(int)$gift_id.'" AND c.meta_type="spiritual-gifts" AND c.people_id=a.people_id)';
-							$filteredby[]=$gift;
-						}
-					}
-				}
-			}
-			if(in_array('no-group',$smallgroups) )
-			{
-				 $spiritual_giftsSQL=array('a.people_id NOT IN (SELECT people_id FROM '.$wpdb->prefix.'church_admin_people_meta WHERE meta_type="spiritual-gifts")');
-					}
-		}//end spiritual gifts
-		//small groups
-
-		if(!empty( $smallgroups)&&is_array( $smallgroups) )
-		{
-
-			if(!in_array('all',$smallgroups) )//only do if all not selected
-			{
-				$sgs=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_smallgroup');
-				if(!empty( $sgs) )
-				{
-					foreach( $sgs AS $sg)
-					{
-
-						if(in_array(sanitize_title( $sg->group_name),$smallgroups) )
-						{
-							$smallgroupsSQL[]='a.people_id=(SELECT c.people_id FROM '.$wpdb->prefix.'church_admin_people_meta c WHERE  c.ID="'.(int)$sg->id.'" AND c.meta_type="smallgroup" AND c.people_id=a.people_id)';
-							$filteredby[]=$sg->group_name;
-						}
-					}
-				}
-			}
-			if(in_array('no-group',$smallgroups) )
-			{
-				 $smallgroupsSQL=array('a.people_id NOT IN (SELECT people_id FROM '.$wpdb->prefix.'church_admin_people_meta WHERE meta_type="smallgroup")');
-					}
-		}//end smallgroups
-        /**************************************************
-        *
-        *   Classes
-        *
-        ***************************************************/
-        if(!empty( $classes)&&is_array( $classes) )
-		{
-            if(defined('CA_DEBUG') )church_admin_debug('Classes section');
-            if(defined('CA_DEBUG') )church_admin_debug(print_r( $classes,TRUE) );
-			if(!in_array('all',$classes) )//only do if all not selected
-			{
-				if(defined('CA_DEBUG') )church_admin_debug("Not all classes");
-                $cls=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_classes');
-                if(defined('CA_DEBUG') )church_admin_debug(print_r( $cls,TRUE) );
-				if(!empty( $cls) )
-				{
-					foreach( $cls AS $cl)
-					{
-
-						if(in_array(sanitize_title( $cl->name),$classes) )
-						{
-							$classesSQL[]='a.people_id=(SELECT c.people_id FROM '.$wpdb->prefix.'church_admin_people_meta c WHERE  c.ID="'.(int)$cl->class_id.'" AND c.meta_type="class" AND c.people_id=a.people_id)';
-							$filteredby[]=$cl->name;
-						}
-					}
-				}
-			}
-
-		}//end classes
-
-		//ministries
-		if(!empty( $ministries)&&is_array( $ministries) )
-		{
-			if(!in_array('all',$ministries) )//only do if all not selected
-			{
-				$mins=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_ministries');
-
-				if(!empty( $mins) )
-				{
-					foreach( $mins AS $min)
-					{
-						if(in_array(sanitize_title( $min->ministry),$ministries) )
-						{
-							$ministriesSQL[]=' a.people_id=(SELECT people_id FROM '.$wpdb->prefix.'church_admin_people_meta c, '.$wpdb->prefix.'church_admin_ministries g WHERE  c.ID="'.(int)$min->ID.'" AND c.ID=g.ID AND c.meta_type="ministry" AND c.people_id=a.people_id)';
-							$filteredby[]=$min->ministry;
-						}
-					}
-				}
-			}
-		}//end smallgroups
 		$other=$tbls='';
 		 $group_by=' GROUP BY a.people_id ';
 		$columns=array('a.first_registered','a.pushToken','a.people_id','a.user_id','a.household_id','a.head_of_household','a.first_name','a.middle_name','a.prefix','a.last_name','a.people_type_id','a.member_type_id','a.email','a.mobile','a.e164cell','a.sex','b.phone','b.address','b.mailing_address','b.wedding_anniversary','a.date_of_birth','a.show_me','a.active','a.marital_status','a.date_of_birth','a.last_updated','b.last_updated AS householdUpdated','a.updated_by','a.gdpr_reason');
@@ -1319,12 +985,7 @@ function church_admin_build_filter_sql( $input,$type=NULL)
 										$columns[]='f.member_type';
 										$tables['f']=$wpdb->prefix.'church_admin_member_types'.' f';
 									}
-		if(!empty( $ministriesSQL) ) 	{
-										$other.=' AND ('. implode(" OR ",$ministriesSQL).')';
-										$columns[]='g.ministry ';
-										$tables['g']=$wpdb->prefix.'church_admin_ministries'.' g';
-										$tables['c']=$wpdb->prefix.'church_admin_people_meta'.' c';
-									}
+
 		if(!empty( $customSQL) )
 		{
 

@@ -2,11 +2,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit('You need Jesus!'); // Exit if accessed directly
 function church_admin_calendar_list( $days=28,$category=NULL,$fac_ids=NULL)
 {
-	$licence =get_option('church_admin_app_new_licence');
-		if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-			return '<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="https://buy.stripe.com/fZedSB9ErbQRcjm14V">Upgrade</a></p></div>';
-			
-		}
+	
 	//church_admin_debug("DISPLAY: church_admin_calendar_list");
 	global $wpdb,$wp_locale;
 	$out='';
@@ -36,7 +32,7 @@ function church_admin_calendar_list( $days=28,$category=NULL,$fac_ids=NULL)
 	
 	$display_categories = $display_facilities = array();
 	
-	$facilities=church_admin_calendar_facilities_array();
+	
 	$categories=church_admin_calendar_categories_array();
 	//process categories
 	$cat_sql='';
@@ -87,12 +83,7 @@ function church_admin_calendar_list( $days=28,$category=NULL,$fac_ids=NULL)
 		foreach( $results AS $row)
 		{
 			$rota = null;
-			if(!empty($row->service_id)){
-				/********************************************
-				 * Is a service, so retrieve schedule data
-				 *******************************************/
-				$rota = church_admin_retrieve_rota_data_array($row->service_id,$row->start_date,'service');
-			}
+		
 			if($row->bgcolor=='#FFFFFF'){$row->bgcolor="#CCCCCC";}
 			if( $row->start_time=='00:00:00' && $row->end_time=='23:59:00')
     		{//all day
@@ -107,8 +98,7 @@ function church_admin_calendar_list( $days=28,$category=NULL,$fac_ids=NULL)
 								'location'=>$row->location,
 								'bgcolor'=>$row->bgcolor,
 								'textcolor'=>$row->text_color,
-								'rota'=>$rota,
-								'service_id'=>$row->service_id
+								
 							);
 			}
 			{//timed
@@ -123,8 +113,7 @@ function church_admin_calendar_list( $days=28,$category=NULL,$fac_ids=NULL)
 								'location'=>$row->location,
 								'bgcolor'=>$row->bgcolor,
 								'textcolor'=>$row->text_color,
-								'rota'=>$rota,
-								'service_id'=>$row->service_id
+								
 							);
 			}
 		}
@@ -178,23 +167,7 @@ function church_admin_calendar_list( $days=28,$category=NULL,$fac_ids=NULL)
                 if(!empty( $event['link_title'] ) )  {$title=esc_html( $event['link_title'] );}else{$title=__('More information...','church-admin');}
                 $out.='<br/><a href="'.esc_url( $event['link'] ).'">'.$title.'</a>';
             }
-			if(!empty($event['rota'])){
-				$out.='<table><tr ><th scope="row" data-id="'.(int)$event['id'].'">'.esc_html('Who is doing what','church-admin').'</th><td><span class="rota-expander dashicons dashicons-arrow-up-alt2" id="toggle'.(int)$event['id'].'" data-what="show" data-id="'.(int)$event['id'].'" ></span></td></tr>';
-				foreach($event['rota'] AS $job=>$who){
-					$out.='<tr class="rota-details date'.(int)$event['id'].'" style="display:none"><th scope="row">'.esc_html($job).'</th><td>'.esc_html($who).'</td></tr>';
-				}
-				$out.='</table>';
-			}
-			if(!empty($row->service_id)){
-
-				
-                //add link to rota for this service
-               if(church_admin_level_check('Rota')){
-                    $out.='<p><a href="'.wp_nonce_url(admin_url().'admin.php?page=church_admin/index.php&action=edit-rota&service_id='.(int)$event['service_id'].'&rota_date='.esc_attr($event['date']),'edit-rota').'">'.esc_html(__('Edit schedule','church-admin')).'</a></p>';
-               }
-               
-               $out.=church_admin_rota_popup($row->service_id,$row->start_date);
-			}
+			
 			$out.= '<br/><a  rel="nofollow" class="vcf-link" href="'.site_url().'?ca_download=ical&date_id='.(int)$event['id'].'"><span class="ca-dashicons dashicons dashicons-download"></span>'.esc_html(__('iCal download','church-admin')).'</a>';
             $out.='</td></tr>';
 		}

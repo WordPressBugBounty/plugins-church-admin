@@ -1,76 +1,7 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-/*****************************
-*
-* Choose filters to show
-*
-*****************************/
-function church_admin_choose_filters()
-{
-    echo '<h2>'.esc_html( __("Choose which filters are shown",'church-admin' ) ).'</h2>';
-    $menuFilters=array(
-		'contact-form'=>esc_html( __('Contact form','church-admin' ) ),
-		'show-me'=>esc_html( __('Shown in directory','church-admin' ) ),
-	'address'=>esc_html( __('Address','church-admin' ) ),
-	'bible-readings'=>esc_html(__('Bible readings','church-admin')),
-	"genders"=>esc_html( __('Genders','church-admin' ) ),
-	'photo-permission'=>esc_html( __('Photo permission','church-admin' ) ),
-	'user-accounts'=>esc_html( __('User accounts','church-admin' ) ),
-	'email-addresses'=>esc_html( __('Email address','church-admin' ) ),
-	'phone-calls'=>esc_html(__("Receive phone calls",'church-admin' ) ),
-	'cell'=>esc_html( __('Cell phone','church-admin' ) ),
-	'classes'=>esc_html( __('Classes','church-admin' ) ),
-	'gdpr'=>esc_html( __('Data protection confirmed','church-admin' ) ),
-	'people_types'=>esc_html( __('People types','church-admin' ) ),
-	'active'=>esc_html( __('Active','church-admin' ) ),
-	'marital'=>esc_html( __('Marital Status','church-admin' ) ),
-	'sites'=>esc_html( __('Sites','church-admin' ) ),
-	'member_types'=>esc_html( __('Member Types','church-admin' ) ),
-	'small-groups'=>esc_html( __('Small groups','church-admin' ) ),
-	'ministries'=>esc_html( __('Ministries','church-admin' ) ),
-	'birth-year'=>esc_html( __('Birth year','church-admin' ) ),
-	'birth-month'=>esc_html( __('Birth month','church-admin' ) ),
-	'parents'=>esc_html( __('Parents','church-admin' ) ),
-	'spiritual-gifts'=>esc_html( __('Spiritual gifts','church-admin' ) ),
-	'email-send'=>esc_html( __('Email Permission','church-admin') ),
-	'age-related'=>esc_html(__('Age related groups','church-admin'))
-	);
 
-    //add on custom fields
-    $customFields=church_admin_get_custom_fields();
-	
-    if(!empty( $customFields) )
-    {
-        foreach ( $customFields AS $ID=>$field)
-        {
-            $menuFilters[sanitize_title( $field['name'] )]=$field['name'];
-        }
-    }
-    if(!empty( $_POST['save-filters'] ) )
-    {
-        $chosenFilters=array();
-        foreach ( $menuFilters AS $ID=>$field)
-		{
-            if(!empty( $_POST[$ID] ) )$chosenFilters[$ID]=TRUE;
-        }
-        update_option('church-admin-which-filters',$chosenFilters);
-        echo'<div class="notice notice-success inline"><h2>'.esc_html( __("Filter choice saved",'church-admin' ) ).'</h2></div>';
-    }
-	$whichFilters=get_option("church-admin-which-filters");
-    echo'<form action="" method="POST">';
-    echo'<table class="form-table"><tbody>';
-    foreach( $menuFilters AS $ID=>$field)
-    {
-        echo'<tr><th scope="row">'.esc_html( $field).'</th><td><input type="checkbox" name="'.esc_html( $ID).'" ';
-        if(!empty( $whichFilters[$ID] ) )echo 'checked="checked" ';
-        echo' value=1/></td></tr>';
-    }
-    echo'<tr><td colspan=2><input type="hidden" name="save-filters" value="TRUE" /><input type="Submit" class="button-primary" value="'.esc_html( __('Save','church-admin' ) ).'" /></td></tr></table>';
-
-    
-    
-}
 /**
  * This function sets up which modules are displayed on the tabs, default on install is all displayed
  *
@@ -412,6 +343,7 @@ function church_admin_email_settings()
 	echo'<div class="church-admin-form-group"><input type="radio" class="speed" id="immediate"  name="cron" value="immediate" '.checked( $current_cron,'immediate',false).'/><label>'.esc_html( __('Send Emails Immediately','church-admin' ) ).' ('.esc_html( __("Use this option if your hosting company doesn't limit how many emails you can send an hour",'church-admin' ) ).')</label></div>';
 	echo'<div class="church-admin-form-group"><input type="radio"  class="speed cron" name="cron" value="cron" '.checked( $current_cron,'cron',false).'/><label>'.esc_html( __('I want to use cron','church-admin' ) ).' ('.esc_html( __('Use this option if you are on a Linux server and are limited how many emails you can send an hour','church-admin' ) ).')</label></div>';
 	$cronCommand='<strong>curl --silent '.admin_url().'/admin-ajax.php?action=church_admin_cronemail</strong>';
+	//translators: %1$s is a cron command
 	echo'<p>'.wp_kses_post(sprintf(__('Set up a cron job with the command %1$s in your cPanel or hosting account','church-admin' ) ,$cronCommand)).'</p>';
 	echo'<div class="church-admin-form-group"><input  id="wp-cron" type="radio" class="speed wp-cron" name="cron" value="wp-cron" '.checked( $current_cron,'wp-cron',FALSE).'/><label>'.esc_html( __('I want to use wp-cron','church-admin' ) ).' ('.esc_html( __("Use this option if you are on a Windows server or don't understand cron and are limited how many emails you can send an hour. It will be set to send a batch every hour.",'church-admin' ) ).')</label></div>';
 	echo '<div id="batch-size" ';
@@ -579,7 +511,7 @@ function church_admin_smtp_settings()
  */
 
 function church_admin_roles(){
-global $wpdb;
+	global $wpdb;
 	$modules = array('App'=>__('App','church-admin'),
 					'Attendance'=>__('Attendance','church-admin'),
 					'Bible'=>__('Bible Readings','church-admin'),
@@ -1018,61 +950,10 @@ function church_admin_sms_settings()
         if(!empty( $_POST['prayer-request-moderation'] ) ){
 			update_option('prayer-request-moderation',church_admin_sanitize( $_POST['prayer-request-moderation'] ) );
 		}
-		if(!empty( $_POST['volunteer'] ) ){
-			update_option('church-admin-volunteer-message',church_admin_sanitize($_POST['volunteer'] ) );
-		}
-        if(!empty( $_POST['acts_of_courage'] ) )  {
-			update_option('church-admin-acts-of-courage',TRUE);
-		}else{
-			delete_option('church-admin-acts-of-courage');
-		}
-		if(!empty( $_POST['acts-of-courage-request-message'] ) )  {
-			update_option('church-admin-acts-of-courage-message',church_admin_sanitize( $_POST['acts-of-courage-request-message'] ) );
-		}else{
-			delete_option('church-admin-acts-of-courage-message');
-		}
+	
+        
 		update_option('church_admin_pdf_size',church_admin_sanitize($_POST['pdf_size'] ));
-		if(!empty( $_POST['no-bible-readings'] ) ){
-			update_option('church-admin-no-bible-readings',1);
-			//adjust app menu
-			$chosenMenu=get_option('church_admin_app_new_menu');
-			if(!empty($chosenMenu)){
-				unset( $chosenMenu['bible'] );
-				update_option('church_admin_app_new_menu',$chosenMenu);
-
-			}
-		}else{
-			delete_option('church-admin-no-bible-readings');
-			//app
-			$chosenMenu=get_option('church_admin_app_new_menu');
-			if(!empty($chosenMenu)){
-				$chosenMenu['bible']=array('edit'=>true,'item'=>esc_html( __('Bible','church-admin' ) ),'order'=>5,'show'=>TRUE,'type'=>'app','loggedinOnly'=>0);
-				update_option('church_admin_app_new_menu',$chosenMenu);
-			}
-		}	
-		if(!empty( $_POST['no-prayer-requests'] ) )  {
-			update_option('church-admin-no-prayer',1);
-			
-			//app
-			$chosenMenu=get_option('church_admin_app_new_menu');
-			if(!empty($chosenMenu)){
-				unset( $chosenMenu['bible'] );
-				update_option('church_admin_app_new_menu',$chosenMenu);
-
-			}
 		
-		}else{
-			
-			delete_option('church-admin-no-prayer');
-			
-			//app
-			//app
-			$chosenMenu=get_option('church_admin_app_new_menu');
-			if(!empty($chosenMenu)){
-				$chosenMenu['prayer']=array('edit'=>true,'item'=>esc_html( __('Prayer','church-admin' ) ),'order'=>14,'show'=>TRUE,'type'=>'app','loggedinOnly'=>0);
-				update_option('church_admin_app_new_menu',$chosenMenu);
-			}
-		}	
 
 		//change in prayer requests or bible readings requires a permalinks refresh
 		flush_rewrite_rules();
@@ -1249,85 +1130,7 @@ function church_admin_sms_settings()
             echo'<option '. selected( $saved_member_type_id , $id , FALSE ).' value="'.(int)$id.'">'.esc_html($type).'</option>';
         }    
         echo'</select></div>';
-		/***********************
-		 * Serving and volunteering
-		 ***********************/
-		echo'<table class="form-table"><thead><tr><th colspan=2><h2>'.esc_html( __('Serving and volunteering','church-admin' ) ).'</th></tr><thead><tbody>';
 		
-		// volunteer message
-		$volunteerMessage=get_option('church-admin-volunteer-message');
-		echo'<tr><th scope="row">'.esc_html( __('Explanation for volunteer shortcode','church-admin' ) ).'</th><td><textarea cols=80 rows=10 name="volunteer" > ';
-		if( $volunteerMessage) {echo esc_textarea( $volunteerMessage );}
-		else{echo __('You can volunteer for various ministries in the church here. The team leaders will be in touch','church-admin');}
-		echo '</textarea></td></tr>';
-		echo'</table>';
-		/***********************
-		 * Acts of Courage
-		 ***********************/
-		echo'<table class="form-table"><thead><tr><th colspan=2><h2>'.esc_html( __('Acts of Courage','church-admin' ) ).'</th></tr><thead><tbody>';
-		echo'<tr><th scope="row">'.esc_html( __('Acts of courage post type','church-admin' ) ).'</th><td><input type="checkbox" name="acts_of_courage" value="TRUE" ';
-		$acts=get_option('church-admin-acts-of-courage');
-		if( $acts) echo ' checked="checked" ';
-		echo '/></td></tr>';
-		echo'<tr><th scope="row">'.esc_html( __('Make acts of courage viewable by logged in users only','church-admin' ) ).'</th><td><input type="checkbox" name="private-acts-of-courage" value="TRUE" ';
-		
-		
-		$privateActs=get_option('church-admin-private-acts-of-courage');
-		if( $privateActs) echo ' checked="checked" ';
-		echo '/></td></tr>';
-		
-		echo'<tr><th scope="row">'.esc_html( __('Message for Acts of Courage submission form','church-admin' ) ).'</th><td><textarea cols=80 rows=10 name="acts-of-courage-request-message">';
-		$message=get_option('church-admin-acts-of-courage-message');
-		if(!empty( $message) )  {echo esc_textarea( $message);}
-		else{echo __('We love to hear stories of acts of courage in sharing your faith','church-admin');}
-		echo'</textarea></td></tr>';
-		echo'</table>';
-		/***********************
-		 * Bible REadings
-		 ***********************/
-		echo'<table class="form-table"><thead><tr><th colspan=2><h2>'.esc_html( __('Bible Readings','church-admin' ) ).'</th></tr><thead><tbody>';
-		$noBibleReadings=get_option('church-admin-no-bible-readings');
-		echo'<tr><th scope="row">'.esc_html( __('No Bible readings custom post type','church-admin' ) ).'</th><td><input type="checkbox" name="no-bible-readings" value="TRUE" ';
-		if( $noBibleReadings) echo ' checked="checked" ';
-		echo '/></td></tr>';
-		echo'</table>';
-		/***********************
-		 * Prayer Requests
-		 ***********************/
-		echo'<table class="form-table"><thead><tr><th colspan=2><h2>'.esc_html( __('Prayer Requests','church-admin' ) ).'</th></tr><thead><tbody>';
-
-		$noPrayerRequests=get_option('church-admin-no-prayer');
-		echo'<tr><th scope="row">'.esc_html( __('No prayer requests custom post type','church-admin' ) ).'</th><td><input type="checkbox" name="no-prayer-requests" value="TRUE" ';
-		if( $noPrayerRequests) echo ' checked="checked" ';
-		echo '/></td></tr>';
-
-		echo'<tr><th>'.esc_html( __('Email address for prayer request moderation')).'</th><td>';
-        echo'<input type="email" name="prayer-request-moderation"  ';
-        $prm=get_option('prayer-request-moderation');
-        if ( empty( $prm) )  { $prm=get_option('church_admin_default_from_email');}
-        echo' value="'.esc_html( $prm).'" ';
-        echo'/></td></tr>';
-		
-		echo'<tr><th scope="row">'.esc_html( __('Make prayer requests viewable by logged in users only','church-admin' ) ).'</th><td><input type="checkbox" name="private-prayer" value="TRUE" ';
-		$private=get_option('church-admin-private-prayer-requests');
-		if( $private) echo ' checked="checked" ';
-		echo '/></td></tr>';
-		echo'<tr><th scope="row">'.esc_html( __('Message for Prayer request submission form','church-admin' ) ).'</th><td><textarea cols=80 rows=10 name="prayer-request-message">';
-		$message=get_option('church_admin_prayer_request_message');
-		if(!empty( $message) )echo esc_textarea( $message);
-		echo'</textarea></td></tr>';
-
-		//Admins to get prayer request moderations push notification
-		$licence_level = church_admin_app_licence_check(); 
-		if($licence_level!='premium')
-		{
-			echo'<tr><th scope="row">'.esc_html( __('Admins to get prayer request moderation push','church-admin' ) ).'</th><td>';
-			$prayer_request_people_ids=get_option('church_admin_prayer_request_receive_push_to_admin');
-			$prayer_request_people='';
-			if(!empty( $prayer_request_people_ids) )$prayer_request_people=church_admin_get_people( $prayer_request_people_ids);
-			echo church_admin_autocomplete('prayer-request-admin-push','friends','to',$prayer_request_people,FALSE).'</td></tr>';
-		}
-		echo'</tbody></table>';
 		/***********************
 		 * GDPR
 		 ***********************/
@@ -1450,19 +1253,9 @@ function church_admin_sms_settings()
 		echo '<tr><th scope="row">'.esc_html( __('Email from name','church-admin' ) ).'</th><td><input type="text" name="church_admin_receipt_email_from_name" value="'.esc_html( $from_name).'" /></td></tr>';
 		echo '<tr><th scope="row">'.esc_html( __('Email from email','church-admin' ) ).'</th><td><input type="text" name="church_admin_receipt_email_from_email" value="'.esc_html( $from_email).'" /></td></tr>';
 		echo '<tr><th scope="row">'.esc_html( __('Email template before amounts','church-admin' ) ).'</th><td><textarea name="church_admin_receipt_email_template"  cols=80 rows=10>'.esc_textarea( $template ).'</textarea></td></tr>';
-		/********************************
-		 * Rota SMS mesage
-		 *******************************/
-		$message=null;
-		$message = get_option('church_admin_sms_rota_reply_mesage');
-		echo'<h2>'.__('SMS Schedule Message','church-admin').'</h2>';
-		echo'<p>'.esc_html('For sites with SMS schedule sending setup, you can add some text to the end of a text where they are informed they are serving','church-admin').'</p>';
-		echo'<div class="church-admin-form-group"><label>'.esc_html(__('SMS extra text','church-admin')).'</label><input class="church-admin-form-control" type="text" name="rota_sms_message" value="'.esc_attr($message).'"></div>';
+		echo'</table>';
 
-		echo'<tr><th scope="row" >&nbsp;</th><td><input type="hidden" name="save-general-settings" value="1" /><input class="button-primary" type="submit"  value="'.esc_html( __('Save Settings','church-admin' ) ).' &raquo;" /></td></tr></tbody></table></form>';
-
-
-
+		echo'<p><input type="hidden" name="save-general-settings" value="save"><input class="button-primary" type="submit" value="'.esc_attr(__('Save','church-admin')).'"></p></form>';
 
  }
 
@@ -1638,11 +1431,13 @@ function church_admin_debug_log()
 	if(file_exists( $debug_path) )
 	{
 		$filesize=filesize( $debug_path);
+		//translators: %1$s is a file path
 		echo'<p>'.esc_html(sprintf(__('Debug path: %1$s','church-admin'),$debug_path)).'</p>';
 		echo'<p><a class="button-secondary" href="'.wp_nonce_url('admin.php?page=church_admin/index.php&amp;section=settings&action=clear-debug','clear-debug').'">'.esc_html( __('Clear Debug Log','church-admin' ) ).'</a></p>';
 	
 		$filesize=filesize( $debug_path);
 		$size=size_format( $filesize, $decimals = 2 );
+		//translators: %1$s is file size
 		echo'<p>'.esc_html(sprintf(__('Debug file is currently %1$s','church-admin' ) ,$size)).'</p>';
 	
 		if( $filesize<2097152)
@@ -1670,13 +1465,14 @@ function church_admin_debug_log()
 
 function church_admin_send_debug_to_support()
 {
-	global $wp_version,$church_admin_version,$wpdb;
+	global $wp_version,$wpdb;
 	$upload_dir = wp_upload_dir();
 	$debug_path=$upload_dir['basedir'].'/church-admin-cache/debug_log.php';
 	if(!file_exists( $debug_path) ) return '<p>'.esc_html( __("Debug log is empty",'church-admin' ) ).'</p>';
 	$filesize=@filesize( $debug_path);
 	$size=size_format( $filesize, $decimals = 2 );
 	echo'<h2>'.esc_html( __("Send debug log to support",'church-admin' ) ).'</h2>';
+	//translators: %1$s is a file size
 	echo'<p>'.esc_html(sprintf(__('Debug file is currently %1$s','church-admin' ) ,$size)).'</p>';
 	if( $filesize>2097152)  {echo '<p>'.esc_html( __("Debug log is too big",'church-admin' ) ).'</p>';return;}
 	if( $filesize<500)  {echo '<p>'.esc_html( __("Debug log is too small to send (not enough debug data). Please repeat the task you are wanting to report a bug for and refresh this page.",'church-admin' ) ).'</p>';return;}
@@ -1701,7 +1497,7 @@ function church_admin_send_debug_to_support()
 		$subject='Debug Log from '.site_url();
 		$message='<table><tr><th scope="row">Site</th><td>'.esc_html(site_url() ).'</td></tr>';
 		$message.='<tr><th scope="row">WordPress version</th><td>'.esc_html( $wp_version).'</td></tr>';
-		$message.='<tr><th scope="row">Church Admin Plugin version</th><td>'.esc_html( $church_admin_version).'</td></tr>';
+		$message.='<tr><th scope="row">Church Admin Plugin version</th><td>'.CHURCH_ADMIN_VERSION.'</td></tr>';
 		$message.='<tr><th scope="row">Premium?</th><td>'.esc_html( $premium).'</td></tr>';
 		$message.='<tr><th scope="row">PHP version</th><td>'.esc_html(PHP_VERSION).'</td></tr>';
 		
@@ -1896,4 +1692,76 @@ function church_admin_new_user_template()
 	
 
 
+}
+
+
+/*****************************
+*
+* Choose filters to show
+*
+*****************************/
+function church_admin_choose_filters()
+{
+    echo '<h2>'.esc_html( __("Choose which filters are shown",'church-admin' ) ).'</h2>';
+    $menuFilters=array(
+		'contact-form'=>esc_html( __('Contact form','church-admin' ) ),
+		'show-me'=>esc_html( __('Shown in directory','church-admin' ) ),
+	'address'=>esc_html( __('Address','church-admin' ) ),
+	'bible-readings'=>esc_html(__('Bible readings','church-admin')),
+	"genders"=>esc_html( __('Genders','church-admin' ) ),
+	'photo-permission'=>esc_html( __('Photo permission','church-admin' ) ),
+	'user-accounts'=>esc_html( __('User accounts','church-admin' ) ),
+	'email-addresses'=>esc_html( __('Email address','church-admin' ) ),
+	'phone-calls'=>esc_html(__("Receive phone calls",'church-admin' ) ),
+	'cell'=>esc_html( __('Cell phone','church-admin' ) ),
+	'classes'=>esc_html( __('Classes','church-admin' ) ),
+	'gdpr'=>esc_html( __('Data protection confirmed','church-admin' ) ),
+	'people_types'=>esc_html( __('People types','church-admin' ) ),
+	'active'=>esc_html( __('Active','church-admin' ) ),
+	'marital'=>esc_html( __('Marital Status','church-admin' ) ),
+	'sites'=>esc_html( __('Sites','church-admin' ) ),
+	'member_types'=>esc_html( __('Member Types','church-admin' ) ),
+	'small-groups'=>esc_html( __('Small groups','church-admin' ) ),
+	'ministries'=>esc_html( __('Ministries','church-admin' ) ),
+	'birth-year'=>esc_html( __('Birth year','church-admin' ) ),
+	'birth-month'=>esc_html( __('Birth month','church-admin' ) ),
+	'parents'=>esc_html( __('Parents','church-admin' ) ),
+	'spiritual-gifts'=>esc_html( __('Spiritual gifts','church-admin' ) ),
+	'email-send'=>esc_html( __('Email Permission','church-admin') ),
+	'age-related'=>esc_html(__('Age related groups','church-admin'))
+	);
+	ksort($menuFilters);
+    //add on custom fields
+    $customFields=church_admin_get_custom_fields();
+	
+    if(!empty( $customFields) )
+    {
+        foreach ( $customFields AS $ID=>$field)
+        {
+            $menuFilters[sanitize_title( $field['name'] )]=$field['name'];
+        }
+    }
+    if(!empty( $_POST['save-filters'] ) )
+    {
+        $chosenFilters=array();
+        foreach ( $menuFilters AS $ID=>$field)
+		{
+            if(!empty( $_POST[$ID] ) )$chosenFilters[$ID]=TRUE;
+        }
+        update_option('church-admin-which-filters',$chosenFilters);
+        echo'<div class="notice notice-success inline"><h2>'.esc_html( __("Filter choice saved",'church-admin' ) ).'</h2></div>';
+    }
+	$whichFilters=get_option("church-admin-which-filters");
+    echo'<form action="" method="POST">';
+    echo'<table class="form-table"><tbody>';
+    foreach( $menuFilters AS $ID=>$field)
+    {
+        echo'<tr><th scope="row">'.esc_html( $field).'</th><td><input type="checkbox" name="'.esc_html( $ID).'" ';
+        if(!empty( $whichFilters[$ID] ) )echo 'checked="checked" ';
+        echo' value=1/></td></tr>';
+    }
+    echo'<tr><td colspan=2><input type="hidden" name="save-filters" value="TRUE" /><input type="Submit" class="button-primary" value="'.esc_html( __('Save','church-admin' ) ).'" /></td></tr></table>';
+
+    
+    
 }

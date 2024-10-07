@@ -2,64 +2,6 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit('You need Jesus!'); // Exit if accessed directly
 
-/*********************************
- * 
- * COVID booking CSV
- * 
- *********************************/
-function church_admin_service_booking_csv( $date_id,$service_id,$alphabetical=FALSE)
-{
-  
-    global $wpdb;
-    $nextservice=$wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'church_admin_calendar_date WHERE date_id="'.(int)$date_id.'"');
-    if(defined('CA_DEBUG') )church_admin_debug(print_r( $nextservice,true) );
-    $serviceDetails=$wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'church_admin_services WHERE service_id="'.(int)$service_id.'"');
-    $sql='SELECT * FROM '.$wpdb->prefix.'church_admin_covid_attendance WHERE service_id="'.(int)$service_id.'" AND date_id="'.(int)$date_id.'" ORDER BY people_id ASC';
-    $results=$wpdb->get_results( $sql);
-    
-    if(!empty( $results) )
-    {
-        
-       
-        
-        
-        $csv='"'.esc_html( __('No','church-admin' ) ).'","'.esc_html( __('Bubble','church-admin' ) ).'","'.esc_html( __('Name','church-admin' ) ).'","'.esc_html( __('Email','church-admin' ) ).'","'.esc_html( __('Phone','church-admin' ) ).'"'."\r\n";
-        $x=1;
-        
-        if(!empty( $alphabetical) )
-        {
-            $newArray=array();
-            foreach( $results AS $row)
-            {
-                $splitname=explode(" ",$row->people_id);
-                if(!empty( $splitname[1] ) )
-                {
-                    $key=$splitname[1].', '.$splitname[0];
-                }else{$key=$splitname[0];}
-                $newArray[$key]=$row;
-                $newArray[$key]->people_id=$key;
-            }
-            ksort( $newArray);
-            $results=$newArray;
-        }
-        foreach( $results AS $row)
-        {
-            $csv.='"'.$x.'","'.(int)$row->bubble_id.'","'.$row->people_id.'","'.$row->email.'","'.$row->phone.'"'."\r\n";
-            
-        }
-		header('Content-Description: File Transfer');
-		header('Content-Type: application/octet-stream');
-		header('Content-Disposition: attachment; filename="service-prebooking.csv"');
-		header('Content-Transfer-Encoding: binary');
-		header('Expires: 0');
-		header('Cache-Control: must-revalidate');
-		header('Pragma: public');
-		header("Content-Disposition: attachment; filename=\"service-prebooking.csv\"");
-		echo "\xEF\xBB\xBF"; // UTF-8 BOM
-		echo $csv;
-		exit();
-    }
-}
 /**********************************
  *
  * Giving CSV
@@ -100,14 +42,6 @@ function church_admin_giving_csv( $start_date,$end_date,$people_id)
         {
             $name=$row->name;
             $serviceDetail='';
-            if(!empty( $row->service_id) )
-            {
-                $service=$wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'church_admin_services WHERE service_id="'.(int)$row->service_id.'"');
-                if(!empty( $service) )
-                {
-                    $serviceDetail=$service->service_name.' '.$service->service_time;
-                }
-            }
             if(!empty( $row->people_id) )
             {
                 $person=$wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'church_admin_people WHERE people_id="'.(int)$row->people_id.'"');
@@ -392,70 +326,3 @@ function church_admin_people_csv()
 }
 
 
-
-function church_admin_attendance_csv()
-{
-    global $wpdb;
-    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/attendance.php');
-
-    echo'<h2>'.esc_html( __('Attendance CSV','church-admin' ) ).'</h2>';
-	echo'<form action="'.admin_url().'admin.php" method="POST"><table>';
-    wp_nonce_field('attendance-csv');
-	echo'<input type="hidden" name="page" value="church_admin/index.php" /><input type="hidden" name="ca_download" value="attendance-csv" /><input type="hidden" name="service" value="attendance" />';
-    echo'<tr><th scope="row">'.esc_html( __('Meeting','church-admin' ) ).'</th><td>'.church_admin_att_mtg_chooser(NULL,NULL);
-	echo'</td><td><input class="button-primary" type="submit" value="'.esc_html( __('Download CSV','church-admin' ) ).'" /></td></tr></table></form>';
-    
-}
-function church_admin_attendance_csv_output()
-{
-    
-    global $wpdb;
-    $csv='"'.esc_html( __('Date','church-admin' ) ).'","'.esc_html( __('Adults','church-admin' ) ).'","'.esc_html( __('Children','church-admin' ) ).'","'.esc_html( __('Rolling Average Adults','church-admin' ) ).'","'.esc_html( __('Rolling Average Children','church-admin' ) ).'"'."\r\n";
-
-    if(!empty( $_REQUEST['service_id'] ) )
-  		{
-  			$meeting=explode('/',church_admin_sanitize($_REQUEST['service_id'] ));
-  			if(!empty( $meeting) )
-  			{//meeting populated
-  				switch( $meeting['0'] )
-  				{
-  					default:
-  					case'S':
-  						$mtg_type='service';
-  					break;
-  					case 'G':
-  						$mtg_type='group';
-  					break;
-  					case 'C':
-  						$mtg_type='class';
-  					break;
-  				}
-		  		$service_id=intval( $meeting['1'] );
-  		    }
-        }
-  		else
-  		{
-  			$service_id=1;
-  			$mtg_type='service';
-  		}
-  		$query = 'SELECT * FROM '.$wpdb->prefix.'church_admin_attendance WHERE mtg_type="'.$mtg_type.'" AND service_id="'.esc_sql( $service_id).'" ORDER BY `date` DESC';
-        $results=$wpdb->get_results( $query);
-        if(!empty( $results) )
-        {
-            foreach( $results AS $row)
-            {
-                $csv.='"'.$row->date.'","'.intval( $row->adults).'","'.intval( $row->children).'","'.intval( $row->rolling_adults).'","'.intval( $row->rolling_children).'"'."\r\n";
-            }
-            
-        }
-    
-    $filename="attendance.csv";
-	header("Cache-Control: public");
-	header("Content-Description: File Transfer");
-	header("Content-Disposition: attachment; filename=$filename");
-	header("Content-Type: text/csv");
-	header("Content-Transfer-Encoding: binary");
-	echo "\xEF\xBB\xBF"; // UTF-8 BOM
-	echo $csv; 
-    exit();
-}

@@ -1,5 +1,5 @@
-<?PHP
-
+<?php
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  /**
  *
  * Registers google map api with low priority, so it happens last on enqueuing!
@@ -91,9 +91,9 @@ function church_admin_autocomplete_script()
 }
 function church_admin_date_picker_script()
 {
-	global $church_admin_version;
-    wp_enqueue_script( 'jquery-ui-datepicker','','',NULL );
-    wp_enqueue_style('church-admin-ui','https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css',false,"1.13.2",false);
+    church_admin_debug('Enqueuing datepicker');
+    wp_enqueue_script( 'jquery-ui-datepicker');
+    wp_enqueue_style('church-admin-ui',plugins_url('/',dirname(__FILE__) ). 'css/jquery-ui-1.13.2.css',false,"1.13.2",false);
 
 }
 function church_admin_farbtastic_script()

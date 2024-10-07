@@ -12,11 +12,7 @@ function church_admin_find_custom_id( $customField)
 
 function church_admin_display_custom_field( $deltadays=365,$showYears=1,$custom_id)
 {
-    $licence =get_option('church_admin_app_new_licence');
-    if($licence!='standard' && $licence!='premium'){
-        return '<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-        
-    }
+   
     global $wpdb;
     $custom_fields=church_admin_get_custom_fields();
     if ( empty( $custom_fields[$custom_id] ) ) return __("Custom field doesn't exist",'church-admin');

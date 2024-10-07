@@ -36,7 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 	$initial=true;
 
 	$display_categories = $display_facilities = array();
-    $facilities=church_admin_calendar_facilities_array();
+    
 	$categories=church_admin_calendar_categories_array();
     if(!empty($cat_id))
     {
@@ -309,7 +309,7 @@ function church_admin_category_list()
         $table.='<tr><td>'.$edit_url.'</td><td>'.$delete_url.'</td><td style="background:'.esc_attr($row->bgcolor).';color:'.esc_attr($row->text_color).'">'.esc_html( $row->category).'</td><td>'.$shortcode.'</td></tr>';
     }
     $table.='</tbody><tfoot>'.$thead.'</tfoot></table>';
-    echo '<h2>'.esc_html( __('Calendar Categories','church-admin' ) ).'</h2><p><a href="'.wp_nonce_url('admin.php?page=church_admin/index.php&amp;action=edit-category&section=calendar','edit-category').'">'.esc_html( __('Add a category','church-admin' ) ).'</a></p>'.$table;
+    echo '<h2>'.esc_html( __('Calendar Categories','church-admin' ) ).'</h2><p><a class="button-primary" href="'.wp_nonce_url('admin.php?page=church_admin/index.php&amp;action=edit-category&section=calendar','edit-category').'">'.esc_html( __('Add a category','church-admin' ) ).'</a></p>'.$table;
 }
 
 
@@ -360,7 +360,7 @@ function church_admin_edit_category( $id)
         }
         else
         {
-        	$wpdb->query('INSERT INTO '.$wpdb->prefix.'church_admin_calendar_category (category,bgcolor,textcolor) VALUES("'.esc_sql($color ).'","'.esc_sql($textColor).'")');        
+        	$wpdb->query('INSERT INTO '.$wpdb->prefix.'church_admin_calendar_category (category,bgcolor,textcolor) VALUES("'.esc_sql($category_name  ).'","'.esc_sql($color ).'","'.esc_sql($textColor).'")');      
 		}
         echo '<div id="message" class="notice notice-success inline">';
         if( $id)  {
@@ -397,10 +397,12 @@ function church_admin_edit_category( $id)
  		if(!empty( $data->category) ) echo 'value="'.esc_attr( $data->category).'"';
 			echo'/></div>';
  		echo'<div class="church-admin-form-group"><label>'.esc_html( __('Background Colour','church-admin' ) ).'</label><input  class="church-admin-form-control" type="text" ';
-  		if(!empty( $data->bgcolor) ) echo' style="background:'.esc_attr( $data->bgcolor).';color:'.esc_attr($row->text_color).'" ';
+  		if(!empty( $data->bgcolor) && !empty($data->text_color)) {
+			echo' style="background:'.esc_attr( $data->bgcolor).';color:'.esc_attr($data->text_color).'" ';
+		}
   		echo' id="color" name="color" ';
   		if(!empty( $data->bgcolor) )echo' value="'.esc_attr( $data->bgcolor).'" ';
-  		echo'/><div>';
+  		echo'/></div>';
 		echo'<div id="colorpicker"></div>';
     	echo'<p><input type="submit" class="button-primary" name="edit_category" value="'.$which.'" /></p></form>';
 

@@ -5,8 +5,8 @@ Tags: church, sermons, membership,schedule,  calendar
 Requires at least: 5.0
 Requires PHP: 7.0
 Tested up to: 6.6
-Stable tag: 4.5.2
-Elementor tested up to: 3.23.4
+Stable tag: 5.0.0
+Elementor tested up to: 3.24.1
 License: GNU General Public License (GPL) version 2 
 
 Organise and communicate church life, with associated Android and iOS app for your congregation.
@@ -17,41 +17,15 @@ This plugin is for church wordpress sites and has an smartphone app too - it add
 <a href="http://demo.churchadminplugin.com">Demo site</a>
 <a href="https://www.churchadminplugin.com">Plugin site</a>
 
-Compatible with Elementor and provides Elementor widgets, tested to v3.21.4
+Compatible with Elementor and provides Elementor widgets, tested to v3.24.1
 
 
 * FREE VERSION
 * Church Membership database
 * Integrate newcomers with customisable registration form and follow up flows
+* Calendar for church diary
+* Sermon podcasting
 * Customisable Church Directory with full privacy settings.
-* BASIC Version
-* Adds sermon podcasting and the calendar
-* STANDARD VERSION - free 28 day trial.
-* Adds...
-* Communication tools - SMS, Email and push notifications (premium)
-* Event ticketing - for logged in users and others, with account setup if the customer wants 
-* Small Groups - add, edit and delete
-* Members - add, edit and delete
-* Email- send an email to members, parents or small group leaders. Now has a template - make sure you update your settings to include Facebook page and twitter if you use them!
-* PDF Mailing labels
-* SMS - send bulk sms to members using Twilio (with reply handling), TextMagic or  www.bulksms.com
-* Sunday Rota/Schedules - create and show rotas for your volunteers.
-* Kidswork - automatically sort children into their age groups, with manual override
-* Attendance tracking
-* Ministries - people can have different ministries they are involved in and be sent SMS or email by role, other functions coming soon.
-* Google map integrations for small groups and directories
-* Calendar - month to view, agenda view and nth day recurring events (eg 3rd Sunday)
-* Facilities - manage facilities like rooms and equipment and their bookings.
-* The calendar now includes that most powerful of planning tools - the year planner!
-* Volunteers - church members can volunteer online and be approved/decline by team leaders.
-* Simple pre-booking places for services during the Covid-19 pandemic
-* PREMIUM VERSION
-* Adds...
-* Our Church app subscription for your church. Free install on iOS and Android via https://ourchurchapp.online
-* Online giving via PayPal/Stripe for premium version (including Gift Aid for UK churches)
-* Paid ticketing
-* Pastoral Visitation module
-* Logged in users can indicate serving availablilty, to ease scheduling.
 
 == Installation ==
 
@@ -81,9 +55,17 @@ You can report any security bugs found in the source code of the site-reviews pl
 1. Address list display
 2. Sermon podcasting display
 3. Calendar display
-4. Rota / Schedule display
+
 
 == Changelog ==
+= 5.0.0 =
+* In line with WordPress plugin rules, Church Admin contains all the free stuff.
+* All premium features are now in a separate plugin downloadable from https://churchadminplugin.com
+* Fix new calendar category not saving
+= 4.5.3 =
+* Toilet messaging shortcode added, for chidlrens workers to quickly SMS parents when child needs toilet. 
+* Twilio list also shows  outbound not replied yet too.
+* Custom Field Bulk Editor entries sorted by name
 = 4.5.2 =
 * Fix roles not saving
 * Added date search to main sermons new style block and shortcode

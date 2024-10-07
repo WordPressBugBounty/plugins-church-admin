@@ -2,11 +2,7 @@
 
 function church_admin_all_the_series_display( $sermon_page=NULL)
 {
-    $licence =get_option('church_admin_app_new_licence');
-    if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-        return '<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="https://buy.stripe.com/fZedSB9ErbQRcjm14V">Upgrade</a></p></div>';
-        
-    }
+   
 
     global $wpdb;
     $cols=3;

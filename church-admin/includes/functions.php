@@ -136,34 +136,6 @@ function church_admin_date_picker( $db_date=null,$name=null,$array=FALSE,$start=
 
 
 /**
- * Array of ministries
- *
- * @param
- * deprecated
- *
- * @author andy_moyle
- *
- */
-function church_admin_ministries( $childID=NULL)  {
-	global $wpdb;
-	$ministries=array();
-	$sql='SELECT * FROM '.$wpdb->prefix.'church_admin_ministries';
-	$where='';
-	//if(!empty( $childID) ) {$where=' WHERE childID ="'.intval( $childID).'"';}
-	//if( $childID=='None')$where=' WHERE childID =0';
-	$order=' ORDER BY ministry';
-	$results=$wpdb->get_results( $sql.$where.$order);
-	if(!empty( $results) )
-	{
-
-		foreach( $results as $row)  {$ministries[$row->ID]=$row->ministry;}
-
-	}
-
-	return $ministries;
-
-}
-/**
  * sets wp_mail to html type!
  *
  * Author:     Andy Moyle
@@ -303,6 +275,8 @@ function church_admin_checkdate( $date)
         }
 }
 
+
+
 function church_admin_level_check( $what,$user_id=NULL)
 {
   
@@ -319,23 +293,7 @@ function church_admin_level_check( $what,$user_id=NULL)
        
         return false;
     }
-/*
-    //ministry team contact
-    if($what=="ministries")
-    {
-        church_admin_debug('Checking for ministries what');
-        $people_id = $wpdb->get_var('SELECT people_id FROM '.$wpdb->prefix.'church_admin_people WHERE user_id="'.(int)$user_id.'"');
-        //church_admin_debug($wpdb->last_query);
-        if(!empty($people_id))
-        {
-            $is_team_contact=$wpdb->get_var('SELECT people_id FROM '.$wpdb->prefix.'church_admin_people_meta WHERE people_id="'.(int)$people_id.'" AND meta_type="team_contact"');
-            //church_admin_debug($wpdb->last_query);
-            if(!empty($is_team_contact)){
-                return TRUE;
-            }
-        }
-    }
-*/
+
 
 
     $user_permissions=maybe_unserialize(get_option('church_admin_user_permissions') );
@@ -515,6 +473,10 @@ function church_admin_get_person( $id)
         return $name;
     }else{return FALSE;}
 }
+
+
+
+
 function church_admin_get_name_from_user( $id)
 {
              /**
@@ -527,24 +489,24 @@ function church_admin_get_name_from_user( $id)
  * @version  0.1
  *
  *
-*/
- global $wpdb;
- ;
-    $row=$wpdb->get_row('SELECT first_name,middle_name,nickname,prefix,last_name FROM '.$wpdb->prefix.'church_admin_people WHERE user_id="'.esc_sql( $id).'"');
+    */
+    global $wpdb;
+    ;
+        $row=$wpdb->get_row('SELECT first_name,middle_name,nickname,prefix,last_name FROM '.$wpdb->prefix.'church_admin_people WHERE user_id="'.esc_sql( $id).'"');
 
-    if( $row)
-    {
-    	//build name
-		$name=$row->first_name.' ';
-					$middle_name=get_option('church_admin_use_middle_name');
-					if(!empty( $middle_name)&&!empty( $row->middle_name) )$name.=$row->middle_name.' ';
-					$nickname=get_option('church_admin_use_nickname');
-					if(!empty( $nickname)&&!empty( $row->nickname) )$name.='('.$row->nickname.') ';
-					$prefix=get_option('church_admin_use_prefix');
-					if(!empty( $prefix)&&!empty( $row->prefix) )		$name.=$row->prefix.' ';
-					$name.=$row->last_name;
-    	return esc_html( $name);
-    }else{return FALSE;}
+        if( $row)
+        {
+            //build name
+            $name=$row->first_name.' ';
+                        $middle_name=get_option('church_admin_use_middle_name');
+                        if(!empty( $middle_name)&&!empty( $row->middle_name) )$name.=$row->middle_name.' ';
+                        $nickname=get_option('church_admin_use_nickname');
+                        if(!empty( $nickname)&&!empty( $row->nickname) )$name.='('.$row->nickname.') ';
+                        $prefix=get_option('church_admin_use_prefix');
+                        if(!empty( $prefix)&&!empty( $row->prefix) )		$name.=$row->prefix.' ';
+                        $name.=$row->last_name;
+            return esc_html( $name);
+        }else{return FALSE;}
 }
 
 
@@ -654,15 +616,15 @@ function church_admin_get_people( $idArray)
 function church_admin_get_people_id( $name)
 {
         /**
- *
- * Returns serialized array of people_id if $name is in DB
- *
- * @author  Andy Moyle
- * @param    $name
- * @return   serialized array
- * @version  0.1
- *
- */
+     *
+     * Returns serialized array of people_id if $name is in DB
+     *
+     * @author  Andy Moyle
+     * @param    $name
+     * @return   serialized array
+     * @version  0.1
+     *
+     */
     global $wpdb;
     $names=explode(',',$name);
 
@@ -729,40 +691,7 @@ function church_admin_get_people_ids( $names)
 
 
 
-function church_admin_get_push_tokens_from_ids( $ids)
-{
-    church_admin_debug("**** FUNCTION church_admin_get_push_tokens_from_ids ******");
-    church_admin_debug("For array of people_ids");
-    //church_admin_debug($ids);
-        /**
-         *
-         * Returns  array of pushTokens from array of people_ids
-         *
-         * @author  Andy Moyle
-         * @param    $name
-         * @return   serialized array
-         * @version  0.1
-         *
-         */
-    global $wpdb;
-    
-    $pushTokens=array();
-    if(!empty( $ids) )
-    {
-        foreach( $ids AS $key=>$id)
-        {
-			 $sql='SELECT pushToken FROM '.$wpdb->prefix.'church_admin_people WHERE people_id="'.(int)$id.'" AND pushToken!="" LIMIT 1';
-            church_admin_debug( $sql);
-            $result=$wpdb->get_var( $sql);
-            //church_admin_debug($result);
-            if( !empty( $result ) )  {$pushTokens[]=$result;}
-         
-        }
-    }
-    church_admin_debug('Array of pushTokens');
-    //church_admin_debug($pushTokens);
-    return array_filter( $pushTokens);
-}
+
 function church_admin_get_user_id( $name)
 {
         /**
@@ -844,7 +773,22 @@ function church_admin_update_order( $which='member_type')
     }
 }
 
-   
+function church_admin_facilities_array(){
+    global $wpdb;
+    $out=array();
+    $sql='SELECT * FROM '.$wpdb->prefix.'church_admin_facilities ORDER BY facility_name';
+    $results=$wpdb->get_results( $sql );
+    if( $results )
+    {
+
+        foreach( $results AS $row ){
+        
+            $out[$row->facilities_id]= $row->facility_name;
+        }
+    }
+    
+    return $out;
+}   
  
 function church_admin_sermon_series_array(){
     global $wpdb;
@@ -897,42 +841,7 @@ function church_admin_event_array(){
     return $out;
 
 }
-function church_admin_facilities_array(){
-    global $wpdb;
-    $out=array();
-    $sql='SELECT * FROM '.$wpdb->prefix.'church_admin_facilities ORDER BY facility_name';
-    $results=$wpdb->get_results( $sql );
-    if( $results )
-    {
 
-        foreach( $results AS $row ){
-        
-            $out[$row->facilities_id]= $row->facility_name;
-        }
-    }
-    
-    return $out;
-}
-
-
-function church_admin_events_array(){
-    global $wpdb;
-    $out=array();
-    $sql='SELECT * FROM '.$wpdb->prefix.'church_admin_events WHERE event_date>=NOW() ORDER BY event_date';
-    $results=$wpdb->get_results( $sql );
-    if( $results )
-    {
-
-        foreach( $results AS $row ){
-        
-            $out[(int)$row->event_id]= esc_html($row->title);
-        }
-    }
-    
-    return $out;
-
-
-}
 
 function church_admin_sermon_sermons_array(){
     global $wpdb;
@@ -951,98 +860,9 @@ function church_admin_sermon_sermons_array(){
     return $out;
 
 }
-function church_admin_services_array(){
-    global $wpdb,$wp_locale;
-    $out=array();
-    $sql='SELECT a.*,b.venue AS site FROM '.$wpdb->prefix.'church_admin_services a ,'.$wpdb->prefix.'church_admin_sites b WHERE a.site_id=b.site_id';
-    $results=$wpdb->get_results( $sql);
-    if( $results)
-    {
 
-        foreach($results AS $row){
-            if(church_Admin_int_check($row->service_day) && $row->service_day <=6 && $row->service_day>=0 )
-            {
-                //church_admin_debug($row->service_day.' - '.$wp_locale->get_weekday( $row->service_day));
-                $serviceDay = $wp_locale->get_weekday( $row->service_day);
-            }
-            else
-            { 
-                //church_admin_debug($row->service_day);
-                $serviceDay = __('As Arranged','church-admin');
-            }
-           
-            $out[$row->service_id]=esc_html(sprintf(__('%1$s on %2$s at %3$s','church-admin' ) ,$row->service_name,$serviceDay,$row->service_time));
-        }
-    }
-    
-    return $out;
-}
-function church_admin_sites_array(){
-    global $wpdb;
-    $out=array();
-    $sql='SELECT * FROM '.$wpdb->prefix.'church_admin_sites';
-    $results=$wpdb->get_results( $sql);
-    if( $results)
-    {
 
-        foreach($results AS $row){
-            
-            
-            $out[$row->site_id]= esc_html( $row->venue );
-        }
-    }
-    
-    return $out;
-}
-function church_admin_groups_array()
-{
-    //church_admin_debug('****** CHURCH ADMIN GROUPS ARRAY ******');
-    global $wpdb,$wp_locale;
-    $groups=array();
-    $results=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_smallgroup ORDER BY group_day ASC, group_name ASC');
-    if(!empty( $results) )
-    {
-        foreach( $results AS $row)
-        {
-            $groups[(int)$row->id]=$row->group_name;
-            if(isset( $row->group_day) )$groups[(int)$row->id].=' ('.$wp_locale->get_weekday( $row->group_day).')';
-        }
-    }
-    //church_admin_debug( $groups);
-    //church_admin_debug('**************************************');
-    return $groups;
-}
-function church_admin_units_array()
-{
-    global $wpdb;
-    $units=array();
-    $results=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_units ORDER BY name');
-    if(!empty($results))
-    {
-        foreach($results AS $row){
-            $units[(int)$row->unit_id]=$row->name;
-        }
-    }
-    return $units;
-}
 
-function church_admin_on_visit_list_array()
-{
-    global $wpdb;
-
-    $output = array();
-
-    $results = $wpdb->get_results('SELECT a.*,b.* FROM '.$wpdb->prefix.'church_admin_people_meta a, '.$wpdb->prefix.'church_admin_people b  WHERE a.people_id=b.people_id AND a.meta_type="pastoral-visit-required"');
-    if(empty($results)){return $output;}
-
-    foreach($results AS $row){
-        $last_visit = null;$last_visit = $wpdb->get_var('SELECT visit_date FROM '.$wpdb->prefix.'church_admin_pastoral_visits WHERE visited="'.(int)$row->people_id.'" ORDER BY visit_date DESC LIMIT 1');
-        $lastvisit = null;
-        $output[church_admin_formatted_name($row)] = array('people_id'=>$row->people_id,'last_visited'=>$last_visit);
-    }
-    asort($output);
-    return $output;
-}
 
 function church_admin_calendar_facilities_array()
 {
@@ -1187,65 +1007,9 @@ function church_admin_kidswork_array()
 
 
 
-function church_admin_get_ministry_hierarchy( $ID)
-{
 
-	$structure=array();
-	while( $ID)
-	{
-		$thisOne=church_admin_get_ministry( $ID);
-		if(!empty( $thisOne->ministry) )$structure[$ID]=$thisOne->ministry;
-		if(!empty( $thisOne->parentID) )  {$ID=$thisOne->parentID;}
-		else $ID=FALSE;
-	}
-	return $structure;
-	
-}
-function church_admin_get_ministry( $ID)
-{
-	global $wpdb;
-    if(empty($ID) || !church_admin_int_check($ID)){
-        return FALSE;
-    }
-	$result=$wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'church_admin_ministries WHERE id="'.(int)$ID.'"');
-	if ( empty( $result) )  {
-        return FALSE;
-    }else{
-        return $result;
-    }
 
-}
 
-function church_admin_get_hierarchy( $ID)
-{
-		$rand=rand();
-  		church_admin_leadership_hierarchy( $ID,$rand);
-    	$hierarchy=get_option('church_admin_leadership_hierarchy'.$rand);
-    	delete_option('church_admin_leadership_hierarchy'.$rand);
-    	return $hierarchy;
-}
-
-function church_admin_leadership_hierarchy( $ID,$rand)
-{
-	global $wpdb;
-	$hierarchy=get_option('church_admin_leadership_hierarchy'.$rand);
-	if ( empty( $hierarchy)||(is_array( $hierarchy)&&!in_array( $ID,$hierarchy) ))  {$hierarchy=array(1=>$ID);update_option('church_admin_leadership_hierarchy'.$rand,$hierarchy);}
-	$sql='SELECT parentID FROM '.$wpdb->prefix.'church_admin_ministries WHERE ID="'.esc_sql( $ID).'"';
-
-	$nextlevel=$wpdb->get_var( $sql);
-	if ( empty( $nextlevel) )
-	{
-
-	 	return $hierarchy;
-	}
-	else
-	{
-		$hierarchy[]=(int)$nextlevel;
-
-		update_option('church_admin_leadership_hierarchy'.$rand,$hierarchy);
-		church_admin_leadership_hierarchy( $nextlevel,$rand);
-	}
-}
 /**
 * This function updates a people meta
 *
@@ -1469,15 +1233,20 @@ function church_admin_plays( $file_id)
 
 function church_admin_dateCheck( $date, $yearepsilon=5000)
 { // inputs format is "yyyy-mm-dd" ONLY !
-if (count( $datebits=explode('-',$date) )!=3) return false;
-$year = intval( $datebits[0] );
-$month = intval( $datebits[1] );
-$day = intval( $datebits[2] );
-if ((abs( $year-date('Y') )>$yearepsilon) || // year outside given range
-( $month<1) || ( $month>12) || ( $day<1) ||
-(( $month==2) && ( $day>28+(!( $year%4) )-(!( $year%100) )+(!( $year%400) )) ) ||
-( $day>30+(( $month>7)^( $month&1) )) ) return false; // date out of range
-if( checkdate( $month,$day,$year) ) {return ( $year.'-'.esc_html(sprintf("%02d", $month).'-'.sprintf("%02d", $day) ));}else{return FALSE;}
+    if (count( $datebits=explode('-',$date) )!=3) return false;
+    $year = intval( $datebits[0] );
+    $month = intval( $datebits[1] );
+    $day = intval( $datebits[2] );
+    if ((abs( $year-date('Y') )>$yearepsilon) || // year outside given range
+    ( $month<1) || ( $month>12) || ( $day<1) ||
+    (( $month==2) && ( $day>28+(!( $year%4) )-(!( $year%100) )+(!( $year%400) )) ) ||
+    ( $day>30+(( $month>7)^( $month&1) )) ) return false; // date out of range
+    if( checkdate( $month,$day,$year) ) {
+        
+        return ( $year.'-'.esc_html(sprintf("%02d", $month).'-'.sprintf("%02d", $day) ));
+    }else{
+        return FALSE;
+    }
 }
 
 /**************************************************************************************************************************************************
@@ -1645,182 +1414,11 @@ function church_admin_adjust_brightness( $hex, $steps)
 
  	return $out;
  }
-  /**
- *
- * Grab array of people_ids for particular rota_task_id and event
- *
- * @author  Andy Moyle
- * @param    $rota_date,$rota_taks_id,$service_id,$mtg_type
- * @return   array( $people_id=>$name)
- * @version  0.1
- *
- */
- function church_admin_rota_people_array( $rota_date,$rota_task_id,$service_id,$mtg_type)
- {
- 	global $wpdb;
- 	$out=array();
-	$sql='SELECT * FROM '.$wpdb->prefix.'church_admin_new_rota WHERE rota_task_id="'.(int)$rota_task_id.'" AND mtg_type="'.esc_sql( $mtg_type).'" AND service_id="'.(int)$service_id.'" AND rota_date="'.esc_sql( $rota_date).'"';
-	
-    //church_admin_debug( $sql);
- 	
-	if(!empty( $rota_date) )$results=$wpdb->get_results( $sql);
- 	if(!empty( $results) )
- 	{
- 		foreach( $results AS $row)  {
-            if(!empty( $row->people_id) ){
-                $out[$row->people_id]=church_admin_get_person( $row->people_id);
-            }
-        }
- 	}
- 	return $out;
- }
-   /**
- *
- * Grab comma separated list of people for particular rota_taks_id and event
- *
- * @author  Andy Moyle
- * @param    $rota_date,$rota_taks_id,$service_id,$mtg_type
- * @return   string
- * @version  0.1
- *
- */
- function church_admin_rota_people( $rota_date,$rota_task_id,$service_id,$mtg_type)
- {
- 	return implode(", ",church_admin_rota_people_array( $rota_date,$rota_task_id,$service_id,$mtg_type) );
- }
+ 
 
 
- /*
- * Grab array of schedule for date, service_id and mtg_type
- *
- * @author  Andy Moyle
- * @param    $service_id,$date,$mtg_type
- * @return   array
- * @version  0.1
- *
- */
- function church_admin_retrieve_rota_data_array($service_id,$date,$mtg_type='service'){
-	church_admin_debug(' church_admin_retrieve_rota_data_array');
-    global $wpdb;
-	if(empty($service_id)){
-        church_admin_debug('No service id');
-        return NULL;
-    }
-	if(empty($date)){
-        church_admin_debug('No date');
-        return NULL;
-    }
 
 
-	//get tasks
-	$rota_tasks=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_rota_settings ORDER BY rota_order');
-	$requiredRotaJobs=array();
-	foreach( $rota_tasks AS $rota_task)
-	{
-		$allServiceID=maybe_unserialize( $rota_task->service_id);
-		if(is_array( $allServiceID)&& in_array( $service_id,$allServiceID) && !empty($rota_task->calendar))$requiredRotaJobs[$rota_task->rota_id]=$rota_task->rota_task;
-		
-	}
-	if(empty($requiredRotaJobs)){
-        church_admin_debug('No jobs');
-        return NULL;
-    }
-	$data=array();
-    //church_admin_debug($requiredRotaJobs);
-	foreach($requiredRotaJobs AS $rota_task_id => $job){
-        $people = FALSE;
-        //church_admin_debug($date.' '.$rota_task_id.' '.$service_id.' '.$mtg_type);
-		$people = church_admin_rota_people( $date,$rota_task_id,$service_id,$mtg_type);
-        if(!empty($people))$data[$job]= $people;
-	}
-    //church_admin_debug($data);
-    church_admin_debug('END church_admin_retrieve_rota_data_array');
-	return $data;
-}
-
-    /**
- *
- * Grab comma separated list of people for particular rota_taks_id and event
- *
- * @author  Andy Moyle
- * @param    $rota_date,$rota_taks_id,$service_id,$mtg_type
- * @return   string
- * @version  0.1
- *
- */
- function church_admin_rota_people_initials( $rota_date,$rota_task_id,$service_id,$mtg_type)
- {
- 	$people=church_admin_rota_people_array( $rota_date,$rota_task_id,$service_id,$mtg_type);
- 	$initials=array();
- 	foreach( $people AS $key=>$person)
- 	{
- 		$words = explode(" ", $person);
-        
-		$acronym = "";
-		if(!empty( $words) )
-        {
-            foreach ( $words as $w) {if(!empty( $w[0] ) )$acronym .= strtoupper( $w[0] );}
-        }
-		$initials[]=$acronym;
- 	}
- 	return implode(", ",$initials);
- }
-
-function church_admin_rota_people_firstname_initial_last_name( $rota_date,$rota_task_id,$service_id,$mtg_type)
-{
-    //church_admin_debug('First name initial Last name initial processing');
-    global $wpdb;
-    $out=array();
-	$sql='SELECT * FROM '.$wpdb->prefix.'church_admin_new_rota WHERE rota_task_id="'.(int)$rota_task_id.'" AND mtg_type="'.esc_sql( $mtg_type).'" AND service_id="'.(int)$service_id.'" AND rota_date="'.esc_sql( $rota_date).'"';
-	if(!empty( $rota_date) )$results=$wpdb->get_results( $sql);
- 	if(!empty( $results) )
- 	{
- 		foreach( $results AS $row)
-        {
-            //church_admin_debug( $row);
-            //church_admin_debug( $row->people_id);
-            if(church_admin_int_check( $row->people_id) )
-            {
-                //church_admin_debug("DIGIT");
-                //stored as a people id
-                $person = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'church_admin_people WHERE people_id="'.(int)$row->people_id.'"');
-                //church_admin_debug( $person);
-                if(!empty( $person) )
-                {
-                    //church_admin_debug( $person);
-                    $firstName=!empty( $person->first_name)?$person->first_name:NULL;
-                    $prefix=!empty( $person->prefix)?$person->prefix:NULL;
-                    $initialOfLastName=!empty( $person->last_name)?substr( $person->last_name,0,1)  :NULL;   
-                    $out[]=implode(" ",array_filter(array( $firstName,$prefix,$initialOfLastName) ));
-                }
-            }
-            else
-            {
-                
-                //church_admin_debug("WORDS");
-                //stored as a name
-                $words=explode(" ",$row->people_id);
-                //church_admin_debug( $words);
-                //assume first word is first name and last word is last name, everything between a prefix
-                $count=count( $words);
-                //church_admin_debug('ARRAY COUNT:'. $count);
-                $firstName=$words[0];
-                $initialOfLastName=strtoupper(substr( $words[$count-1],0,1) );
-                $prefix=array();
-                if( $count>2)
-                {
-                    
-                    //there's a prefix eg "van der"
-                    for ( $x=1; $x<$count-1; $x++)$prefix[]=$words[$x];
-                }
-                $prefix=implode(' ',$prefix);
-                $out[]=implode(" ",array_filter(array( $firstName,$prefix,$initialOfLastName) ));
-                
-            }
-        }
- 	}
- 	return implode(", ",$out);
-}
 
 /**
  *
@@ -2071,7 +1669,38 @@ function church_admin_dismissable_notices() {
     church_admin_debug('*** church_admin_dismissable_notices ****');
     church_admin_debug($_GET);
     
-    
+
+    //free only in repository
+    $free_dismissed=get_option('dismissed-church-admin-free-version');
+    if ( empty( $free_dismissed) && !empty( $_GET['page'] )&& ( $_GET['page']=='church_admin/index.php') ) { 
+        church_admin_debug('NOTICE');
+   
+        echo'<div class="notice notice-danger is-dismissible ca-notice-dismiss" data-notice="prefix_deprecated"><h2>Church Admin Plugin News from v5.0.0</h2>';
+        
+        
+        echo'<p>In line with changes to the WordPress plugins repository rules, the main plugin contains the free modules only.</p><p>To upgrade to the Premium version with full feature set, please subscribe with this <a href="https://buy.stripe.com/fZedSB9ErbQRcjm14V">link</a>.</p><p>If you have already upgraded, please install the upgrade...</p><p> <a class="button-primary" href="'.esc_url(wp_nonce_url('admin.php?page=church_admin/index.php&action=premium-upgrade','premium-upgrade')).'">Premium plugin install</a></p> </div>';
+        echo'<script>jQuery(document).ready(function( $)  {
+            $("body").on("click",".ca-notice-dismiss",function()  {
+                
+                var data ={
+                    "action": "church_admin",
+                    "method":"dismissed-notice-handler",
+                    "nonce":"'.wp_create_nonce('dismissed-notice-handler').'",
+                    "type": "church-admin-free-version"
+                  };
+                  
+                $.ajax( ajaxurl,
+                {
+                  "type": "POST",
+                  "data": data ,
+                  success:function()  {console.log("Ajax dismiss done");}
+                } );
+
+            });
+
+        });</script>';
+    }
+
     /********************************
     * ROLES and Permissions v4.5.0
     ********************************/
@@ -2247,32 +1876,9 @@ function church_admin_people_activate_callback() {
 }
 
 
-function church_admin_ministries_array()
-{
-	global $wpdb;
-	$ministries=array();
-	$results=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_ministries ORDER BY ministry');
-	if(!empty( $results) )
-	{
-		foreach( $results AS $row){
-            $ministries[(int)$row->ID]=esc_html( $row->ministry);
-        }
-	}
-	return $ministries;
-}
 
 
-function church_admin_small_groups_array()
-{
-	global $wpdb;
-	$small_groups=array();
-	$results=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_smallgroup');
-	if(!empty( $results) )
-	{
-		foreach( $results AS $row)$small_groups[(int)$row->id]=esc_html( $row->group_name);
-	}
-	return $small_groups;
-}
+
 
 function church_admin_encode( $word) {
 
@@ -2396,7 +2002,7 @@ function ca_date_link( $year,$month,$day,$legend=FALSE,$class=NULL,$type=calenda
         if(!empty( $facilities_id) )$link.='&amp;facilities_id='.intval( $facilities_id);
     }else{$link='';}
 	$out='<form action="'.$link.'" method="POST">
-	<input type="hidden" name="start_date" value="'.esc_html( $year.'-'.$month.'-'.sprintf('%02d', $day) ).'" /><button '.$class.'>'.esc_html( $legend).'</button></form>';
+	<input type="hidden" name="start_date" value="'.esc_attr( $year.'-'.$month.'-'.sprintf('%02d', $day) ).'" /><button '.$class.'>'.esc_html( $legend).'</button></form>';
 	return $out;
 
 }
@@ -2453,83 +2059,9 @@ function church_admin_detect_runtime_issues()
 
 
 }
-function church_admin_refresh_rolling_average()
-{
-	global $wpdb;
-	$results=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_attendance');
-	if(!empty( $results) )
-	{
-		foreach( $results AS $row)
-		{
-			$avesql='SELECT FORMAT(AVG(adults),0) AS rolling_adults,FORMAT(AVG(children),0) AS rolling_children FROM '.$wpdb->prefix.'church_admin_attendance WHERE `mtg_type`="'.esc_sql( $row->mtg_type).'" AND `service_id`="'.esc_sql( $row->service_id).'" AND `date` >= DATE_SUB("'.esc_sql( $row->date).'",INTERVAL 52 WEEK) AND `date`<= "'.esc_sql( $row->date).'"';
-    		$averow=$wpdb->get_row( $avesql);
-    		$wpdb->query('UPDATE '.$wpdb->prefix.'church_admin_attendance SET rolling_adults= "'.(int)$averow->rolling_adults.'",rolling_children= "'.(int) $averow->rolling_children.'" WHERE attendance_id="'.(int) $row->attendance_id.'"');
-		}
-	}
 
-}
 
-function church_admin_whosin_kidswork_array()
-{
-		global $wpdb;
-		$kidswork=array();
-		//select GROUPS
 
-			$results=$wpdb->get_results('SELECT a.*,a.id AS kidswork_id, b.ministry FROM '.$wpdb->prefix.'church_admin_kidswork a  LEFT JOIN '.$wpdb->prefix.'church_admin_ministries b ON a.department_id=b.ID ORDER BY youngest DESC');
-			if(!empty( $results) )
-			{
-					foreach( $results AS $row)
-					{
-							$kidswork[$row->kidswork_id]=array('name'=>$row->group_name,'youngest'=>$row->youngest,'oldest'=>$row->oldest);
-							//get kids in that group
-							$sql='SELECT people_id,household_id,kidswork_override FROM '.$wpdb->prefix.'church_admin_people WHERE  (kidswork_override="'.esc_sql( $row->id).'" OR ((date_of_birth<"'.$row->youngest.'" AND date_of_birth>"'.$row->oldest.'") AND kidswork_override=0 ) )';
-
-							$kids=$wpdb->get_results( $sql);
-							if(!empty( $kids) )
-							{
-								foreach( $kids AS $kid)
-								{
-										//get parents of that kid
-										$parents=array();
-										$parents_result=$wpdb->get_results('SELECT people_id FROM '.$wpdb->prefix.'church_admin_people WHERE household_id="'.(int) $kid->household_id.'" AND people_type_id=1');
-										if(!empty( $parents_result) )
-										{
-											foreach( $parents_result AS $parent)
-											{
-													$parents[]=$parent->people_id;
-											}
-										}
-										$kidswork[$row->kidswork_id]['children'][]=array('people_id'=>(int)$kid->people_id,'household_id'=>(int) $kid->household_id,'parents'=>$parents);
-
-								}
-							}
-					}
-				}
-
-				return $kidswork;
-
-}
-function church_admin_get_kids_groups( $people_id)
-{
-  //this function finds the kids work groups a parent has children in.
-    $groups=array();//array of groups people_id is a parent of a child in that group
-    $kidsGroups=church_admin_whosin_kidswork_array();
-    if(!empty( $kidsGroups) )
-    {
-      foreach( $kidsGroups AS $group_id=>$kidsGroup)
-      {
-        if(!empty( $kidsGroup['children'] ) )
-	    {
-		  	foreach( $kidsGroup['children'] AS $kids)
-          	{
-            	if(in_array( $people_id,$kids['parents'] ) )$groups[]=$group_id;
-          	}
-		}
-      }
-    }
-    //church_admin_debug("people_id: $people_id is a parent of kids in these groups \r\n".print_r( $groups,TRUE) );
-    return $groups;
-}
 /**
  *
  * Returns member level of current user
@@ -2662,6 +2194,7 @@ function church_admin_shortcodes_list()
         foreach( $results AS $row)
         {
              $shortcode='<strong>[church_admin type="calendar-list" category="'.esc_html( $row->cat_id).'" weeks="4"]</strong>';
+             //translators: %1$s is category name
             echo'<tr><th scope="row">'.$shortcode.'</th><td>'.esc_html(sprintf(__('Calendar List by Category %1$s','church-admin' ) ,esc_html( $row->category) )).'</td></tr>';
         }
         echo'</tbody></table>';
@@ -2714,14 +2247,7 @@ function church_admin_shortcodes_list()
     //member map
     echo'<h3>'.esc_html( __('Member Map','church-admin' ) ).'</h3>';
     echo'<p>'.esc_html( __('[church_admin_map member_type_id="#" zoom="13" small_group="1"]- zoom is Google map zoom level, small_group=1 for different colours for small groups, 0 for all in red','church-admin' ) ).'</p>';
-    //ministries
-    echo'<h3>'.esc_html( __('Ministries','church-admin' ) ).'</h3>';
-    echo'<p><strong>[church_admin type="ministries" ministry_id=# member_type_id="#"] </strong>'.esc_html( __('Lists people doing various ministries - just specify ministry_ids','church-admin' ) ).'</p>';
-    $min=get_option('church_admin_ministries');
-    if(!empty( $min) )  {
-    	foreach( $min AS $id=>$ministry) echo'<p>'.esc_html(sprintf(__( '"%1$s" has id %2$s.', 'church-admin' ), $ministry, (int)$id )).'</p>';
-
-    }
+   
     echo'<p>'.esc_html( __('[church_admin type="kidswork"] shows the childrens groups','church-admin' ) ).'.</p>';
 	//volunteers
     echo'<h3>'.esc_html( __('Online serving/volunteer application','church-admin' ) ).'</h3>';
@@ -2729,29 +2255,7 @@ function church_admin_shortcodes_list()
     //recent
 	echo'<h3>'.esc_html( __('Recent Visitors','church-admin' ) ).'</h3>';
 	echo'<p><strong>[church_admin type="recent" member_type_id="#"] </strong>'.esc_html( __('Lists your recent visitors - just specify member_types_ids','church-admin' ) ).'</p>';
-    //small groups
-    echo'<h3>'.esc_html( __('Small groups','church-admin' ) ).'</h3>';
-    echo'<p><strong>[church_admin type="small-groups-list" map="1"]</strong>'.esc_html( __(' lists all your small group\'s details in map form (map=1)or as a list (map=0)','church-admin' ) ).'</p>';
-    echo'<p><strong>[church_admin type="small-groups" member_type_id="#" ]</strong>'.esc_html( __('lists all your small groups and their members for a specific member type','church-admin' ) ).'</p>';
-    echo'<p>'.esc_html( __('For the small-groups shortcode you can add loggedin=TRUE and restricted=TRUE to only show groups the user is in or leading','church-admin' ) ).'</p>';
-
-    //rotas
-    echo'<h3>'.esc_html( __('Schedules','church-admin' ) ).'</h3>';
-    echo'<p><strong>[church_admin type="my_rota"]</strong>'.esc_html( __(' shows a logged in user their schedule involvement.','church-admin' ) ).'</p>';
-    echo'<p><strong>[church_admin type="rota" service_id="1"]</strong>'.esc_html( __(' lists the upcoming schedule for a particular service','church-admin' ) ).'</p>';
-
-    $results=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_services ORDER BY service_id');
-    if( $results)
-    {
-        echo '<p>'.esc_html( __('These are your current services','church-admin' ) ).'</p>';
-        foreach( $results AS $row)
-        {
-            if(!(church_admin_int_check( $row->service_day)&&$row->service_day>=0 &&$row->service_day<=7) )$row->service_day=0;
-
-            	echo'<p><label>'.esc_html( $row->service_name).' on '.$wp_locale->get_weekday( $row->service_day).' at '.esc_html( $row->service_time).' </label>service_id='.intval( $row->service_id).'</p>';
-
-        }
-    }
+   
 
     //user registration
     echo'<h3>'.esc_html( __('User Registration','church-admin' ) ).'</h3>';
@@ -3318,7 +2822,7 @@ function church_admin_app_licence_check()
     //church_admin_debug('**** church_admin_app_licence_check() *****');
     //church_admin_debug('Called by: '. debug_backtrace(!DEBUG_BACKTRACE_PROVIDE_OBJECT|DEBUG_BACKTRACE_IGNORE_ARGS,2)[1]['function']);
     $one_month = 28*24*50*60;
-    global $church_admin_version;
+  
 
     //check trial 
     $trial = get_option('church_admin_trial');
@@ -3356,7 +2860,7 @@ function church_admin_app_licence_check()
     if(time() > $licence_checked + $one_month ){
         
         //time to check licence again
-        $url = 'https://www.churchadminplugin.com/?licence_check='.md5(site_url() ).'&url='.site_url().'&v='.$church_admin_version;
+        $url = 'https://www.churchadminplugin.com/?licence_check='.md5(site_url() ).'&url='.site_url().'&v='.CHURCH_ADMIN_VERSION;
         //church_admin_debug($url);
         $response = wp_remote_get( esc_url_raw( $url ) );
         if ( is_array(  $response ) && ! is_wp_error(  $response ) )
@@ -3675,7 +3179,9 @@ function church_admin_url_check( $echo=TRUE)
         {
             
             $message='<h2  style="color:red">'.esc_html( __('Homepage URL issue','church-admin' ) ).'</h2><p>'.esc_html( __('You have a hard-coded value of the site homepage that is different from the setting in Dashboard>Settings>General','church-admin' ) ).'</p>';
+            //translators: %1$s is a URL
             $message.='<p>'.esc_html( sprintf(__('WP_HOME is %1$s','church-admin' ) ,esc_url(WP_HOME) )).'</p>';
+            //translators: %1$s is a URL
             $message.='<p>'.esc_html( sprintf(__('Settings value is %1$s','church-admin' ) ,esc_url( $home) )).'</p>';
         }
         
@@ -3687,7 +3193,9 @@ function church_admin_url_check( $echo=TRUE)
         if(WP_SITEURL!=$siteurl)
         {
             $message.='<h2 style="color:red">'.esc_html( __('Site URL issue','church-admin' ) ).'</h2><p>'.esc_html( __('You have a hard-coded value of the site url that is different from the setting in Dashboard>Settings>General','church-admin' ) ).'</p>';
+            //translators: %1$s is a URL
             $message.='<p>'.esc_html( sprintf(__('WP_SITEURL is %1$s','church-admin' ) ,esc_url(WP_SITEURL)) ).'</p>';
+            //translators: %1$s is a URL
             $message.='<p>'.esc_html( sprintf(__('Settings value is %1$s','church-admin' ) ,esc_url( $siteurl)) ).'</p>';
         }
         
@@ -3849,7 +3357,7 @@ function church_admin_mobile_menu()
 function church_admin_check_user_in_directory()
 {
     
-    global $wpdb,$church_admin_version;
+    global $wpdb;
     $user=wp_get_current_user();
     //perform check user is in directory
     $warning='';
@@ -3859,6 +3367,7 @@ function church_admin_check_user_in_directory()
         if ( empty( $person->user_id) )
         {
             $wpdb->query('UPDATE '.$wpdb->prefix.'church_admin_people SET user_id="'.(int)$user->ID.'" WHERE people_id="'.(int)$person->people_id.'"');
+            //translators: %1$s is an email, %2$s is a name 
             $warning=esc_html( sprintf(__('Your user login email %1$s was not connected to a directory entry, so the plugin connected you to %2$s','church-admin' ) ,$user->user_email,'<a href="'.wp_nonce_url('admin.php?page=church_admin/index.php&amp;action=edit_people&amp;people_id='.(int)$person->people_id,'edit_people').'">'.implode(" ",array_filter(array( $person->first_name,$person->prefix,$person->last_name) )).'</a>'));
         }
     }else
@@ -3870,6 +3379,7 @@ function church_admin_check_user_in_directory()
         $household_id=$wpdb->insert_id;
         $wpdb->query('INSERT INTO '.$wpdb->prefix.'church_admin_people (first_name,last_name,email,household_id,show_me,user_id,head_of_household,sex,people_type_id,gdpr_reason,first_registered)VALUES("'.esc_sql( $first_name).'","'.esc_sql( $last_name).'","'.esc_sql( $email ).'","'.(int)$household_id.'","0","'.(int)$user->ID.'",1,1,1,"'.esc_sql( __('Created from current user account')).'",,"'.esc_sql(wp_date('Y-m-d')).'")');
         $people_id=$wpdb->insert_id;
+        //translators: %1$s is an email, %2$s is a link "Edit your entry"
         $warning=esc_html( sprintf(__('Your user login email %1$s was not in the directory, so the plugin created an entry for you - %2$s','church-admin' ) ,   $user->user_email,
         '<a class="button-primary" href="'.esc_url(wp_nonce_url('admin.php?page=church_admin/index.php&amp;action=edit_people&amp;people_id='.(int)$people_id,'edit_people')).'">'.esc_html( __('Edit your entry','church-admin')).'</a>'));
      
@@ -3886,6 +3396,7 @@ function church_admin_trial_period(){
             
             $sec_left = ($trial_period + $one_month) - time();
             $days = (int)($sec_left/86400);
+            //translators: %1$s a number
             $trial_period_countdown = '<span style="color:red">'.sprintf(_n('Trial period - %1$s day left','Trial period - %1$s days left',$days,'church-admin'),$days).'</span>';
         }
 
@@ -3896,87 +3407,11 @@ function church_admin_title()
 {
   
    
-    global $wpdb,$church_admin_version;
-    $licence = get_option('church_admin_app_new_licence');
-    //church_admin_debug('licence: '.$licence);
-    switch($licence){
-        case 'basic':
-            $title =__('Church Admin Plugin - Basic version','church-admin'); 
-        break;
-        case 'free': 
-        default:
-            $title =__('Church Admin Plugin - Free version','church-admin'); 
-        break;
-        case 'standard': 
-            $title =__('Church Admin Plugin - Standard version','church-admin'); 
-        break;
-        case 'premium': 
-            $title =__('Church Admin Plugin - Premium version','church-admin'); 
-        break;
-    }
+    global $wpdb;
  
-    $title .= ' '.church_admin_trial_period().' v.'. $church_admin_version;
+   $title = 'Church Admin Plugin v.'. CHURCH_ADMIN_VERSION;
     echo'<h1 class="church-admin-title"><a title="'.esc_html( __('Back to menu','church-admin')).'" href="'.esc_url(admin_url().'admin.php?page=church_admin/index.php').'"><span class="ca-dashicons dashicons dashicons-menu-alt3" style="text-decoration:none;"></span></a> '.$title.'</h1>';
 
-}
-function church_admin_classic_header()
-{
-    global $wpdb,$church_admin_version;
-    
-    
-    //header signup
-    echo'<div class="church-admin-content">';
-    echo'<div id="church-admin-header">';
-    church_admin_title();
-    church_admin_change_look();
-    church_admin_search_form();
-    if(!empty( $warning) )
-    {
-       echo'<div class="notice notice-error inline"><h2>'.esc_html( __('Your account','church-admin' ) ).'</h2><p>'.$warning.'</p></div>';
-    }
-    if(isset( $_GET['action'] ) )  {
-        $action= sanitize_text_field( stripslashes( $_GET['action'] ) ) ;
-    }else {
-        $action='default';
-    }
-    if(!empty( $_GET['section'] ) && $_GET['section']!='favourites'){
-        echo'<p><button class="button-secondary" id="add-to-favourites">'.esc_html( __('Add this page to favourites menu','church-admin' ) ).'</button></p>'; 
-    }
-    echo'<div class="church_admin_help"><div class="ca-show-help"><p><button class="button-primary ca-helper" data-action="'.esc_attr($action).'">'.esc_html( __('Show help for this page','church-admin' ) ).'</button></p></div></div><!-- END helper-->
-    <script>
-    jQuery(document).ready(function( $)  {
-        $("body").on("click",".ca-hide-help",function(e)
-        {
-            console.log("hide help");
-            e.preventDefault();
-            
-            $(".ca-show-help").hide();
-        });
-
-        $("body").on("click",".ca-helper",function(e)
-        {
-            e.preventDefault();
-            var which=$(this).data("action");
-            console.log("which: "+ which);
-            var data = {"action":"church_admin","method": "show-help","which": which};
-            console.log(data);
-            var request=$.ajax({
-                url: ajaxurl,
-                type: "post",
-                data:  data
-            })
-            request.error(function()  {console.log("theres an error with AJAX");} );
-            request.success(function(response) { $(".ca-show-help").html(response);})
-                
-        });
-    });
-    </script>';
-    
-    
-    echo'</div><!-- END .church-admin-header -->';
-    
-   
-    
 }
 
 function church_admin_module_dropdown( $module)
@@ -4020,20 +3455,17 @@ function church_admin_module_dropdown( $module)
 function church_admin_boxes_look()
 {
     global $church_admin_menu;
-    $modules=get_option('church_admin_modules');
+ 
+    $modules=array('People'=>1,'Calendar'=>1,'Media'=>1,'Settings'=>1);
   
-    $modules['Settings']=1;//Setting always visible to users with permission
-    $modules['App']=1;
 
     church_admin_title();
-    //church_admin_change_look();
-    church_admin_modules_dropdown();
-  
-    if( !empty( $modules['Support'] ) ){ 
-        church_admin_manual_advert();
-    }
+    
+   
+    church_admin_manual_advert();
+   
     church_admin_new_look_gdpr();
-    $licence = get_option('church_admin_app_new_licence');
+
 
     //create array for dropdowns for each parent
     $parentArray=array();
@@ -4043,13 +3475,11 @@ function church_admin_boxes_look()
         $parentArray[$item['parent']][]=$item;
         
     }
-   
+
     $permissions = $x =0;//no of modules permission for
     foreach( $church_admin_menu AS $name=>$item)
     {
-       
-        
-        if( $item['parent']==$name && !empty( $modules[$item['module']] && in_array($licence,$item['licence_level'] ) ))
+        if( $item['parent']==$name && !empty( $modules[$item['module']]  ))
         {
             $x++;
             if(church_admin_level_check( $item['level'] ) )
@@ -4079,6 +3509,7 @@ function church_admin_boxes_look()
     }
     if($x>$permissions)
     {
+        //translators: %1$s and %2$s are numbers
         echo'<div class="notice notice-danger"><h2>Church Admin</h2><p>'.sprintf(__('You have permissions for %1$d out of %2$d modules','church-admin'),$permissions,$x).'</p>';
         
         echo'</div>';
@@ -4100,31 +3531,7 @@ function church_admin_boxes_look()
     </script>';
     
 }
-/**********************************************************
-*   Switcher for look
-***********************************************************/  
-function church_admin_change_look()
-{
-    if(!church_admin_level_check('Directory') ) return;
-    global $church_admin_url,$church_admin_menu;
-    $user=wp_get_current_user();
-    /*
-    $frontpage=get_option('church-admin-frontpage-look'.$user->ID);
-    echo'<div class="church-admin-change-look"><form action="" method="post"><p>';
-    switch( $frontpage)
-    {
-        case'classic':default: echo'<input type="hidden" name="change-look" value="boxes" /><input class="button-primary" type="submit" value="'.esc_html( __('Switch to new style','church-admin' ) ).'" />';break;
-      
-    }
-    echo'</p></form>';
-    */
-    echo'<div id="church-admin-signup"><form action="//thegatewaychurch.us2.list-manage.com/subscribe/post?u=de873ad10bb6b43b54744b951&amp;id=848214cef0" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate><div id="mc_embed_signup_scroll"><strong>'.esc_html( __('Sign up for news and free PDF manual','church-admin' ) ).'</strong>';
-    if(!empty( $user->user_firstname) )echo'<input type="hidden" name="FNAME" value="'.esc_html( $user->user_firstname).'" />';
-    if(!empty( $user->user_lastname) )echo'<input type="hidden" name="LNAME" value="'.esc_html( $user->user_lastname).'" />';
-    echo'<input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="'.esc_html( __('Email address','church-admin' ) ).'" required><!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups--><div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_de873ad10bb6b43b54744b951_848214cef0" tabindex="-1" value=""></div><input type="submit" value="'.esc_html( __('News sign up','church-admin' ) ).'" name="subscribe" id="mc-embedded-subscribe" class="button-primary"></div></form></div></div>';
- 
-    
-}
+
 
 /**********************************************************
 *   Front End email check
@@ -4252,12 +3659,6 @@ function church_admin_actions()
 
     
 
-
-    $licence = get_option('church_admin_app_new_licence');
-    if(empty($licence)){
-        echo'<div class="notice notice-warning"><p>'.__('Licence missing - free, standard or premium','church-admin');
-        return;
-    }
     //allow people to edit their own entry
     //if(!is_user_logged_in() )exit( __('You must be logged in','church-admin') );
     //if(!is_admin() )exit( __('You must be logged in','church-admin') );
@@ -4318,6 +3719,13 @@ function church_admin_actions()
         
         switch( $_GET['action'] )
         {
+            case 'premium-upgrade':
+                check_admin_referer('premium-upgrade');
+                if(!current_user_can('activate_plugins')){return 'You can not do this, you need to be an admin';}
+                require_once(plugin_dir_path(dirname(__FILE__) ).'premium-installer.php');
+                
+                church_admin_install_premium_plugin();
+            break;
               /*************************************
             *
             *       AUTOMATIONS
@@ -4331,6 +3739,8 @@ function church_admin_actions()
                 }
                 if(!church_admin_level_check('Directory') )
                 {
+                   
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
                     return;
                 }
@@ -4340,12 +3750,11 @@ function church_admin_actions()
             break;
             case'registration-followup-email-setup':
                 check_admin_referer('registration-followup-email-setup');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                 if(!church_admin_level_check('Directory') )
                 {
+                     
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
                     return;
                 }
@@ -4355,12 +3764,11 @@ function church_admin_actions()
             break;
             case 'custom-field-automations':
                 check_admin_referer('custom-field-automations');
-                if($licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is premium only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+              
                 if(!church_admin_level_check('Directory') )
                 {
+                     
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
                     return;
                 }
@@ -4376,6 +3784,7 @@ function church_admin_actions()
                 }
                 if(!church_admin_level_check('Directory') )
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
                     return;
                 }
@@ -4391,6 +3800,7 @@ function church_admin_actions()
                 }
                 if(!church_admin_level_check('Directory') )
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
                     return;
                 }
@@ -4406,6 +3816,7 @@ function church_admin_actions()
                 }
                 if(!church_admin_level_check('Directory') )
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
                      return;
                 }
@@ -4413,99 +3824,8 @@ function church_admin_actions()
                 require_once(plugin_dir_path(dirname(__FILE__) ).'includes/automations.php');
                 church_admin_delete_custom_field_automation($id);
             break;
-              /*************************************
-            *
-            *       INVENTORY
-            *
-            **************************************/
-            case 'inventory':
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Inventory') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Inventory','church-admin') )).'</h2></div>';
-                     return;
-                }
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/inventory.php');
-                echo church_admin_inventory_list();
-            break;
-            case 'edit-inventory':
-                check_admin_referer('edit-inventory');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Inventory') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Inventory','church-admin') )).'</h2></div>';
-                    return;
-                }
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/inventory.php');
-                echo church_admin_edit_inventory($id);
-            break;
-            case 'delete-inventory':
-                check_admin_referer('delete-inventory');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Inventory') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Inventory','church-admin') )).'</h2></div>';
-                    return;
-                }
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/inventory.php');
-                echo church_admin_delete_inventory($id);
-            break;
-            /****************************
-             * BIBLE READINGS
-             ****************************/
-            case 'bulk-bible-readings':
-                check_admin_referer('bulk-bible-readings');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Bible') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bible readings','church-admin') )).'</h2></div>';
-                     return;
-                }
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/bible-readings.php');
-                church_admin_bible_reading_bulk_post();
-            break;
-            case'resend-bible-reading':
-                check_admin_referer('resend-bible-reading');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Bible') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bible readings','church-admin') )).'</h2></div>';
-                    return;
-                }
-                $ID=(int)$_GET['ID'];
-                $post=get_post( $ID);
-               
-                echo'<p>'.esc_html( __('Bible reading resent','church-admin' ) ).'</p>';
-            break;
-            case 'reset_readings':
-                check_admin_referer('reset_readings');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }if(!church_admin_level_check('Bible') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bible','church-admin') )).'</h2></div>';
-                   
-                    return;
-                }
-                $wpdb->query('UPDATE '.$wpdb->prefix.'church_admin_brplan SET passages=""');
-                echo esc_html(__('Done','church-admin'));
-            break;
+            
+            
             /****************************
              * DIRECTORY
              ****************************/
@@ -4521,44 +3841,13 @@ function church_admin_actions()
                         echo church_admin_merge_people( (int)$p1,(int)$p2 );
                     }else{echo'<div class="error"><p>'.esc_html( __("Missing people ids",'church-admin' ) ).'</p></div>';}
                 }else{
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
                     
                 }
             break;  
             
-            /****************************
-             * FACILITIES
-             ****************************/
-            case 'approve-facility-booking':
-                check_admin_referer('approve-facility-booking');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(church_admin_level_check('Calendar') )
-                {
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/facilities.php');
-                    echo church_admin_approve_facility_booking( $booking_id);
-                }else{
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Calendar','church-admin') )).'</h2></div>';
-                    
-                }
-            break;
-            case 'decline-facility-booking':
-                check_admin_referer('decline-facility-booking');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(church_admin_level_check('Calendar') )
-                {
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/facilities.php');
-                    echo church_admin_decline_facility_booking( $booking_id);
-                }else{
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Calendar','church-admin') )).'</h2></div>';
-                   
-                }
-            break;
+            
             
             /*************************
              * SHORTCODES
@@ -4575,6 +3864,7 @@ function church_admin_actions()
             case'import-csv':
                 check_admin_referer('import-csv');
                 if(!church_admin_level_check('Directory') ){
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
                     return;
                 }
@@ -4590,6 +3880,7 @@ function church_admin_actions()
                 check_admin_referer('replicate-roles');
                 if(!church_admin_level_check('Directory') )
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
                     return;
                 }
@@ -4603,6 +3894,7 @@ function church_admin_actions()
             case 'edit_marital_status': 
                 check_admin_referer('edit_marital_status');
                 if(!church_admin_level_check('Directory') ){
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Calendar','church-admin') )).'</h2></div>';
                 }
                 else
@@ -4612,6 +3904,7 @@ function church_admin_actions()
                 check_admin_referer('delete_marital_status');
                 if(!church_admin_level_check('Directory') )
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Calendar','church-admin') )).'</h2></div>';
                     return;
                 }
@@ -4620,397 +3913,8 @@ function church_admin_actions()
                     church_admin_delete_marital_status( $ID);
                 }
             break;
-            /****************************
-             * Spiritual Gifts
-             ****************************/
-            case 'spiritual-gifts':
-                check_admin_referer('spiritual-gifts');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Gifts') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Spiritual Gifts','church-admin') )).'</h2></div>';
-                    return;
-                }
-                echo'<p>'.esc_html( __('Use the shortcode [church_admin type="spiritual-gifts"] for people to fill in the questionnaire','church-admin' ) ).'</p>';
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/spiritual-gifts.php');
-                church_admin_spiritual_gifts_list();
-                
-            break;
-            /*************************************
-            *
-            *		APP
-            *
-            **************************************/
-            case 'app-logout':
-                check_admin_referer('app-logout');
-                if($licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is premium only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('App') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('App','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('app');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'app/app-admin.php');    
-                church_admin_logout_app_everyone();
-            break;
-            case 'logout_app':
-                check_admin_referer('logout_app');
-                if($licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is premium only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('App') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('App','church-admin') )).'</h2></div>';
-                    return;
-                }
-                require_once(plugin_dir_path(dirname(__FILE__) ).'app/app-admin.php');church_admin_logout_app( $user_id);
-            break;
-            //case 'app_page':require_once(plugin_dir_path(dirname(__FILE__) ).'app/app-admin.php');church_admin_app_post();break;
-            case 'app': 
-                check_admin_referer('app');
-                if($licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is premium only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('App') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('App','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('app');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'app/app-admin.php');
-                church_admin_app();
-            break;
-            case 'app-visits':
-                check_admin_referer('app-visits');
-                if($licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is premium only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                } 
-                if(!church_admin_level_check('App') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('App','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('app');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'app/app-admin.php');
-                church_admin_app_logs();
-            break;
-            case 'reset-app-menu':
-                check_admin_referer('reset-app-menu');
-                if($licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is premium only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('App') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('App','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('app');
-                delete_option('church_admin_app_new_menu');
-                church_admin_app();
-            break;
-            //case 'delete_app_content':if(current_user_can('manage_options') )  {require_once(plugin_dir_path(dirname(__FILE__) ).'app/app-admin.php');church_admin_delete_current_app_content();}break;
-            case 'app-settings':
-                check_admin_referer('app-settings');
-                if($licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is premium only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('App') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('App','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('app');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'app/app-admin.php');
-                church_admin_app_settings();
-                church_admin_app_member_types();
-            break;
-            case 'app-menu':
-                check_admin_referer('app-menu');
-                if($licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is premium only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('App') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('App','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('app');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'app/app-admin.php');
-                church_admin_sortable_script();
-                church_admin_app_menu();
-            break;
-            case 'bible-reading-plan':
-                check_admin_referer('bible-reading-plan');
-                if($licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is premium only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Bible') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bible','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('app');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'app/app-admin.php');
-                church_admin_bible_reading_plan();
-            break; 
-            case 'app-cache-clear':
-                check_admin_referer('app-cache-clear');
-                if($licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is premium only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('App') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('App','church-admin') )).'</h2></div>';
-                    return;
-                }
-                delete_option('church_admin_modified_app_content');
-                echo'<div class="notice notice-success"><p>'.esc_html(__('App cache cleared','church-admin')).'</p></div>';
-                require_once(plugin_dir_path(dirname(__FILE__) ).'app/app-admin.php');
-                church_admin_app_menu();
-            break;
-            case 'churchwide-my-prayer':
-                check_admin_referer('churchwide-my-prayer');
-                if($licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is premium only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('App') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('App','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('app');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'app/app-setup.php');
-                church_admin_churchwide_my_prayer();
-            break;
-            case 'app-member-types':
-                check_admin_referer('app-member-types');
-                if($licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is premium only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('App') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('App','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('app');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'app/app-admin.php');    
-                church_admin_app_member_types();
-            break;
-            
-            case 'app-logins':
-            case 'app-users':
-                check_admin_referer('app-users');
-                if($licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is premium only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('App') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Calendar','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('app');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'app/app-admin.php');    
-                church_admin_app_logins();
-            break;
            
-            /*************************************
-            *
-            *		ATTENDANCE
-            *
-            **************************************/
-            case 'graph':
-                check_admin_referer('graph');
-                echo'<h2>'.esc_html( __('Attendance graph','church-admin' ) ).'</h2>';
-                require_once(plugin_dir_path(dirname(__FILE__) ).'display/graph.php');
-                echo church_admin_graph( $type='weekly','S/1',date("Y-01-01"),date("Y-12-31"),900,500,TRUE);
-                
-            break;
-            case'show-attendance':
-            case 'attendance':  
-                check_admin_referer('attendance');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Attendance') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Attendance','church-admin') )).'</h2></div>';
-                    return;
-                }
-                echo'<h2>'.esc_html( __('Attendance','church-admin' ) ).'</h2>';
-                church_admin_module_dropdown('attendance');
-
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/attendance.php');
-                church_admin_attendance_list($meeting);
-
-                echo'<h2>'.esc_html( __('Attendance graph','church-admin' ) ).'</h2>';
-                require_once(plugin_dir_path(dirname(__FILE__) ).'display/graph.php');
-                echo church_admin_graph( $type='weekly','S/1',date("Y-01-01"),date("Y-12-31"),900,500,TRUE);
-                
-                
-            break; 
-            case 'individual-attendance-list':
-                check_admin_referer('individual-attendance-list');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Attendance') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin'  ),__('Attendance','church-admin') )).'</h2></div>';
-                    return;
-                }    
-                church_admin_module_dropdown('attendance'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/individual_attendance.php');
-                church_admin_individual_attendance_list();
-                echo'<h2>'.esc_html( __('Attendance graph','church-admin' ) ).'</h2>';
-                require_once(plugin_dir_path(dirname(__FILE__) ).'display/graph.php');
-                echo church_admin_graph( $type='weekly','S/1',date("Y-01-01"),date("Y-12-31"),900,500,TRUE);
-            break;
-            case 'individual-attendance-csv':
-                check_admin_referer('individual-attendance-csv');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Attendance') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ),__('Attendance','church-admin') ) ).'</h2></div>';
-                    return;
-                }   
-                church_admin_module_dropdown('attendance'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/individual_attendance.php');
-                echo church_admin_individual_attendance_csv();
-            
-            break;
-            case 'attendance-csv':
-                check_admin_referer('attendance-csv');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Attendance') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Attendance','church-admin') )).'</h2></div>';
-                    return;
-                }   
-                church_admin_module_dropdown('attendance');  
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/csv.php');
-                echo church_admin_attendance_csv();
-                
-            break;
-            case 'edit-individual-attendance':
-            case 'individual-attendance':
-            case 'individual_attendance':
-                check_admin_referer('individual-attendance');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Attendance') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Attendance','church-admin') ) ).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('attendance');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/individual_attendance.php'); 
-                echo church_admin_individual_attendance();
-            break;
-            case 'attendance-metrics':
-                check_admin_referer('attendance-metrics');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Attendance') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin'  ),__('Attendance','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('attendance');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/attendance.php');
-                church_admin_attendance_metrics( $service_id);break;
-            case 'attendance-list':
-                check_admin_referer('attendance-list');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Attendance') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Attendance','church-admin') )).'</h2></div>';
-                    return;
-                }
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/attendance.php');
-                church_admin_attendance_list( $service_id);
-            break;
-            case 'add-attendance':
-            case 'edit-attendance':
-                check_admin_referer('edit-attendance');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Attendance') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Attendance','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('attendance');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/attendance.php');
-                church_admin_edit_attendance($attendance_id);
-                
-            break;
-            case 'weeks-attendance':
-                check_admin_referer('weeks-attendance');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Attendance') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Attendance','church-admin') ) ).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('attendance');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/attendance.php');
-                church_admin_edit_this_weeks_attendance();
-                
-            break;
-            case 'delete-attendance':
-                check_admin_referer('delete-attendance');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Attendance') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Attendance','church-admin') ) ).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('attendance');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/attendance.php');
-                church_admin_delete_attendance( $attendance_id);
-            break;
-
-
+        
             /*************************************
             *
             *		CALENDAR
@@ -5018,12 +3922,10 @@ function church_admin_actions()
             **************************************/
             case 'import-ics':
                 check_admin_referer('import-ics');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                 if(!church_admin_level_check('Calendar') )
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Calendar','church-admin') ) ).'</h2></div>';
                     return;
                 }
@@ -5035,12 +3937,10 @@ function church_admin_actions()
             case 'church_admin_new_calendar':
             case 'new-calendar':
                 check_admin_referer('calendar');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+              
                 if(!church_admin_level_check('Calendar') )
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Calendar','church-admin') )).'</h2></div>';
                     return;
                 }
@@ -5053,12 +3953,10 @@ function church_admin_actions()
             case 'church_admin_new_edit_calendar':
             case 'edit-calendar':
                 check_admin_referer('edit-calendar');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                 if(!church_admin_level_check('Calendar') )
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Calendar','church-admin') ) ).'</h2></div>';
                     return;
                 }
@@ -5074,12 +3972,10 @@ function church_admin_actions()
             break;
             case 'delete-calendar':
                 check_admin_referer('delete-calendar');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                 if(!church_admin_level_check('Calendar') )
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Calendar','church-admin') ) ).'</h2></div>';
                     return;
                 }
@@ -5091,12 +3987,10 @@ function church_admin_actions()
             case 'church_admin_calendar_list':
             case 'calendar-list':
                 check_admin_referer('calendar-list');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                 if(!church_admin_level_check('Calendar') )
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Calendar','church-admin') ) ).'</h2></div>';
                     return;
                 }
@@ -5108,12 +4002,10 @@ function church_admin_actions()
             case 'edit-category':
             case 'church_admin_edit_category':
                 check_admin_referer('edit-category');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+              
                 if(!church_admin_level_check('Calendar') )
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Calendar','church-admin') )) .'</h2></div>';
                     return;
                 }
@@ -5125,12 +4017,10 @@ function church_admin_actions()
             case 'church_admin_delete_category':
             case 'delete-category':
                 check_admin_referer('delete-category');
-                    if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                        echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                        return;
-                    }
+                  
                 if(!church_admin_level_check('Calendar') )
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Calendar','church-admin') ) ).'</h2></div>';
                     return;
                 }
@@ -5141,13 +4031,11 @@ function church_admin_actions()
             case 'church_admin_single_event_delete':
             case 'single-event-delete':
                 check_admin_referer('single-event-delete');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                     
                 if(!church_admin_level_check('Calendar') )
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Calendar','church-admin') ) ).'</h2></div>';
                     return;
                 }
@@ -5159,13 +4047,11 @@ function church_admin_actions()
             case 'church_admin_series_event_delete':
             case 'series-event-delete':
                 check_admin_referer('series-event-delete');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+                
                 //check_admin_referer('series_event_delete');
                 if(!church_admin_level_check('Calendar') )
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Calendar','church-admin') ) ).'</h2></div>';
                     return;
                 }
@@ -5175,13 +4061,11 @@ function church_admin_actions()
             break;
             case 'future-event-delete':
                 check_admin_referer('future-event-delete');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+              
                 //check_admin_referer('series_event_delete');
                 if(!church_admin_level_check('Calendar') )
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Calendar','church-admin') ) ).'</h2></div>';
                     return;
                 }
@@ -5194,12 +4078,10 @@ function church_admin_actions()
             case 'category-list':
             case 'view-categories':
                 check_admin_referer('view-categories');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+            
                 if(!church_admin_level_check('Calendar') )
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Calendar','church-admin') ) ).'</h2></div>';
                     return;
                 }
@@ -5210,29 +4092,19 @@ function church_admin_actions()
             case 'church_admin_single_event_edit':
             case 'single-event-edit':
                 check_admin_referer('single-event-edit');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                //check_admin_referer('single_event_edit');
-                if(!church_admin_level_check('Calendar') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Calendar','church-admin') ) ).'</h2></div>';
-                    return;
-                }
+               
+              
                 church_admin_module_dropdown('calendar'); 
                 require_once(plugin_dir_path(dirname(__FILE__) ).'includes/calendar.php');
                 church_admin_event_edit( $date_id,$event_id,'single',NULL,NULL);
             break;
             case 'whole-series-edit':
                 check_admin_referer('whole-series-edit');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                 //check_admin_referer('single_event_edit');
                 if(!church_admin_level_check('Calendar') )
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Calendar','church-admin') ) ).'</h2></div>';
                      return;
                 }
@@ -5242,13 +4114,11 @@ function church_admin_actions()
             break;   
             case 'future-series-edit':
                 check_admin_referer('future-series-edit');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+                
                 //check_admin_referer('single_event_edit');
                 if(!church_admin_level_check('Calendar') )
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Calendar','church-admin') ) ).'</h2></div>';
                      return;
                 }
@@ -5258,111 +4128,7 @@ function church_admin_actions()
             break;  
             
                 
-            /*************************************
-            *
-            *		CHECK-IN
-            *
-            **************************************/
-            case 'QRCode':
-                check_admin_referer('QRCode');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Check-in') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Check-in','church-admin') ) ).'</h2></div>';
-                    return;
-                }
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/checkin.php');
-                church_admin_create_QR( $people_id);
-                break;
-            case 'checkin-labels':
-                check_admin_referer('checkin-labels');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Check-in') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Check-in','church-admin') ) ).'</h2></div>';
-                    return;
-                }
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/checkin.php');
-                church_admin_checkin_labels();
-            break;
-            /******************************************
-            *
-            *   classes
-            *
-            *******************************************/
-            case 'classes':
-            case 'class':
-                check_admin_referer('classes');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Classes') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Classes','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('classes'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/classes.php');
-                echo'<h2>'.esc_html( __("Classes",'church-admin' ) ).'</h2>';
-                church_admin_classes();
-                
-            break;
-            case 'edit-class':
-                check_admin_referer('edit-class');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Classes') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Classes','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('classes'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/classes.php');
-                church_admin_edit_class( $id);
-                
-            break;
-            case 'delete-class':
-                check_admin_referer('delete-class');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Classes') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Classes','church-admin') ) ).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('classes'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/classes.php');
-                church_admin_delete_class( $id);
-                
-            break;
-            case 'view_class':
-            case 'view-class':
-                check_admin_referer('view-class');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Classes') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Classes','church-admin') ) ).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('classes'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/classes.php');
-                    church_admin_view_class( $id);
-                
-            break;
+           
 
             /*************************************
             *
@@ -5373,13 +4139,11 @@ function church_admin_actions()
                 case 'test-email':
                 case 'testemail':
                     check_admin_referer('test-email');
-                    if($licence!='standard' && $licence!='premium'){
-                        echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                        return;
-                    }
+                    
                     if(!church_admin_level_check('Bulk_Email') )
                     {
-                        echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bulk Email','church-admin'))  ).'</h2></div>';
+                         //translators: %1$s is a permission name
+                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bulk Email','church-admin'))  ).'</h2></div>';
                         return;
                     }
                     require_once(plugin_dir_path(dirname(__FILE__) ).'includes/email.php');
@@ -5392,97 +4156,10 @@ function church_admin_actions()
                 break;
 
 
-            /*************************
-             * PUSH
-             ************************/
-            case 'push-to-all':
-                check_admin_referer('push-to-all');
-                if( $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Push') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Push','church-admin'))  ).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('comms'); 
-                
-                 $licence = get_option('church_admin_app_new_licence');;
-                if( $licence=='premium')ca_push_message();
-                
-            break;
             
-            case 'send-sms':
-                check_admin_referer('send-sms');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Bulk_SMS') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bulk SMS','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('comms'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/sms.php');
-                church_admin_send_sms();
-                
-            break;
-            case 'twilio-replies':
-                check_admin_referer('twilio-replies');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Bulk_SMS') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bulk SMS','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('comms'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/twilio.php');
-                church_admin_twilio_replies_list();
-                
-            break;   
-            case 'view-sms-thread':
-                check_admin_referer('view-sms-thread');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Bulk_SMS') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bulk SMS','church-admin') )).'</h2></div>';
-                    return;
-                }
-                    church_admin_module_dropdown('comms'); 
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/twilio.php');
-                    church_admin_view_sms_thread(urldecode( church_admin_sanitize($_GET['mobile'] ) ));
-                
-            break; 
-            case 'delete-sms-thread':
-                check_admin_referer('delete-sms-thread');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Bulk_SMS') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bulk SMS','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('comms'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/twilio.php');
-                church_admin_delete_sms_thread(urldecode(church_admin_sanitize( $_GET['mobile'] )));
-                
-            break; 
             case 'email-settings':
                 check_admin_referer('email-settings');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+                
                 if(!church_admin_level_check('Bulk_Email') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bulk Email','church-admin') )).'</h2></div>';
@@ -5493,57 +4170,7 @@ function church_admin_actions()
                 church_admin_email_settings();
                 
             break;
-            case 'sms-settings':
-                check_admin_referer('sms-settings');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Bulk_SMS') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bulk Email','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('comms'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/settings.php');            
-                church_admin_sms_settings();
-                
-            break;
-            case 'smtp-settings':
-                check_admin_referer('smtp-settings');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Bulk_Email') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bulk Email','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('comms'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/settings.php');     
-                       
-                church_admin_email_settings();
-                
-            break;          
-            
-            case 'push':
-            case 'push-message':  
-                check_admin_referer('push');
-                if($licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }  
-                if(!church_admin_level_check('Push') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bulk SMS','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('comms'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/push.php');            
-                church_admin_push();
-                
-            break;
+           
             case 'single-gdpr-email':
                 check_admin_referer('single-gdpr-email');
                 if(!church_admin_level_check('Directory') )
@@ -5586,10 +4213,7 @@ function church_admin_actions()
             break;
             case 'send-email':
                 check_admin_referer('send-email');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+                
                 if(!church_admin_level_check('Bulk_Email') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bulk Email','church-admin') )).'</h2></div>';
@@ -5602,10 +4226,7 @@ function church_admin_actions()
             break;
             case 'mailersend-status':
                 check_admin_referer('mailersend-status');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+                
                 if(!church_admin_level_check('Bulk_Email') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bulk Email','church-admin') )).'</h2></div>';
@@ -5621,10 +4242,7 @@ function church_admin_actions()
             break;
             case 'clear-email-queue':
                 check_admin_referer('clear-email-queue');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+                
                 if(!church_admin_level_check('Bulk_Email') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bulk Email','church-admin') )).'</h2></div>';
@@ -5637,12 +4255,10 @@ function church_admin_actions()
             break;
             case 'comms':
                 check_admin_referer('comms');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                 if(!church_admin_level_check('Bulk_Email') && !church_admin_level_check('Bulk_SMS'))
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Attendance','church-admin') ) ).'</h2></div>';
                     return;
                 }
@@ -5655,10 +4271,7 @@ function church_admin_actions()
             case 'email-list':
                 check_admin_referer('email-list');
 
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                 if(!church_admin_level_check('Bulk_Email') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bulk Email','church-admin') )).'</h2></div>';
@@ -5681,10 +4294,7 @@ function church_admin_actions()
             break;
             case 'delete-email':
                 check_admin_referer('delete-email');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+                
                 if(!church_admin_level_check('Bulk_Email') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bulk Email','church-admin') )).'</h2></div>';
@@ -5696,10 +4306,7 @@ function church_admin_actions()
             break;
             case 'resend-email':
                 check_admin_referer('resend-email');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                 if(!church_admin_level_check('Bulk_Email') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bulk Email','church-admin') )).'</h2></div>';
@@ -5711,10 +4318,7 @@ function church_admin_actions()
             break;
             case 'resend-new':
                 check_admin_referer('resend-new');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+              
                 if(!church_admin_level_check('Bulk_Email') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bulk Email','church-admin') )).'</h2></div>';
@@ -5727,10 +4331,7 @@ function church_admin_actions()
 
             case 'edit-resend':
                 check_admin_referer('edit-resend');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                 if(!church_admin_level_check('Bulk_Email') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bulk Email','church-admin') )).'</h2></div>';
@@ -5794,6 +4395,7 @@ function church_admin_actions()
                     require_once(plugin_dir_path(dirname(__FILE__) ).'includes/photo-permissions.php');
                     echo church_admin_photo_list( $member_type_id);
                 }else{
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
                    
                 }
@@ -5806,6 +4408,7 @@ function church_admin_actions()
                     require_once(plugin_dir_path(dirname(__FILE__) ).'includes/photo-permissions.php');
                     echo church_admin_photo_permission_pdf_form();
                 }else{
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
                    
                 }
@@ -5846,58 +4449,8 @@ function church_admin_actions()
 
 
 
-            /***********
-             * GROUPS
-             ***********/
-            case 'smallgroups-map':
-                check_admin_referer('smallgroups-map'); 
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Groups') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Groups','church-admin') ) ).'</h2></div>';
-                    return;
-                }
-                $centre=church_admin_center_coordinates($wpdb->prefix.'church_admin_smallgroup');
-                echo'<h2>'.esc_html( __('Smallgroups map','church-admin' ) ).'</h2>';
-                church_admin_module_dropdown('groups');   
-                if ( empty( $centre->lat)||empty( $centre->lng) ){
-                    $centre=$wpdb->get_row('SELECT lat, lng FROM '.$wpdb->prefix.'church_admin_sites ORDER BY site_id ASC LIMIT 1');
-                }
-                if(!empty( $centre) )
-                {
-                    echo'<script type="text/javascript">var xml_url="'.site_url().'/?ca_download=small-group-xml&small-group-xml='.wp_create_nonce('small-group-xml').'";';
-                    if(!empty( $centre->lat) )  {echo' var lat='.esc_html( $centre->lat).';';}
-                    if(!empty( $centre->lng) )  {echo' var lng='.esc_html( $centre->lng).';';}
-                    echo' var zoom=13;';
-                    echo'jQuery(document).ready(function()  {sgload(lat,lng,xml_url,zoom);})</script><div id="map" style="width:100%;height:750px;" ></div>';
-                    
-                }
-                
-            
-                
-            break; 
-            case 'people-map':
-                check_admin_referer('people-map'); 
-                if(!church_admin_level_check('Directory') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
-                    return;
-                }
-                
-                church_admin_module_dropdown('people');   
-                $api_key=get_option('church_admin_google_api_key');
-                if(empty($api_key)){
-                    echo '<div class="notice notice-warning"><h2>'.esc_html(__('People Map','church-admin' ) ).'</h2><p>'.esc_html( __('A Google API key is required for this feature','church-admin') ).'</p>';
-                    echo'<p><a class="tutorial-link" target="_blank" href="https://www.churchadminplugin.com/tutorials/google-api-key/"><span class="dashicons dashicons-welcome-learn-more"></span>&nbsp;'.esc_html(__('Learn more','church-admin')).'</a></p>';
-                    echo'</div>';
-                    return;
-                }
-                $args=array('width'=>'100%','height'=>'750px','zoom'=>13);
-                echo church_admin_map(13,NULL,1,1,1,"100%","750px");
-            break;
+          
+           
             case 'add-household':
                 check_admin_referer('add-household'); 
                 if(!church_admin_level_check('Directory') )
@@ -5983,147 +4536,14 @@ function church_admin_actions()
                 church_admin_bulk_geocode();
         break;
      
-        case 'key-dates':
-            check_admin_referer('key-dates');
-            if($licence!='standard' && $licence!='premium'){
-                echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                return;
-            }
-            if(!church_admin_level_check('Directory') )
-            {
-                echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
-                return;
-            }
-                church_admin_module_dropdown('key-dates');  
-                echo'<h2>'.esc_html(__('Key dates','church-admin')).'</h2>';
-                church_admin_keydates_callback();
-        break;
-       
-        case 'happy-birthday-email-setup':
-            check_admin_referer('happy-birthday-email-setup');
-            if($licence!='standard' && $licence!='premium'){
-                echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                return;
-            }
-            if(!church_admin_level_check('Directory') )
-            {
-                echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
-                return;
-            }
-            church_admin_module_dropdown('key-dates');   
-            require_once(plugin_dir_path(dirname(__FILE__) ).'includes/birthdays.php');
-            church_admin_happy_birthday_email_setup();
-        break;
-        case 'global-birthday-email-setup':
-            check_admin_referer('global-birthday-email-setup');
-            if($licence!='standard' && $licence!='premium'){
-                echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                return;
-            }
-            if(!church_admin_level_check('Directory') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('key-dates');   
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/birthdays.php');
-                church_admin_global_birthday_email_setup();
-        break;
-        case 'happy-anniversary-email-setup':
-            check_admin_referer('happy-anniversary-email-setup');
-            if(!church_admin_level_check('Directory') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('key-dates');   
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/birthdays.php');
-                church_admin_happy_anniversary_email_setup();
-        break;
-        case 'global-anniversary-email-setup':
-            check_admin_referer('global-anniversary-email-setup');
-            if($licence!='standard' && $licence!='premium'){
-                echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                return;
-            }
-            if(!church_admin_level_check('Directory') )
-            {
-                echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
-                return;
-            }
-            church_admin_module_dropdown('key-dates');   
-            require_once(plugin_dir_path(dirname(__FILE__) ).'includes/birthdays.php');
-            church_admin_global_anniversary_email_setup();
-        break;
-        case 'global-both-email-setup':
-            check_admin_referer('global-both-email-setup');
-            if($licence!='standard' && $licence!='premium'){
-                echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                return;
-            }
-            if(!church_admin_level_check('Directory') )
-            {
-                echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
-                return;
-            }
-            church_admin_module_dropdown('key-dates');     
-            require_once(plugin_dir_path(dirname(__FILE__) ).'includes/birthdays.php');
-            church_admin_global_both_email_setup();
-        break;
-
-        case 'send-test-automation-emails':
-            check_admin_referer('send-test-automation-emails');
-            if(!church_admin_level_check('Directory') )
-            {
-                echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
-                return;
-            }
-            church_admin_module_dropdown('key-dates');   
-            church_admin_send_test_automation_email();
-        break;
-        case 'birthdays':
-            check_admin_referer('birthdays');
-            if($licence!='standard' && $licence!='premium'){
-                echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                return;
-            }
-                if(!church_admin_level_check('Directory') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('key-dates');   
-                echo'<h2>'.esc_html( __("All birthdays",'church-admin' ) ).'</h2>';
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/birthdays.php');
-                echo church_admin_frontend_birthdays(0,0,365,TRUE,1,1);
                 
-        break;
-        case 'anniversaries':
-        
-            check_admin_referer('anniversaries');
-            if($licence!='standard' && $licence!='premium'){
-                echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                return;
-            }
-            if(!church_admin_level_check('Directory') )
-            {
-                echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
-                return;
-            }
-            church_admin_module_dropdown('key-dates');   
-            echo'<h2>'.esc_html( __("Wedding Anniversaries",'church-admin' ) ).'</h2>';
-            require_once(plugin_dir_path(dirname(__FILE__) ).'includes/birthdays.php');
-            echo church_admin_frontend_anniversaries(0,0,365,TRUE,1,1);
-            
-    break;
+       
+       
         
     
             case 'gdpr-bulk-confirm':
                 check_admin_referer('gdpr-bulk-confirm');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                 if(!church_admin_level_check('Directory') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
@@ -6135,10 +4555,7 @@ function church_admin_actions()
             break;
             case 'view_person':
                 check_admin_referer('view_person');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                 if(!church_admin_level_check('Directory') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') )).'</h2></div>';
@@ -6164,6 +4581,7 @@ function church_admin_actions()
                 check_admin_referer('view-address-list');
                 if(!church_admin_level_check('Directory') )
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') ) ).'</h2></div>';
                     return;
                 }
@@ -6282,7 +4700,7 @@ function church_admin_actions()
                     return;
                 }
                 church_admin_module_dropdown('people');   
-                church_admin_module_dropdown('people');   
+            
                 require_once(plugin_dir_path(dirname(__FILE__) ).'includes/directory.php');
                 church_admin_potential_duplicates();
                 
@@ -6294,7 +4712,7 @@ function church_admin_actions()
                     if(!$self_edit)church_admin_module_dropdown('people');   
                     require_once(plugin_dir_path(dirname(__FILE__) ).'includes/directory.php');
 
-                    church_admin_debug('functions.php line 5529 people_id:'.$people_id);
+                    
                     church_admin_edit_people( $people_id,$household_id);
                 
                 }else{
@@ -6341,53 +4759,52 @@ function church_admin_actions()
                     church_admin_search( church_admin_sanitize($_POST['ca_search'] ));
                 }
             break;
-         
-            /*************************************
-            *
-            *		contact form
-            *
-            **************************************/
-            case 'contact-form':
-                check_admin_referer('contact-form');
+            case 'bulk-edit-anniversary':
+                check_admin_referer('bulk-edit-anniversary');
+                if(church_admin_level_check('Directory') )
+                {
+                    church_admin_module_dropdown('people'); 
+                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/directory.php');
+                    church_admin_bulk_edit_wedding_anniversary();
+                }
+                else{echo'<p>'.esc_html( __("You don't have permissions for this page",'church-admin' ) ).'</p>';}
+            break;
+            case 'bulk-edit-dob':
+                check_admin_referer('bulk-edit-dob');
+                if(church_admin_level_check('Directory') )
+                {
+                    church_admin_module_dropdown('people'); 
+                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/directory.php');
+                    church_admin_bulk_edit_date_of_birth();
+                }
+                else{echo'<p>'.esc_html( __("You don't have permissions for this page",'church-admin' ) ).'</p>';}
+            break;
+            case 'bulk-edit-custom':
+                check_admin_referer('bulk-edit-custom');
+                if(church_admin_level_check('Directory') )
+                {
+                    church_admin_module_dropdown('people'); 
+                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/directory.php');
+                    church_admin_bulk_edit_custom_field();
+                }
+                else{echo'<p>'.esc_html( __("You don't have permissions for this page",'church-admin' ) ).'</p>';}
+            break;
+
+            case 'bulk-edit-comms-permissions':
+                check_admin_referer('bulk-edit-comms-permissions');
                 if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
+                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=premium_church_admin#support">Upgrade</a></p></div>';
                     return;
                 }
-                if(!church_admin_level_check('Contact_Form') )
+                if(church_admin_level_check('Directory') )
                 {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Contact Form','church-admin') )).'</h2></div>';
-                    return;
+                    church_admin_module_dropdown('people'); 
+                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/directory.php');
+                    church_admin_bulk_edit_comms_settings();
                 }
-                church_admin_module_dropdown('contact-form'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/contact_form.php'); 
-                church_admin_contact_form_list();
+                else{echo'<p>'.esc_html( __("You don't have permissions for this page",'church-admin' ) ).'</p>';}
             break;
-            case 'contact-form-settings':
-                check_admin_referer('contact-form-settings');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Contact_Form') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Contact Form','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('contact-form'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/contact_form.php'); 
-                church_admin_contact_form_settings();
-            break;
-            case 'delete-contact-message':
-                check_admin_referer("delete_contact_message");
-                if(!church_admin_level_check('Contact_Form') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Contact Form','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('contact-form'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/contact_form.php'); 
-                church_admin_delete_contact_message((int) $_GET['id'] );
-            break;
+           
             /*************************************
             *
             *		ERRORS
@@ -6397,6 +4814,7 @@ function church_admin_actions()
                 check_admin_referer('activation-log-clear');
                 if(!church_admin_level_check('Directory') )
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') ) ).'</h2></div>';
                     return;
                 }
@@ -6407,6 +4825,7 @@ function church_admin_actions()
                 check_admin_referer('installation-errors');
                 if(!church_admin_level_check('Directory') )
                 {
+                     //translators: %1$s is a permission name
                     echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Directory','church-admin') ) ).'</h2></div>';
                     return;
                 }
@@ -6419,930 +4838,20 @@ function church_admin_actions()
                     echo'<p><a href="'.wp_nonce_url('admin.php?page=church_admin/index.php&amp;section=settings&action=activation-log-clear','activation-log-clear').'">'.esc_html( __('Clear activation errors log','church-admin' ) ).'</a></p><hr/>';
                 }
                 else{
-                    echo'<p>'.esc_html( __('No installation errors recoreded','church-admin' ) ).'</p>';
+                    echo'<p>'.esc_html( __('No installation errors recorded','church-admin' ) ).'</p>';
                 }
             break;
 
-            /*************************************
-            *
-            *		Events
-            *
-            **************************************/
-           
-            case 'edit_event':
-                check_admin_referer('edit_event');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Events') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Events','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('events'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/events.php'); 
-                    
-                church_admin_edit_event( $event_id);
-
-            break;
-            case 'edit_ticket_type':
-                check_admin_referer('edit_ticket_type');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Events') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Events','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('events'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/events.php'); 
-                church_admin_edit_ticket_type( $event_id,$ticket_id);
-                
-            break;
-            case 'delete_ticket_type':
-                check_admin_referer('delete_ticket_type');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Events') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Events','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('events'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/events.php'); 
-                church_admin_delete_ticket_type( $event_id,$ticket_id);
-            break;
-            case 'view-event':
-        
-                check_admin_referer('view-event');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Events') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Events','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('events'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/events.php'); 
-                church_admin_view_event( $event_id);
-                
-            break;
-            case   'delete_event':
-                check_admin_referer('delete_event');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-             
-                if(!church_admin_level_check('Events') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Events','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('events'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/events.php'); 
-                church_admin_delete_event( $event_id);
-            break;
-            case 'edit-booking':
-                check_admin_referer('edit-booking');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Events') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Events','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('events'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/events.php'); 
-                church_admin_edit_booking( $ticket_id,$event_id,$booking_ref);
-            break;
-            case 'delete_booking':
-                check_admin_referer('delete_booking');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Events') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Events','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('events'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/events.php'); 
-                church_admin_delete_booking( $ticket_id);
-            break;
-            case 'event-checkin':
-                if(!church_admin_level_check('Events') )
-                    {
-                        echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Events','church-admin') )).'</h2></div>';
-                        return;
-                    }
-                    church_admin_module_dropdown('events'); 
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/events.php'); 
-                echo church_admin_ticket_checkin($event_id);
-            break;
-            case 'view_bookings':
-                check_admin_referer('view_bookings');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                
-                if(!church_admin_level_check('Events') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Events','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('events'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/events.php'); 
-                church_admin_view_bookings( $event_id);
-            break;
-            case 'show-events':
-            case 'events':
-                check_admin_referer('events');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Events') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Events','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('events'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/events.php'); 
-                church_admin_events();
-                
-            break;
-
-                
-            /*************************************
-            *
-            *		FACILITIES
-            *
-            **************************************/
-            case 'facilities':
-            case 'church_admin_facilities':
-                check_admin_referer('facilities');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Facilities') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Facilities','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('facilities'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/facilities.php');
-                church_admin_facilities($facilities_id);
-                
-            break;
-            case 'edit_facility':
-            
-                check_admin_referer('edit_facility');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Facilities') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Facilities','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('facilities'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/facilities.php');
-                    church_admin_edit_facility( $facilities_id);
-                
-            break;
-            case 'delete_facility':
-                check_admin_referer('delete_facility');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Facilities') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Facilities','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('facilities'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/facilities.php');
-                church_admin_delete_facility( $facilities_id);
-                
-            break;
-            case 'facility-bookings':
-                check_admin_referer('facility-bookings');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Facilities') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Facilities','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('facilities'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/facilities.php');
-                    church_admin_facility_bookings( $facilities_id);
-    
-            break;
-            case 'facility-hires':
-                check_admin_referer('facility-hires');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Facilities') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Facilities','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('facilities'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/facilities.php');
-                church_admin_facility_hire( $facilities_id);
-    
-            break;  
-            /*************************************
-            *
-            *		FOLLOW UP
-            *
-            **************************************/
-            case'funnel':
-            case 'follow-up':
-            case 'church_admin_funnel_list':
-                check_admin_referer('funnel');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                church_admin_module_dropdown('follow-up'); 
-                if(!church_admin_level_check('Funnel') ){
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Follow Up Funnel','church-admin') )).'</h2></div>';
-                    return;
-                }else{ 
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/funnel.php');
-                    church_admin_funnel_list();
-                }
-            break;
-            case 'add-funnel':
-            case 'edit_funnel':
-                check_admin_referer('edit_funnel');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Funnel') )
-                { 
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Follow Up Funnel','church-admin') )).'</h2></div>';
-                    return;
-                }
-            break;
-            case 'delete_funnel':
-                check_admin_referer('delete_funnel');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Funnel') )
-                {  
-                    
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Follow Up Funnel','church-admin') )).'</h2></div>';
-                    return;
-
-                }
-             
-                church_admin_module_dropdown('follow-up'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/funnel.php');
-                church_admin_delete_funnel( $funnel_id);
-                break;
-            case 'assign_funnel':
-                check_admin_referer('assign_funnel');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Funnel') )
-                {  
-                    
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Follow Up Funnel','church-admin') )).'</h2></div>';
-                    return;
-
-                }
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/people_activity.php');
-                church_admin_assign_funnel();
-            break;
-            case 'email_follow_up_activity':
-                check_admin_referer('email_follow_up_activity');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Funnel') ){
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Follow Up Funnel','church-admin') )).'</h2></div>';
-                    return;
-                }
-                else
-                { 
-                    church_admin_module_dropdown('follow-up'); 
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/funnel.php');
-                    church_admin_edit_funnel( $funnel_id,$people_type_id);
-                }
-                church_admin_module_dropdown('follow-up'); 
-                
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/people_activity.php');
-                church_admin_email_follow_up_activity();
-            break;
-            case 'follow_up_completed':
-                //no nonce as coming from an email
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Funnel') )
-                { 
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Follow Up Funnel','church-admin') )).'</h2></div>';
-                    
-                    return;
-                }
-                church_admin_module_dropdown('follow-up'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/funnel.php');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/people_activity.php');
-                church_admin_follow_up_completed( $id);
-            break;
-                
-                
-           
-            /*************************************
-            *
-            *		GIVING
-            *
-            **************************************/
-            case 'pledges':
-                check_admin_referer('pledges');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Giving') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Giving','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('giving'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/pledges.php');
-                echo church_admin_pledges_list(); 
-            break;
-            case 'edit-pledge':
-                check_admin_referer('edit-pledge');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Giving') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Giving','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('giving'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/pledges.php');
-                echo church_admin_edit_pledge($pledge_id); 
-            break;
-            case 'delete-pledge':
-                check_admin_referer('delete-pledge');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Giving') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Giving','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('giving'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/pledges.php');
-                echo church_admin_delete_pledge($pledge_id); 
-            break;
-            case 'payment-gateway-setup':
-            case 'paypal-setup':
-            case 'giving-paypal-setup':
-                check_admin_referer('payment-gateway-setup'); 
-                if($licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }   
-                if(!church_admin_level_check('Giving') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Giving','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('giving'); 
-                church_admin_paypal_setup();
-            break;
-            case 'upgrade':
-                check_admin_referer('upgrade'); 
-                church_admin_app_purchase();
-            break;
-            case 'giving':
-                check_admin_referer('giving'); 
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Giving') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Giving','church-admin') )).'</h2></div>';
-                    return;
-                }
-
-                church_admin_module_dropdown('giving'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/giving.php');
-                church_admin_giving_list(); 
-                
-            break;
-            case 'giving-csv':
-                check_admin_referer('giving-csv'); 
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Giving') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Giving','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('giving'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/giving.php');
-                church_admin_giving_csv_form(); 
-                
-            break;
-            case 'gift-aid-csv':
-                check_admin_referer('gift-aid-csv'); 
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                church_admin_date_picker_script();
-                if(!church_admin_level_check('Giving') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Giving','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('giving'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/giving.php');           
-                church_admin_gift_aid_csv();
-                
-            break;
-            case 'donation-receipt-template':
-                check_admin_referer('donation-receipt-template'); 
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Giving') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Giving','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('giving'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/giving.php');  
-                church_admin_giving_receipt_template();
-            break;
-            case 'email-donor-receipt':
-                check_admin_referer('email-donor-receipt'); 
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Giving') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Giving','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('giving'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/giving.php');    
-                church_admin_donation_receipt_email($id,TRUE) ;        
-                //church_admin_email_donor_receipt( church_admin_sanitize($_GET['receipt_id'] )));
-            break;  
-            case 'funds':
-                check_admin_referer('funds'); 
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                ////check_admin_referer('funds');
-                if(!church_admin_level_check('Giving') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Giving','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('giving'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/giving.php');
-                church_admin_giving_funds(); 
-                
-            break;
-                case 'edit-fund':
-                    check_admin_referer('edit-fund'); 
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                ////check_admin_referer('edit-fund');
-                if(!church_admin_level_check('Giving') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Giving','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('giving'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/giving.php');
-                church_admin_edit_fund( $fund_id); 
-                
-            break;
-            case 'delete-fund':
-                check_admin_referer('delete-fund'); 
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                ////check_admin_referer('delete-fund');
-                if(!church_admin_level_check('Giving') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Giving','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('giving'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/giving.php');
-                church_admin_delete_fund( $fund_id); 
-                
-            break;
-            case 'edit-gift':
-                check_admin_referer('edit-gift'); 
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Giving') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Giving','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('giving'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/giving.php');
-                church_admin_giving_edit( $giving_id); 
-
-            break;
-            case 'fix-anon-gifts':
-                check_admin_referer('fix-anon-gifts'); 
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Giving') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Giving','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('giving'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/giving.php');
-                church_admin_fix_anon_giving();
-                church_admin_giving_list();
-            break;
-            case 'delete-gift':
-                check_admin_referer('delete-gift');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                //check_admin_referer('delete-gift');
-                if(!church_admin_level_check('Giving') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Giving','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('giving'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/giving.php');
-                church_admin_giving_delete( $gift_id); 
-                
-            break;
-            case 'refund-gift':
-                check_admin_referer('refund-gift');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                //check_admin_referer('delete-gift');
-                if(!church_admin_level_check('Giving') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Giving','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('giving'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'stripe/index.php');
-                church_admin_stripe_delete( $gift_id); 
-                
-            break;
-            case 'donor-giving':
-            case 'donor-gift':
-                check_admin_referer('donor-gift');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                
-                if(!church_admin_level_check('Giving') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Giving','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('giving'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/giving.php');
-                church_admin_donor_giving( $people_id); 
-
-            break; 
-            /*************************************
-            *
-            *		Kiosk App
-            *
-            **************************************/
-            case 'kiosk-app':
-                check_admin_referer('kiosk-app');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Directory') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Kidswork','church-admin') )).'</h2></div>';
-                    return;
-                }
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/kiosk-app.php');
-                church_admin_kiosk_app();
-
-            break;
-
-            /*************************************
-            *
-            *		KIDS WORK
-            *
-            **************************************/
-            case 'kidswork-pdf':
-            
-                check_admin_referer('kidswork-pdf');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Kidswork') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Kidswork','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('childrens-work'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/kidswork.php');
-                    church_admin_kidswork_PDF();
-                
-            break;
-            case 'kidswork-checkin-pdf':
-                check_admin_referer('kidswork-checkin-pdf');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Kidswork') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Kidswork','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('childrens-work'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/kidswork.php');
-                church_admin_kidswork_checkin_PDF();
-                
-            break;
-            case 'edit_kidswork':
-                check_admin_referer('edit_kidswork');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Kidswork') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Kidswork','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('childrens-work'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/kidswork.php');
-                church_admin_edit_kidswork( $id);
-                
-            break;
-            case 'delete_kidswork':
-                check_admin_referer('delete_kidswork');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Kidswork') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Kidswork','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('childrens-work'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/kidswork.php');
-                church_admin_delete_kidswork( $id);
-                
-            break;
-            case 'children':
-
-            case 'kidswork': 
-            case 'childrens-work':
-               
-                check_admin_referer('childrens-work');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Kidswork') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Kidswork','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('childrens-work'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/kidswork.php');
-                    echo'<h2>'.esc_html( __("Age related groups",'church-admin' ) ).'</h2>';
-                    echo church_admin_kidswork();
-            
-            break;
-            case 'edit_safeguarding':
-                check_admin_referer('edit_safeguarding');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                //legacy
-                if(!church_admin_level_check('Kidswork') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Kidswork','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('childrens-work'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/kidswork.php');
-                    church_admin_edit_safeguarding( $people_id);
-                
-            break;
-            case 'child-protection':
-                check_admin_referer('child-protection');
-                if( $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('ChildProtection') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Child Protection Ministry','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('child-protection'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/child-protection.php');
-                church_admin_child_protection_reporting();
-
-
-            break;
-            case 'edit-child-protection-incident':
-                check_admin_referer('edit-child-protection-incident');
-                if( $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('ChildProtection') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Child Protection Ministry','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('child-protection'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/child-protection.php');
-                church_admin_edit_child_protection_incident($ID)
-                ;
-
-            break;
-            case 'view-child-protection-incident':
-                check_admin_referer('view-child-protection-incident');
-                if( $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('ChildProtection') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Child Protection Ministry','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('child-protection'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/child-protection.php');
-                church_admin_view_child_protection_incident($ID)
-                ;
-
-            break;
-            case 'safeguarding':
-                check_admin_referer('safeguarding');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Kidswork') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Kidswork','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('childrens-work'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/safeguarding.php');
-                church_admin_safeguarding_main();
-                
-            break;
-            case 'edit-person-safeguarding':
-                check_admin_referer('edit-person-safeguarding');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Kidswork') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Kidswork','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_date_picker_script();
-                church_admin_module_dropdown('childrens-work'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/safeguarding.php');
-                church_admin_edit_person_safeguarding( $people_id);
-                
-            break;
-            case 'edit-safeguarding-field':
-                check_admin_referer('edit-safeguarding-field');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Kidswork') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Kidswork','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('childrens-work'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/safeguarding.php');
-                church_admin_edit_safeguarding_field( $ID);
-                
-            break;
-            case 'legacy-safeguarding':
-                check_admin_referer('legacy-safeguarding');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Kidswork') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Kidswork','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('childrens-work'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/kidswork.php');
-                church_admin_safeguarding_legacy_main();
-                
-            break;
-
-
-                
             /*************************************
             *
             *		MEDIA
             *
             **************************************/
-            case 'itunes-importer':
-                check_admin_referer('itunes-importer');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Sermons') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Sermons','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('media');  
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/itunes-importer/importer.php');
-                church_admin_import_itunes();
-            break;
+            
             case 'podcast':
             case 'media':
                 check_admin_referer('media');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+              
                 if(!church_admin_level_check('Sermons') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Sermons','church-admin') )).'</h2></div>';
@@ -7356,10 +4865,7 @@ function church_admin_actions()
           
             case 'migrate_sermon_manager':
                 check_admin_referer('migrate_sermon_manager');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                 if(!church_admin_level_check('Sermons') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Sermons','church-admin') )).'</h2></div>';
@@ -7372,10 +4878,7 @@ function church_admin_actions()
             break;  
             case 'migrate_advanced_sermons':
                 check_admin_referer('migrate_advanced_sermons');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                 if(!church_admin_level_check('Sermons') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Sermons','church-admin') )).'</h2></div>';
@@ -7388,10 +4891,7 @@ function church_admin_actions()
             break; 
             case 'set-sermon-page':
                 check_admin_referer('set-sermon-page');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+                
                 if(!church_admin_level_check('Sermons') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Sermons','church-admin') )).'</h2></div>';
@@ -7403,10 +4903,7 @@ function church_admin_actions()
             break;
             case 'migrate_sermon_browser':
                 check_admin_referer('migrate_sermon_browser');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                 if(!church_admin_level_check('Sermons') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Sermons','church-admin') )).'</h2></div>';
@@ -7419,10 +4916,7 @@ function church_admin_actions()
             break;          
             case'list_speakers':
                 check_admin_referer('list_speakers');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+              
                 if(church_admin_level_check('Sermons') )
                 {
                     require_once(plugin_dir_path(dirname(__FILE__) ).'includes/sermon-podcast.php');
@@ -7432,10 +4926,7 @@ function church_admin_actions()
             break;
             case'edit_speaker':
                 check_admin_referer('edit_speaker');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                 if(!church_admin_level_check('Sermons') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Sermons','church-admin') )).'</h2></div>';
@@ -7448,10 +4939,7 @@ function church_admin_actions()
             break;
             case'delete_speaker':
                 check_admin_referer('delete_speaker');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+                
                 if(!church_admin_level_check('Sermons') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Sermons','church-admin') )).'</h2></div>';
@@ -7464,10 +4952,7 @@ function church_admin_actions()
             case 'sermon-series':
             case'list_sermon_series':
                 check_admin_referer('sermon-series');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+                
                 if(!church_admin_level_check('Sermons') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Sermons','church-admin') )).'</h2></div>';
@@ -7481,10 +4966,7 @@ function church_admin_actions()
             case 'edit-sermon-series':
            
                 check_admin_referer('edit-sermon-series');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+                
                 if(!church_admin_level_check('Sermons') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Sermons','church-admin') )).'</h2></div>';
@@ -7497,10 +4979,7 @@ function church_admin_actions()
             break;
             case'delete-sermon-series':
                 check_admin_referer('delete-sermon-series');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+              
                 if(!church_admin_level_check('Sermons') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Sermons','church-admin') )).'</h2></div>';
@@ -7513,10 +4992,7 @@ function church_admin_actions()
             break;
             case'list_files':
                 check_admin_referer('list_files');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                 if(church_admin_level_check('Sermons') )
                 { 
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Sermons','church-admin') )).'</h2></div>';
@@ -7529,10 +5005,7 @@ function church_admin_actions()
             case 'upload-mp3':
            
                 check_admin_referer('upload-mp3');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+                
                 if(!church_admin_level_check('Sermons') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Sermons','church-admin') )).'</h2></div>';
@@ -7545,10 +5018,7 @@ function church_admin_actions()
             break;
             case'delete-media-file':
                 check_admin_referer('delete-media-file');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                 //check_admin_referer('delete_podcast_file');
                 if(!church_admin_level_check('Sermons') )
                 {
@@ -7561,10 +5031,7 @@ function church_admin_actions()
             break;
             case 'refresh-podcast':
                 check_admin_referer('refresh-podcast');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                 church_admin_module_dropdown('media'); 
                 require_once(plugin_dir_path(dirname(__FILE__) ).'includes/sermon-podcast.php');
                 ca_podcast_xml();
@@ -7574,10 +5041,7 @@ function church_admin_actions()
            
             case'add-media-file':
                 //check_admin_referer('add-media-file');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                 
                 if(!church_admin_level_check('Sermons') )
                 {
@@ -7590,10 +5054,7 @@ function church_admin_actions()
             break;
             case'check-media-files':
                 check_admin_referer('check-media-files');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+                
                 if(!church_admin_level_check('Sermons') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Sermons','church-admin') )).'</h2></div>';
@@ -7607,10 +5068,7 @@ function church_admin_actions()
            
             case'podcast-settings':
                 check_admin_referer('podcast-settings');
-                if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+               
                 if(!church_admin_level_check('Sermons') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Sermons','church-admin') )).'</h2></div>';
@@ -7618,7 +5076,7 @@ function church_admin_actions()
                 }
                 church_admin_module_dropdown('media'); 
                 require_once(plugin_dir_path(dirname(__FILE__) ).'includes/podcast-settings.php');
-                ca_podcast_settings();
+                church_admin_podcast_settings();
                 
             break;
 
@@ -7675,10 +5133,7 @@ function church_admin_actions()
             case 'edit-ministry':
            
                 check_admin_referer('edit-ministry');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+                
                 if(!church_admin_level_check('Ministries',NULL, $id) )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Ministries','church-admin') )).'</h2></div>';
@@ -7691,10 +5146,7 @@ function church_admin_actions()
             break;
             case 'delete-ministry': 
                 check_admin_referer('delete-ministry');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }           
+                       
                 if(!church_admin_level_check('Ministries') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Ministries','church-admin') )).'</h2></div>';
@@ -7705,46 +5157,11 @@ function church_admin_actions()
                 church_admin_delete_ministry( $id);
                 
             break;
-            case 'ministries':
-           
-            case 'ministry_list':
-                check_admin_referer('ministries');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Ministries') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Ministries','church-admin') )).'</h2></div>';
-                    return;
-                }
-                echo'<h2>'.esc_html( __('Ministries','church-admin' ) ).'</h2>';
-                church_admin_module_dropdown('ministries');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/departments.php');
-                church_admin_ministries_list();
-                
-            break;
-            case 'view_ministry':    
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }        
-                if(!church_admin_level_check('Ministries') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Ministries','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('ministries');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/departments.php');
-                    church_admin_view_ministry( $id);
-                
-            break;
+         
+
             case 'volunteers':
                 check_admin_referer('volunteers');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+                
                 if(!church_admin_level_check('Ministries') )
                 {
                     echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Ministries','church-admin') )).'</h2></div>';
@@ -7756,813 +5173,7 @@ function church_admin_actions()
                 
             break;
 
-            /*************************************
-            *
-            *		ROTA
-            *
-            **************************************/
-
-            case 'show-cron':
-                check_admin_referer('show-cron');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Rota') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Schedule','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('rota');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/rota.new.php');
-                church_admin_cron_check();
-                
-            break;
-            case 'copy-rota-data':
-                check_admin_referer('copy-rota-data');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Rota') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Schedule','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('rota');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/rota.new.php');
-
-                church_admin_copy_rota_data();
-            break;
-            case 'rota':
-                check_admin_referer('rota');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Rota') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Schedule','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('rota');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/rota.new.php');
-
-                church_admin_rota_list( $service_id,$mtg_type);
-                
-            break;
-            case 'add-three-months':
-                check_admin_referer('add-three-months');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Rota') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Schedule','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('rota');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/rota.new.php');
-                church_admin_three_months_rota( $service_id,$mtg_type);
-            break;
-            case 'ministry-rota':
-                check_admin_referer('ministry-rota');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/rota.new.php');
-                echo church_admin_edit_ministry_rota($mtg_type,$service_id);
-            break;
-            case 'edit_rota':
-            case'edit-rota': 
-                check_admin_referer('edit-rota');	
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Rota') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Schedule','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('rota');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/rota.new.php');
-                church_admin_edit_rota( $rota_date,$mtg_type,$service_id);
-                
-            break;
-            case 'delete_rota':
-                check_admin_referer('delete_rota');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Rota') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Schedule','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('rota');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/rota.new.php');
-                church_admin_delete_rota( $rota_date,$mtg_type,(int)$_GET['service_id'] );
-                
-            break;
-           
             
-            /*************************************
-            *
-            *		ROTA SETTINGS
-            *
-            **************************************/
-            case 'not-available':
-                check_admin_referer('not-available');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Rota') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Schedule','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('rota');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'display/not-available.php');
-                echo church_admin_not_available();
-            break;
-            case 'rota-settings':
-            case'church_admin_rota_settings_list':
-                    check_admin_referer('rota-settings');
-                    if($licence!='standard' && $licence!='premium'){
-                        echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                        return;
-                    }
-                if(!church_admin_level_check('Rota') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Schedule','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('rota');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/rota_settings.php');
-                church_admin_rota_settings_list();
-                
-            break;
-            case 'edit-rota-job':
-          
-                check_admin_referer('edit-rota-job');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Rota') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Schedule','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('rota');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/rota_settings.php');
-                church_admin_edit_rota_settings( $id);
-                
-            break;
-            case 'delete-rota-job':
-                check_admin_referer('delete-rota-job');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                //check_admin_referer('delete_rota_settings');
-                if(!church_admin_level_check('Rota') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Schedule','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('rota');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/rota_settings.php');
-                church_admin_delete_rota_settings( $id);
-            break;
-           
-            
-            case 'auto-email-rota':
-                check_admin_referer('auto-email-rota');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Rota') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Schedule','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('rota');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/rota.new.php');
-                church_admin_rota_auto_email();
-                
-            break;
-            
-            case 'auto-sms-rota':
-                check_admin_referer('auto-sms-rota');
-                    if($licence!='standard' && $licence!='premium'){
-                        echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                        return;
-                    }
-                    if(!church_admin_level_check('Rota') )
-                    {
-                        echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Schedule','church-admin') )).'</h2></div>';
-                        return;
-                    }
-                    church_admin_module_dropdown('rota');
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/rota.new.php');
-                    church_admin_rota_auto_sms();
-                    
-                break;
-            case 'email-rota':
-                check_admin_referer('email-rota');
-                
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Rota') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Schedule','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('rota');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/rota.new.php');
-                $service_id = !empty($_REQUEST['service_id'])?church_admin_sanitize($_REQUEST['service_id']): null;
-                $date = !empty($_REQUEST['rota_date'])?church_admin_sanitize($_REQUEST['rota_date']): null;
-                if (!empty($service_id) && church_admin_int_check($service_id) && !empty($date) && church_admin_checkdate($date)) {
-                        church_admin_email_rota( $service_id,$date);
-                }
-                else {
-                    church_admin_email_rota_form();
-                }
-                
-            break; 
-            case'pdf-rota':
-                check_admin_referer('pdf-rota');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Rota') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Schedule','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('rota');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/rota.new.php');
-                    church_admin_rota_pdf_menu();
-                
-            
-            break;
-            case'csv-rota':
-                check_admin_referer('csv-rota');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Rota') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Schedule','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('rota');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/rota.new.php');
-                    church_admin_rota_csv_menu();
-                
-            
-            break;
-            case 'sms-rota':
-                check_admin_referer('sms-rota');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Rota') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Schedule','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('rota');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/rota.new.php');           
-                church_admin_sms_rota();
-               
-            break;
-            /*************************************
-            *
-            *		SERVICES
-            *
-            **************************************/
-            
-           
-          
-            case 'services-list':
-                check_admin_referer('services-list');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                echo'<h2>'.esc_html( __('Services','church-admin' ) ).'</h2>';
-                if(!church_admin_level_check('Service') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Service','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('services');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/services.php');
-                echo church_admin_service_list( $message);
-            
-                
-            break; 
-            
-            case'site-list':
-                check_admin_referer('site-list');
-                    if($licence!='standard' && $licence!='premium'){
-                        echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                        return;
-                    }
-                echo'<h2>'.esc_html( __('Sites','church-admin' ) ).'</h2>';
-                if(!church_admin_level_check('Service') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Service','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('services');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/sites.php');
-                    
-                    church_admin_site_list();
-                
-                
-            break; 
-        
-            case 'edit-service':
-           
-                check_admin_referer('edit-service');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Service') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Service','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('services');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/services.php');  
-                church_admin_edit_service( $id);
-                
-            break;
-            case 'delete-service':
-           
-                check_admin_referer('delete-service');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Service') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Service','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('services');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/services.php');  
-                church_admin_delete_service( $id);
-                
-            break;
-            case  'service-prebooking':
-                check_admin_referer('service-prebooking');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Service') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Service','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('services');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/covid-prebooking.php');  
-                echo church_admin_covid_attendance_list();
-                
-            break;
-            case 'delete_service_booking'  :
-                check_admin_referer('delete_service_booking');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Service') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Service','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('services');
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/covid-prebooking.php');
-                    echo church_admin_delete_service_booking( $id);
-            break;    
-            case 'delete_bubble_booking'  :
-                check_admin_referer('delete_bubble_booking');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Service') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Service','church-admin') )).'</h2></div>';
-                    return;
-                }
-                        church_admin_module_dropdown('services');
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/covid-prebooking.php');
-                    echo church_admin_delete_bubble_booking( $id);
-            break;  
-            case 'edit_bubble_booking'  :
-                check_admin_referer('edit_bubble_booking');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Service') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Service','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('services');
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/covid-prebooking.php');
-                    echo church_admin_edit_bubble_booking( $id);
-            break;
-            case 'add_bubble_booking_to_service'  :
-                check_admin_referer('add_bubble_booking');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Service') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Service','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('services');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/covid-prebooking.php');
-                echo church_admin_add_bubble_booking_to_service( $id);
-            break;
-            case 'add_bubble_booking'  :
-                check_admin_referer('add_bubble_booking');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Service') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Service','church-admin') )).'</h2></div>';
-                    return;
-                }    
-                require_once(plugin_dir_path(dirname(__FILE__) ).'display/covid-prebooking.php');
-                echo'<h2>'.esc_html( __('Add service pre-booking','church-admin' ) ).'</h2>';
-
-                echo church_admin_covid_attendance( $service_id,'bubbles',10,365,get_option('church_admin_default_from_email') );
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/covid-prebooking.php'); 
-                if(!empty( $_POST) ) echo church_admin_covid_attendance_list();
-            break;
-            case  'delete_service':
-                check_admin_referer('delete_service');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                } 
-                if(!church_admin_level_check('Service') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Service','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('services');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/services.php');  
-                church_admin_delete_service( $id);
-            
-            break;
-            case 'delete_site':
-                check_admin_referer('delete_site');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Service') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Service','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('services');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/sites.php'); 
-                church_admin_delete_site( $site_id);
-            break;
-            case 'edit-site':
-            case 'edit_site':
-                check_admin_referer('edit_site');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Service') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Service','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('services');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/sites.php'); 
-                    church_admin_edit_site( $site_id);
-                
-            break;
-            /*************************************
-            *
-            *       SESSIONS
-            *
-            *************************************/
-            case 'sessions': 
-                check_admin_referer('sessions');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }               
-                if(!church_admin_level_check('Sessions') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Sessions','church-admin') )).'</h2></div>';
-                    return;
-                }
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/sessions.php');
-                echo'<h2>'.esc_html( __('Sessions','church-admin' ) ).'</h2>';
-                echo church_admin_sessions();
-            break;
-                
-            /*************************************
-            *
-            *		SMALL GROUPS
-            *
-            **************************************/
-            case'small_groups':
-                check_admin_referer('small_groups');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                
-                if(!church_admin_level_check('Groups') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Groups','church-admin') )).'</h2></div>';
-                    return;
-                }
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/small_groups.php');
-                echo church_admin_smallgroups_main();
-                
-            break;
-            case 'delete_cell':
-                check_admin_referer('delete_cell');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Groups') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html( sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Groups','church-admin') )).'</h2></div>';
-                   
-                    return;
-                }
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/small_groups.php');church_admin_delete_cell( $ID);
-            break;
-            case 'cleanup-groups':
-                check_admin_referer('cleanup-groups');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Groups') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Groups','church-admin') )).'</h2></div>';
-                    return;
-                }
-                wp_enqueue_script('church_admin_google_maps_api');
-                wp_enqueue_script('church_admin_sg_map_script');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/small_groups.php');
-                
-                echo church_admin_smallgroups_cleanup();
-                
-                church_admin_module_dropdown('groups');
-               
-                require_once(plugin_dir_path(dirname(__FILE__) ).'display/small-group-list.php');
-                echo church_admin_small_group_list(1,13,TRUE); 
-                
-            break;
-            case 'show-groups':
-                check_admin_referer('show-groups');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Groups') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Groups','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('groups');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'display/small-groups.php');
-                echo church_admin_frontend_small_groups(NULL,FALSE);
-                
-            break;
-            case 'unattached':
-                check_admin_referer('unattached');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Groups') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Groups','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('groups');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/small_groups.php');
-                church_admin_unattached_list();
-            break;
-            case 'groups':
-                check_admin_referer('groups');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Groups') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Groups','church-admin') )).'</h2></div>';
-                    return;
-                }
-                    wp_enqueue_script('church_admin_sg_map_script');
-                    wp_enqueue_script('church_admin_google_maps_api');
-                    
-                    echo'<h2>'.esc_html( __('Small groups','church-admin' ) ).'</h2>';
-                    church_admin_module_dropdown('groups');
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/small_groups.php');
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'display/small-group-list.php');
-                    church_admin_smallgroup_metrics();
-                    echo church_admin_small_group_list(1,1,TRUE);  
-            break;
-            case 'smallgroup-show-pdf-form':
-                check_admin_referer('smallgroup-show-pdf-form');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Groups') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Groups','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('groups');    
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/small_groups.php');
-                church_admin_smallgroup_PDF_form();
-                
-            break;
-            case 'small-group-metrics':
-                check_admin_referer('small-group-metrics');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Groups') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Groups','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('groups');
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/small_groups.php');
-                    church_admin_smallgroup_metrics();
-                
-            break;
-            
-            case 'delete-all-groups':
-                check_admin_referer('delete-all-groups');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Groups') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Groups','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('groups');   
-                if(!empty( $_POST['sure'] ) )
-                {
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/small_groups.php');
-                    church_admin_delete_all_small_groups();
-                    echo '<p><a class="button-primary" href="'.wp_nonce_url("admin.php?page=church_admin/index.php&section=small_groups&amp;action=edit-small-group",'edit-small-group').'">'.esc_html( __('Add a small group','church-admin' ) ).'</a></p>';
-                
-                }
-                else
-                {
-                    echo'<form action="" method="post"><h2><strong>'.esc_html( __("Are you sure you want to delete all the groups?",'church-admin' ) ).'</strong></h2><p><input type="hidden" name="sure" value="yes" /><input type="submit"  class="button-secondary" value="'.esc_html( __('Yes, delete all the','church-admin' ) ).'" /></p></form>';
-                }
-                
-                
-            
-                
-            break;	
-            case 'smallgroup-structure':
-            case 'small-group-structure':
-                check_admin_referer('smallgroup-structure');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Groups') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Groups','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('groups');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/small_groups.php');
-                echo church_admin_small_group_structure();
-            break;
-            case 'oversight-list': 
-                check_admin_referer('oversight-list');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }   
-                if(!church_admin_level_check('Groups') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Groups','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('groups');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/small_groups.php');            
-                    echo church_admin_oversight_list();
-            
-            break;
-            case'remove_from_smallgroup':
-                check_admin_referer('remove_from_smallgroup');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                //check_admin_referer('remove');
-                church_admin_module_dropdown('groups');
-                if(!church_admin_level_check('Groups') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Groups','church-admin') )).'</h2></div>';
-                    return;
-                }
-                
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/small_groups.php');
-                church_admin_remove_from_smallgroup( $people_id,$smallgroup_id);
-            break;
-            case'whosin':
-                check_admin_referer('whosin');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                ////check_admin_referer('whosin');
-                if(!church_admin_level_check('Groups') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Groups','church-admin') )).'</h2></div>';
-                    return;
-                }
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/small_groups.php'); echo church_admin_whosin( $id);
-            break;
-            case  'edit-small-group':
-            case 'edit-group':
-            case 'add-group':
-                check_admin_referer('edit-small-group');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                ////check_admin_referer('edit-group');
-                if(!church_admin_level_check('Groups') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Groups','church-admin') )).'</h2></div>';
-                    return;
-                }
-                church_admin_module_dropdown('groups'); 
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/small_groups.php'); 
-                echo church_admin_edit_small_group( $id);
-            break;
-            case  'delete-group':
-                check_admin_referer('delete-group');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                //check_admin_referer('delete_small_group');
-                
-            
-                if(!church_admin_level_check('Groups') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Groups','church-admin') )).'</h2></div>';
-                    return;
-                }
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/small_groups.php'); 
-                echo church_admin_delete_small_group( $id);
-            break;
-      
             /*************************************
             *
             *		SETTINGS
@@ -8578,28 +5189,7 @@ function church_admin_actions()
                 }
             break;
             
-            case 'delete-smtp-settings':
-                check_admin_referer('delete-smtp-settings');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(!church_admin_level_check('Bulk_Email') )
-                {
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Bulk Email','church-admin') )).'</h2></div>';
-                    return;
-                }
-                delete_option('church_admin_smtp_settings');
-                update_option('church_admin_transactional_email_method','native');
-                $bulk_method = get_option('church_admin_transactional_email_method');
-                if(!empty($bulk_method) && $bulk_method='smtpserver'){
-                    update_option('church_admin_bulk_email_method','native');
-                }
-                echo '<div class="notice notice-success"><h2>'.esc_html( __('SMTP settings deleted','church-admin' ) ).'</h2><p>'.esc_html( __('Email method set to natice WordPress','church-admin' ) ).'</p></div>';
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/settings.php'); 
-                church_admin_email_settings();
-
-            break;
+          
             case 'toggle-debug-mode':
                 check_admin_referer('toggle-debug-mode');
                 if(current_user_can('manage_options') )
@@ -8637,10 +5227,7 @@ function church_admin_actions()
         break;
             case 'restrict-access':
                 check_admin_referer('restrict-access');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
+                
                 if(current_user_can('manage_options') )
                 {
                     church_admin_module_dropdown('settings');
@@ -8657,21 +5244,7 @@ function church_admin_actions()
                     church_admin_people_types_list();
                 }
         break;
-        case 'choose-modules':
         
-            check_admin_referer('choose-modules');
-            if($licence!='standard' && $licence!='premium'){
-                echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                return;
-            }
-                if(current_user_can('manage_options') )
-                {
-                    
-                    church_admin_module_dropdown('settings');
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/settings.php');           
-                    church_admin_modules();
-                }
-        break;
         case 'marital-status':
             check_admin_referer('marital-status');
                 if(current_user_can('manage_options') )
@@ -8738,22 +5311,19 @@ function church_admin_actions()
                 church_admin_qrcode_generator();
 
         break;
-        case 'new-user-email-template':
-            check_admin_referer('new-user-email-template');
+        case 'email-templates':
+            check_admin_referer('email-templates');
             if(current_user_can('manage_options') )
             {
             
                 church_admin_module_dropdown('settings');
                 require_once(plugin_dir_path(dirname(__FILE__) ).'includes/settings.php');
-                church_admin_new_user_template();
+                church_admin_registration_follow_up_email();
             }
         break;
         case 'global-communications-settings':
             check_admin_referer('global-communications-settings');
-            if($licence!='standard' && $licence!='premium'){
-                echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                return;
-            }
+           
             if(current_user_can('manage_options') )
             {
                 church_admin_module_dropdown('settings');
@@ -8783,10 +5353,7 @@ function church_admin_actions()
         break;
         case'edit_people_type':
             check_admin_referer('edit_people_type');
-            if($licence!='standard' && $licence!='premium'){
-                echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                return;
-            }
+           
             if(!church_admin_level_check('Directory') )
             {
                 echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Groups','church-admin') )).'</h2></div>';
@@ -8799,10 +5366,7 @@ function church_admin_actions()
         break;
         case'delete_people_type':
             check_admin_referer('delete_people_type');
-            if($licence!='standard' && $licence!='premium'){
-                echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                return;
-            }
+          
             if(!church_admin_level_check('Directory') )
             {
                 echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Groups','church-admin') )).'</h2></div>';
@@ -8812,351 +5376,7 @@ function church_admin_actions()
             echo church_admin_delete_people_type( $ID);
             echo church_admin_people_types_list();
             break;
-        /*************************************
-        *
-        *       UNITS
-        *
-        **************************************/
-        case 'units':
-            check_admin_referer('units');
-            if($licence!='standard' && $licence!='premium'){
-                echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                return;
-            }
-            if(!church_admin_level_check('Units') )
-            {
-                echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Units','church-admin') )).'</h2></div>';
-                return;
-            }
-            require_once(plugin_dir_path(dirname(__FILE__) ).'includes/units.php');
-            church_admin_units_list();
-        break;
-        case 'edit-unit':
-        case 'add-unit':
-            check_admin_referer('edit-unit');
-            if($licence!='standard' && $licence!='premium'){
-                echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                return;
-            }
-            if(!church_admin_level_check('Units') )
-            {
-                echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Units','church-admin') )).'</h2></div>';
-                return;
-            }
-            require_once(plugin_dir_path(dirname(__FILE__) ).'includes/units.php');
-            church_admin_edit_unit( $unit_id);
-        break;
-
-
-        case 'show-subunits':
-            check_admin_referer('show-subunits');
-            if($licence!='standard' && $licence!='premium'){
-                echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                return;
-            }
-            if(!church_admin_level_check('Units') )
-            {
-                echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Units','church-admin') )).'</h2></div>';
-                return;
-            }
-            require_once(plugin_dir_path(dirname(__FILE__) ).'includes/units.php');
-            church_admin_show_subunits( $unit_id);
-        break;
-        case 'edit-subunit':
-            check_admin_referer('edit-subunit');
-            if($licence!='standard' && $licence!='premium'){
-                echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                return;
-            }
-            if(!church_admin_level_check('Units') )
-            {
-                echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Units','church-admin') )).'</h2></div>';
-                return;
-            }
-            require_once(plugin_dir_path(dirname(__FILE__) ).'includes/units.php');
-            church_admin_edit_subunit( $unit_id,$subunit_id);
-        break;
-        case 'delete-unit':
-            check_admin_referer('delete-unit');
-            if($licence!='standard' && $licence!='premium'){
-                echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                return;
-            }
-            if(!church_admin_level_check('Units') )
-            {
-                echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Units','church-admin') )).'</h2></div>';
-                return;
-            }
-            require_once(plugin_dir_path(dirname(__FILE__) ).'includes/units.php');
-            church_admin_delete_unit( $unit_id);
-        break;    
-        case 'delete-subunit':
-            if($licence!='standard' && $licence!='premium'){
-                echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                return;
-            }
-            if(!church_admin_level_check('Units') )
-            {
-                echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Units','church-admin') )).'</h2></div>';
-                return;
-            }
-            require_once(plugin_dir_path(dirname(__FILE__) ).'includes/units.php');
-            church_admin_delete_subunit( $unit_id,$subunit_id);
-        break;
-        /*************************************
-        *
-        *       VOLUNTEERS
-        *
-        **************************************/
-        case 'approve-volunteer':
-            if($licence!='standard' && $licence!='premium'){
-                echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                return;
-            }
-            /******************************************************
-             * nonce generated by register functions on front end 
-             * and sentby email to admin won't work normally
-             * because a nonce uses user_id etc
-             * we will check nonce for use within admin area, 
-             * but also allow access if a logged in user with 
-             * directory permissions
-             * *************************************************/
-            $access=FALSE;
-            $nonce = church_admin_sanitize($$_REQUEST['_wpnonce']);
-            if(wp_verify_nonce($nonce,'approve-volunteer')){$access=TRUE;}
-            $expected_token = md5(NONCE_SALT.$people_id);
-            $token = church_admin_sanitize($_REQUEST['token']);
-            if($token = $expected_token){$access=TRUE;}
-           
-
-            if(!empty($access) && church_admin_level_check('Ministries')){
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/volunteer.php');
-                church_admin_volunteer_approval( $people_id,$ministry_id);
-
-            }
-
-            
-           
-            
-            
-        break;
-        case 'decline-volunteer':
-          
-            if($licence!='standard' && $licence!='premium'){
-                echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                return;
-            }
-            /******************************************************
-             * nonce generated by register functions on front end 
-             * and sentby email to admin won't work normally
-             * because a nonce uses user_id etc
-             * we will check nonce for use within admin area, 
-             * but also allow access if a logged in user with 
-             * directory permissions
-             * *************************************************/
-            $access=FALSE;
-            $nonce = church_admin_sanitize($$_REQUEST['_wpnonce']);
-            if(wp_verify_nonce($nonce,'decline-volunteer')){$access=TRUE;}
-            $expected_token = md5(NONCE_SALT.$people_id);
-            $token = church_admin_sanitize($_REQUEST['token']);
-            if($token = $expected_token){$access=TRUE;}
-           
-
-            if(!empty($access) && church_admin_level_check('Ministries')){
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/volunteer.php');
-                church_admin_volunteer_decline( $people_id,$ministry_id);
-            }
-        break;   
-            /*************************************
-        *
-        *     PASTORAL MODULE
-        *
-        **************************************/
-        case 'pastoral':
-            check_admin_referer('pastoral');
-            $premiumLicence = get_option('church_admin_app_new_licence');
-            if ( empty( $premiumLicence)||$premiumLicence!='premium')
-            {
-                echo '<p>'.esc_html( __('This feature is premium only, please upgrade to unlock') ).'</p>';
-                church_admin_app_purchase();
-                return;
-            }
-            $settings = get_option('church_admin_pastoral_settings');
-            if(church_admin_level_check('Pastoral') || church_admin_ministry_team_check($settings['ministry_id']))
-            {
-                church_admin_module_dropdown('pastoral');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/visitation.php');
-                church_admin_pastoral_main();
-            }
-            else{
-                echo '<div class="notice notice-danger"><h2>'.esc_html(__('You need "Pastoral" permissions to access this page, or be part of the pastoral ministry team','church-admin' ) ).'</h2></div>';
-            }
-        break;
-        case 'pastoral-visit-list':
-            check_admin_referer('pastoral-visit-list');
-            $premiumLicence = get_option('church_admin_app_new_licence');
-            if ( empty( $premiumLicence)||$premiumLicence!='premium')
-            {
-                echo '<p>'.esc_html( __('This feature is premium only, please upgrade to unlock') ).'</p>';
-                church_admin_app_purchase();
-                return;
-            }
-            
-            if(church_admin_level_check('Pastoral') || church_admin_ministry_team_check($settings['ministry_id']))
-            {
-                church_admin_module_dropdown('pastoral');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/visitation.php');
-                church_admin_pastoral_visits_list(true);
-            }else{
-                echo '<div class="notice notice-danger"><h2>'.esc_html(__('You need "Pastoral" permissions to access this page, or be part of the pastoral ministry team','church-admin' ) ).'</h2></div>';
-            }
-        break;
-        case 'pastoral-settings':
-            check_admin_referer('pastoral-settings');
-            $premiumLicence = get_option('church_admin_app_new_licence');
-            if ( empty( $premiumLicence)||$premiumLicence!='premium')
-            {
-                echo '<p>'.esc_html( __('This feature is premium only, please upgrade to unlock') ).'</p>';
-                church_admin_app_purchase();
-                return;
-            }
-            if(church_admin_level_check('Pastoral') || church_admin_ministry_team_check($settings['ministry_id']))
-            {
-                
-                church_admin_module_dropdown('pastoral');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/visitation.php');
-                church_admin_pastoral_settings();
-            }else{
-                echo '<div class="notice notice-danger"><h2>'.esc_html(__('You need "Pastoral" permissions to access this page, or be part of the pastoral ministry team','church-admin' ) ).'</h2></div>';
-            }
-        break;
-        case 'schedule-pastoral-visit':
-            check_admin_referer('schedule-pastoral-visit');
-            $premiumLicence = get_option('church_admin_app_new_licence');
-            if ( empty( $premiumLicence)||$premiumLicence!='premium')
-            {
-                echo '<p>'.esc_html( __('This feature is premium only, please upgrade to unlock') ).'</p>';
-                church_admin_app_purchase();
-                return;
-            }
-            if(church_admin_level_check('Pastoral') || church_admin_ministry_team_check($settings['ministry_id']))
-            {
-                church_admin_module_dropdown('pastoral');
-                require_once(plugin_dir_path(dirname(__FILE__) ).'includes/visitation.php');
-                church_admin_schedule_pastoral_visit($people_id);
-            }else{
-                echo '<div class="notice notice-danger"><h2>'.esc_html(__('You need "Pastoral" permissions to access this page, or be part of the pastoral ministry team','church-admin' ) ).'</h2></div>';
-            }
-        break;
-
-
-            case 'edit-pastoral-visit-note':
-                check_admin_referer('edit-pastoral-visit-note');
-                $premiumLicence = get_option('church_admin_app_new_licence');
-                if ( empty( $premiumLicence)||$premiumLicence!='premium')
-                {
-                    echo '<p>'.esc_html( __('This feature is premium only, please upgrade to unlock') ).'</p>';
-                    church_admin_app_purchase();
-                    return;
-                }
-                if(church_admin_level_check('Pastoral') || church_admin_ministry_team_check($settings['ministry_id']))
-                {
-                    church_admin_module_dropdown('pastoral');
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/visitation.php');
-
-                    church_admin_edit_pastoral_note($people_id,$note_id);
-                }else{
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(__('You need "Pastoral" permissions to access this page, or be part of the pastoral ministry team','church-admin' ) ).'</h2></div>';
-                }
-            break;
-            case 'delete-pastoral-visit-note':
-                check_admin_referer('delete-pastoral-visit-note');
-                $premiumLicence = get_option('church_admin_app_new_licence');
-                if ( empty( $premiumLicence)||$premiumLicence!='premium')
-                {
-                    echo '<p>'.esc_html( __('This feature is premium only, please upgrade to unlock') ).'</p>';
-                    church_admin_app_purchase();
-                    return;
-                }
-                if(church_admin_level_check('Pastoral') || church_admin_ministry_team_check($settings['ministry_id']))
-                {
-                    church_admin_module_dropdown('pastoral');
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/visitation.php');
-                    church_admin_delete_pastoral_note($people_id,$id);
-                }else{
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(__('You need "Pastoral" permissions to access this page, or be part of the pastoral ministry team','church-admin' ) ).'</h2></div>';
-                }
-            break;
-            case 'view-pastoral-visits':
-                check_admin_referer('view-pastoral-visits');
-                $premiumLicence = get_option('church_admin_app_new_licence');
-                if ( empty( $premiumLicence)||$premiumLicence!='premium')
-                {
-                    echo '<p>'.esc_html( __('This feature is premium only, please upgrade to unlock') ).'</p>';
-                    church_admin_app_purchase();
-                    return;
-                }
-                if(church_admin_level_check('Pastoral') || church_admin_ministry_team_check($settings['ministry_id']))
-                {
-                    church_admin_module_dropdown('pastoral');
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/visitation.php');
-        
-                    church_admin_view_pastoral_notes($people_id);
-                }else{
-                    echo '<div class="notice notice-danger"><h2>'.esc_html(__('You need "Pastoral" permissions to access this page, or be part of the pastoral ministry team','church-admin' ) ).'</h2></div>';
-                }
-            break;
-            case 'bulk-edit-anniversary':
-                check_admin_referer('bulk-edit-anniversary');
-                if(church_admin_level_check('Directory') )
-                {
-                    church_admin_module_dropdown('people'); 
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/directory.php');
-                    church_admin_bulk_edit_wedding_anniversary();
-                }
-                else{echo'<p>'.esc_html( __("You don't have permissions for this page",'church-admin' ) ).'</p>';}
-            break;
-            case 'bulk-edit-dob':
-                check_admin_referer('bulk-edit-dob');
-                if(church_admin_level_check('Directory') )
-                {
-                    church_admin_module_dropdown('people'); 
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/directory.php');
-                    church_admin_bulk_edit_date_of_birth();
-                }
-                else{echo'<p>'.esc_html( __("You don't have permissions for this page",'church-admin' ) ).'</p>';}
-            break;
-            case 'bulk-edit-custom':
-                check_admin_referer('bulk-edit-custom');
-                if(church_admin_level_check('Directory') )
-                {
-                    church_admin_module_dropdown('people'); 
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/directory.php');
-                    church_admin_bulk_edit_custom_field();
-                }
-                else{echo'<p>'.esc_html( __("You don't have permissions for this page",'church-admin' ) ).'</p>';}
-            break;
-
-            case 'bulk-edit-comms-permissions':
-                check_admin_referer('bulk-edit-comms-permissions');
-                if($licence!='standard' && $licence!='premium'){
-                    echo'<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-                    return;
-                }
-                if(church_admin_level_check('Directory') )
-                {
-                    church_admin_module_dropdown('people'); 
-                    require_once(plugin_dir_path(dirname(__FILE__) ).'includes/directory.php');
-                    church_admin_bulk_edit_comms_settings();
-                }
-                else{echo'<p>'.esc_html( __("You don't have permissions for this page",'church-admin' ) ).'</p>';}
-            break;
-            case 'test':
-                if(current_user_can('manage_options')){
-                    church_admin_test_function();
-                }
-                
-            break;
+      
             /*************************************
             *
             *		DEFAULT
@@ -9402,9 +5622,11 @@ function church_admin_directory_issues_fixer()
         echo'<h2>'.esc_html( __('Remove people duplicates in smallgroups, ministries and classes','church-admin' ) ).'</h2>';
         $sql='DELETE  t1 FROM '.$wpdb->prefix.'church_admin_people_meta t1 INNER JOIN '.$wpdb->prefix.'church_admin_people_meta t2 WHERE t1.meta_id < t2.meta_id AND t1.people_id = t2.people_id AND t1.ID = t2.ID AND t1.meta_type=t2.meta_type;';
         $wpdb->query($sql);
+        //translators: %1$s is a number
         echo '<p>'.esc_html( sprintf( __('%1$s duplicates removed','church-admin' ) ,$wpdb->rows_affected)).'<span class="ca-dashicons dashicons dashicons-yes"  style="color:green"></span></p>';
         echo'<h2>'.esc_html( __('Remove orphaned entries  in smallgroups, ministries and classes','church-admin' ) ).'</h2>';
         $wpdb->query('DELETE FROM '.$wpdb->prefix.'church_admin_people_meta WHERE people_id REGEXP "^-?[0-9]+$" AND people_id NOT IN (SELECT people_id FROM '.$wpdb->prefix.'church_admin_people);');
+        //translators: %1$s is a number
         echo '<p>'.esc_html( sprintf( __('%1$s orphan entries removed','church-admin' ) ,$wpdb->rows_affected)).'<span class="ca-dashicons dashicons dashicons-yes"  style="color:green"></span></p>';
 
         /******************************************************************
@@ -9416,6 +5638,7 @@ function church_admin_directory_issues_fixer()
         {
             echo'<p>'.esc_html( __('Nobody has set "show me" on the address list','church-admin' ) ).'<span class="ca-dashicons dashicons dashicons-no" style="color:red"></span></p>';
         }
+        //translators: %1$s is a number
         else echo'<p>'.esc_html(sprintf(__('%1$s people have set themselves to show me on the address list','church-admin' ) ,$countShowMe)).'<span class="ca-dashicons dashicons dashicons-yes" style="color:green"></span></p>';
         /******************************************************************
          * SHOW POSSIBLE DUPLICATES
@@ -9428,6 +5651,7 @@ function church_admin_directory_issues_fixer()
         {
             foreach( $results AS $row)
             {
+                //translators: %1$s is a name %2$s is a number
                 echo '<h3>'.esc_html(sprintf(__('Possible duplication of %1$s, which occurs %2$s times','church-admin' ) ,esc_html( $row->first_name.' '.$row->last_name),(int)$row->last_name_count)).'</h3>';
                 //grab those details
                 $duplicateResult=$wpdb->get_results('SELECT a.*,b.address,b.last_updated AS householdUpdated FROM '.$wpdb->prefix.'church_admin_people a, '.$wpdb->prefix.'church_admin_household b WHERE a.household_id=b.household_id AND a.first_name="'.esc_sql( $row->first_name).'" AND last_name="'.esc_sql( $row->last_name).'" ORDER BY people_id ASC');
@@ -9458,6 +5682,7 @@ function church_admin_directory_issues_fixer()
                         }
                         $updated=sprintf(__('Person updated %1$s, Household updated %2$s','church-admin' ) ,mysql2date(get_option('date_format'),$dupe->last_updated),mysql2date(get_option('date_format'),$dupe->householdUpdated) );
                         $householdCount=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people WHERE household_id="'.(int)$dupe->household_id.'"');
+                        //translators: %1$s is a number
                         $display='<a target="_blank" href="'.wp_nonce_url('admin.php?page=church_admin/index.php&amp;action=display-household&section=people&household_id='.(int)$dupe->household_id,'display-household').'">'.esc_html(sprintf(__('Display household (%1$s people)','church-admin' ),$householdCount)).'</a>';
                         echo'<tr><td>'.$merge.'</td><td>'.$delete.'</td><td>'.$name.'</td><td>'.$cell.'</td><td>'.$address.'</td><td>'.$display.'</td><td>'.$updated.'</td></tr>';
                         $dupeNo++;
@@ -9639,37 +5864,7 @@ function church_admin_address_list_issues_fixer( $member_type_ids)
 }
 
 
-/*
-function church_admin_plugin_notice() {
-	
-	global $current_user;
-	
-	$user_id = $current_user->ID;
-	
-	if (!get_user_meta( $user_id, 'church_admin_plugin_notice_ignore') ) {
-		
-		echo '<div class="updated notice notice-warning"><h2>'. __('Please note that service prebooking is now defaulted to login only','church-admin') .'</h2><p>'.esc_html( __('Add loggedin=FALSE to the shortcode or uncheck "Require login?" in the block options.','church-admin' ) ).'</p><p> <a href="'.add_query_arg( 'dismiss-ca-service-notice', 'true').'">Dismiss</a></p></div>';
-		
-	}
-	
-}
-add_action('admin_notices', 'church_admin_plugin_notice');
-	
-function church_admin_plugin_notice_ignore() {
-	
-	global $current_user;
-	
-	$user_id = $current_user->ID;
-	
-	if (isset( $_GET['dismiss-ca-service-notice'] ) ) {
-		
-		add_user_meta( $user_id, 'church_admin_plugin_notice_ignore', 'true', true);
-		
-	}
-	
-}
-add_action('admin_init', 'church_admin_plugin_notice_ignore');
-*/
+
 function church_admin_directory_title_name( $people)
 {
     $directory=$first_names=$last_names=array();
@@ -9719,163 +5914,37 @@ function church_admin_directory_title_name( $people)
  ************************/
 function church_admin_manual_advert()
 {
-    global $church_admin_version;
-    $licence = get_option('church_admin_app_new_licence');;
-    if(!empty($licence) && $licence == 'premium'){return;}
-    /**********************
-     * Check Trial Period
-     *********************/
-    $trial_period = get_option('church_admin_trial');
-    $trial_period_countdown = church_admin_trial_period();
+
+   
+   
     
     
     
     echo '<div class="ca-boxes" id="upgrade">';
-    echo    '<div class="ca-boxes-header ca-blue">'."\r\n";
+    echo    '<div class="ca-boxes-header ca-darkpink">'."\r\n";
     echo '<p><span class="ca-dashicons dashicons dashicons-heart ca-dashicons"></span></p>'."\r\n";
-    echo'<h3>'.esc_html( __('Support Church Admin Plugin','church-admin' ) ).'</h3>'."\r\n";
+    echo'<h3>'.esc_html( __('Premium Version','church-admin' ) ).'</h3>'."\r\n";
     echo'</div>'."\r\n";
     echo '<div class="ca-boxes-content">';
     echo'<h3>'.esc_html(__('Weekly Email List','church-admin')).'</h3>';
-    echo'<p><a href="http://churchadminplugin.com/#email-list">Join are our weekly email list to get the free PDF manual</a></p>';
+    echo'<p><a href="http://churchadminplugin.com/#email-list">Join our weekly email list to get the free PDF manual</a></p>';
+    echo'<h2>'.esc_html('Premium Upgrade','church-admin').'</h2>';
+    echo'<p>The premium version of Church Admin adds classes, smallgroups, event booking,services, sites, schedule, communication tools, pastoral visitation organising, ministries, serving sign up and a free App for your church members to use for a low annual subscription price.</p>'; 
     
-    $output='';
-    $output.='<div class="notice notice-success"><h2>'.esc_html(__('If your licence seems wrong.','church-admin')).'</h2>';
-    $output.='<p>'.__('Sometimes the licence check is delayed, please click the button below to check again.','church-admin').'</p>';
-    $output.='<p><a href="'.site_url().'/?licence-change=reset">'.__('Check again','church-admin').'</a></p>';
-    $output.='</div>';
+   echo'<p> <a class="button-primary" href="'.esc_url(wp_nonce_url('admin.php?page=church_admin/index.php&action=premium-upgrade','premium-upgrade')).'">Premium plugin install</a></p>';
 
-        
-    if(!empty($trial_period) && $licence!='premium'){
-        //28 day trial period of standard version
-        $output .= '<h2>'.esc_html(__('Trial Period of Standard Version','church-admin')).'</h2>';
-        $output .='<p style="color:red"><strong>'.$trial_period_countdown.'</strong></p>';
-    }
-    if($licence =='free' || !empty($trial_period)){
-        $output .= '<h3>'.esc_html(__('Free Version','church-admin')).'</h3>';
-        $output .= '<p>'.esc_html(__('Only includes the People module and front end address list blocks and shortcodes','church-admin')).'</p>';
-    }
-    if($licence == 'basic'){
-        $output .= '<h3>'.esc_html(__('Basic Version','church-admin')).'</h3>';
-        $output .= '<p>'.esc_html(__('Only includes the People, Calendar and Sermons modules','church-admin')).'</p>';
-    }
-    if(!empty($trial_period)||$licence=='free'){
-
-        $output.='<h3>'.esc_html(__('Basic Version','church-admin')).'</h3>';
-        $output .= '<p>'.esc_html(__('Only includes the People, Calendar and Sermons modules','church-admin')).'</p>';
-        $output.='<form action="'.CA_PAYPAL.'" method="post"><input name="cmd" type="hidden" value="_xclick-subscriptions"> 
-            <input name="item_name" type="hidden" value="Church Admin Basic Version Subscription from v'.esc_attr($church_admin_version).'"> 
-            
-            <input type="hidden" name="rm" value=2/><input name="notify_url" type="hidden" value="https://www.churchadminplugin.com/wp-admin/admin-ajax.php?action=church_admin_basic_ipn"><div class="church-admin-form-group"><label>Your website URL</label><input  type="hidden" name="custom" value="'.site_url().'" > </div><p><input name="business" type="hidden" value="support@churchadminplugin.com"><input type="hidden" name="a3" class="basic-price" value="12.50"><input type="hidden" class="ca-recurring"  name="p3" value="1" /><input type="hidden" class="ca-recurring" name="t3" value="Y" /><input type="hidden" class="ca-recurring" name="src" value="1" /><input type="hidden" name="no_note" value=1><div class="form-group"><select class="basic-currency_code" name="currency_code"><option value="USD">US Dollar $12.50 annually</option><option value="GBP">GB Pound Sterling £10 annually</option><option value="EUR">Euro €12.50 annually</option><option value="AUD">Australian Dollar $19 annually</option><option value="BRL">Brazilian Real 62 annually</option><option value="CAD">Canadian Dollar $17 annually</option><option value="MXN">Mexican Peso 215 annually</option> <option value="CHF">Swiss Franc 11 annually</option></select></div><button class="button-secondary" type="submit">Instant upgrade to Basic</button></form></p><script>
-                   jQuery( document ).ready(function($) {
-                       console.log( "ready!" );
-                   
-                       $(".standard-currency_code").change(sortPrice);
-                       $(".standard-frequency").change(sortPrice);
-                       
-                       function sortPrice(){
-                           var currency_code=$(".basic-currency_code").val();
-                           var frequency=$(".basic-frequency").val();
-                           console.log("Currency "+ currency_code+ "Frequency "+frequency);
-                           var price=30;
-                           
-                           var sign="&pound;";
-                           console.log(currency_code)
-                           switch(currency_code)
-                           {
-                               default:case "GBP":price=10;sign="GBP &pound;10";break;	
-                               case "AUD":price=19;sign="AUD &dollar;19";break;
-                               case "MXN":price=215;sign="MXN Peso 2120";break;
-                               case "BRL":price=62;sign="BRL Real 62";break;
-                               case "CAD":price=17;sign="CAD &dollar;17";break;
-                               case "USD":price=12.50;sign="USD &dollar;12.50";break;
-                               case"EUR":price=12.50;sign="EU &euro;12.50";break;
-                               case "CHF":price=11;sign="CHF11";break;
-                               
-                           }
-                           
-                           $(".basic-sign").html(sign);
-                           var formattedPrice =parseFloat(Math.round(price * 100) / 100).toFixed(2);
-                           $(".basic-cost").html(formattedPrice);
-                           $(".basic-price").val(formattedPrice);
-                           $(".basic-freq").html(freq);
-                           
-                       };
-                       
-                   });</script>
-            <p><a href="https://buy.stripe.com/8wM29Tg2P7ABcjm14I">Or Pay by card (upgrade is not instant, will be handled manually)</a></p>';
-    }
-    if(empty($licence)||$licence=='free'||$licence=='basic'){
-        $output .= '<h3>'.esc_html(__('Standard Version','church-admin')).'</h3>';
-        $output .= '<p>'.esc_html(__('Includes the following modules: people, age related groups, attendance, calendar, contact form, classes, free events,  follow up funnels,key dates, sermon media and schedule ','church-admin')).'</p>';
-   
-
-        $output.='<p><form action="'.CA_PAYPAL.'" method="post"><input name="cmd" type="hidden" value="_xclick-subscriptions"> 
-        <input name="item_name" type="hidden" value="Church Admin Standard Version Subscription from v'.esc_attr($church_admin_version).'">
-        <input type="hidden" name="return" value="'.site_url().'/?licence-change=reset"/>
-        <input type="hidden" name="rm" value=2/><input name="notify_url" type="hidden" value="https://www.churchadminplugin.com/wp-admin/admin-ajax.php?action=church_admin_standard_ipn">
-            <input type="hidden" name="custom" value="'.site_url().'"> 
-            <input name="business" type="hidden" value="support@churchadminplugin.com"> 
-            <input type="hidden" name="a3" class="standard-price" value="40">
-       <input type="hidden" class="ca-recurring"  name="p3" value="1" />
-       <input type="hidden" class="ca-recurring" name="t3" value="Y" />
-       <input type="hidden" class="ca-recurring" name="src" value="1" />
-       <input type="hidden" name="no_note" value=1>
-       <div class="form-group"><select class="standard-currency_code" name="currency_code"><option value="USD">US Dollar $40 annually</option><option value="GBP">GB Pound Sterling £30 annually</option><option value="EUR">Euro €35 annually</option><option value="AUD">Australian Dollar $60 annually</option><option value="BRL">Brazilian Real 185 annually</option><option value="CAD">Canadian Dollar $170 annually</option><option value="MXN">Mexican Peso 2120 annually</option> <option value="CHF">Swiss Franc 33 annually</option></select></div><input class="button-primary" type="submit" value="Instant upgrade to Standard"></form></p><script>
-               jQuery( document ).ready(function($) {
-                   console.log( "ready!" );
-               
-                   $(".standard-currency_code").change(sortPrice);
-                   $(".standard-frequency").change(sortPrice);
-                   
-                   function sortPrice(){
-                       var currency_code=$(".standard-currency_code").val();
-                       var frequency=$(".standard-frequency").val();
-                       console.log("Currency "+ currency_code+ "Frequency "+frequency);
-                       var price=30;
-                       
-                       var sign="&pound;";
-                       console.log(currency_code)
-                       switch(currency_code)
-                       {
-                           default:case "GBP":price=30;sign="GBP &pound;30";break;	
-                           case "AUD":price=60;sign="AUD &dollar;60";break;
-                           case "MXN":price=2120;sign="MXN Peso 2120";break;
-                           case "BRL":price=185;sign="BRL Real 185";break;
-                           case "CAD":price=170;sign="CAD &dollar;170";break;
-                           case "USD":price=40;sign="USD &dollar;40";break;
-                           case"EUR":price=35;sign="EU &euro;35";break;
-                           case "CHF":price=33;sign="CHF33";break;
-                           
-                       }
-                       
-                       $(".standard-sign").html(sign);
-                       var formattedPrice =parseFloat(Math.round(price * 100) / 100).toFixed(2);
-                       $(".standard-cost").html(formattedPrice);
-                       $(".standard-price").val(formattedPrice);
-                       $(".standard-freq").html(freq);
-                       
-                   };
-                   
-               });</script>';
-               $output.='<p><a href="https://buy.stripe.com/dR615P7wjbQR5UYaEV">Or pay by card  (upgrade is not instant, will be handled manually)</a></p>';
-    }
-    
-
-    $output .= '<h3>'.esc_html(__('Premium Version','church-admin')).'</h3>';
-    $output .= '<p>'.esc_html(__('Includes standard version features and automations, paid tickets for events, giving forms for PayPal and Stripe, the pastoral visitation module,  non availability for serving on schedules and most importantly the app','church-admin')).'</p>';
-
-    $output.='<p><form action="'.CA_PAYPAL.'" method="post">
+   echo '<h3>'.esc_html(__("If you don't have a standard/premium subscription. Please subscribe...",'church-admin')).'</h3>';
+   echo '<p><form action="'.CA_PAYPAL.'" method="post">
     <input name="cmd" type="hidden" value="_xclick-subscriptions"> 
-    <input name="item_name" type="hidden" value="Church Admin Premium Version from v'.esc_attr($church_admin_version).'"
+    <input name="item_name" type="hidden" value="Church Admin Premium Version from v'.CHURCH_ADMIN_VERSION.'"
     <input type="hidden" name="return" value="'.site_url().'/?licence-change=reset"/>
     <input type="hidden" name="rm" value=2/>
-    <input name="notify_url" type="hidden" value="https://www.churchadminplugin.com/wp-admin/admin-ajax.php?action=church_admin_premium_ipn"> 
+    <input name="notify_url" type="hidden" value="https://www.churchadminplugin.com/wp-admin/admin-ajax.php?action=church_admin_ipn"> 
         <input type="hidden" name="custom" value="'.site_url().'">
         <input name="business" type="hidden" value="support@churchadminplugin.com"> 
         <input type="hidden" name="a3" class="premium-price" value="99">
        <input type="hidden" class="ca-recurring"  name="p3" value="1" /><input type="hidden" class="ca-recurring" name="t3" value="Y" /><input type="hidden" class="ca-recurring" name="src" value="1" /><input type="hidden" name="no_note" value=1>
-       <div class="form-group"><select class="premium-currency_code" name="currency_code"><option value="USD">US Dollar $129 annually</option><option value="GBP">GB Pound Sterling £99 annually</option><option value="EUR">Euro €110 annually</option><option value="AUD">Australian Dollar $190 annually</option><option value="BRL">Brazilian Real 500 annually</option><option value="CAD">Canadian Dollar $170 annually</option><option value="MXN">Mexican Peso 2120 annually</option> <option value="CHF">Swiss Franc 110 annually</option></select></div><input class="button-primary" type="submit" value="Instant Upgrade to Premium"></form></p><script>
+       <div class="form-group"><select class="premium-currency_code" name="currency_code"><option value="USD">US Dollar $65 annually</option><option value="GBP">GB Pound Sterling £50 annually</option><option value="EUR">Euro €60 annually</option><option value="AUD">Australian Dollar $100 annually</option><option value="BRL">Brazilian Real 360 annually</option><option value="CAD">Canadian Dollar $90 annually</option><option value="MXN">Mexican Peso 1300 annually</option> <option value="CHF">Swiss Franc 55 annually</option></select></div><input class="button-primary" type="submit" value="Upgrade to Premium"></form></p><script>
                jQuery( document ).ready(function($) {
                    console.log( "ready!" );
               
@@ -9892,14 +5961,14 @@ function church_admin_manual_advert()
                        console.log(currency_code)
                        switch(currency_code)
                        {
-                           default:case "GBP":price=99;sign="GBP &pound;99";break;	
-                           case "AUD":price=190;sign="AUD &dollar;190";break;
-                           case "MXN":price=2120;sign="MXN Peso 2120";break;
-                           case "BRL":price=600;sign="BRL Real 600";break;
-                           case "CAD":price=170;sign="CAD &dollar;170";break;
-                           case "USD":price=129;sign="USD &dollar;129";break;
-                           case"EUR":price=110;sign="EU &euro;110";break;
-                           case "CHF":price=110;sign="CHF110";break;
+                           default:case "GBP":price=50;sign="GBP &pound;50";break;	
+                           case "AUD":price=100;sign="AUD &dollar;100";break;
+                           case "MXN":price=1300;sign="MXN Peso 1300";break;
+                           case "BRL":price=360;sign="BRL Real 360";break;
+                           case "CAD":price=90;sign="CAD &dollar;90";break;
+                           case "USD":price=65;sign="USD &dollar;65";break;
+                           case"EUR":price=60;sign="EU &euro;60";break;
+                           case "CHF":price=55;sign="CHF55";break;
                            
                        }
                        
@@ -9913,8 +5982,7 @@ function church_admin_manual_advert()
                    
                });</script>';
     
-    $output.='<p><a href="https://buy.stripe.com/6oE7ud03R1cd3MQ00i" >Or pay by card  (upgrade is not instant, will be handled manually)</a></p>';
-    echo $output;
+   
                
     echo'</div></div>';
 }
@@ -10422,9 +6490,6 @@ function church_admin_delete_people( $people_id,$household_id,$echo=TRUE,$confir
     
     if(!empty($data->user_id))
     {
-        $wpdb->query('DELETE FROM '.$wpdb->prefix.'church_admin_app WHERE user_id="'.(int)$data->user_id.'"');
-
-       
         $admin_message.='<a href="'.get_edit_user_link($data->user_id).'">'.sprintf(__('User account edit/delete %1$s','church-admin'),$name).'</a></p>';
        
     }
@@ -10696,84 +6761,8 @@ function church_admin_title_case($string)
 }
 
 
-/**
- * Returns array of safeguarding required ministries.
- *
- * @return $out array
- *
- */
-function church_admin_safeguarded_ministries()
-{
-	if(!church_admin_level_check('Kidswork') )
-	{
-		echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Kidswork','church-admin') )).'</h2></div>';
-		return;
-	}
-	global $wpdb;
-	$results=$wpdb->get_results('SELECT ID FROM '.$wpdb->prefix.'church_admin_ministries WHERE safeguarding=1');
-	if(!empty( $results) )
-	{
-		$out=array();
-		foreach( $results AS $row)$out[]=$row->ID;
-		return $out;
-	}
-	else return FALSE;
-}
 
 
-
-function church_admin_safeguarding_ministries()
-{
-	global $wpdb;
-
-	if(!church_admin_level_check('Kidswork') )
-	{
-		echo '<div class="notice notice-danger"><h2>'.esc_html(sprintf(__('You need "%1$s" permissions to access this page','church-admin' ) ,__('Kidswork','church-admin') )).'</h2></div>';
-		return;
-	}
-
-
-	$ministries=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_ministries ORDER BY ministry');
-	if(!empty( $_POST['safemin'] ) )
-	{
-
-		foreach( $ministries AS $ministry)
-		{
-			$postedTitle=sanitize_title( $ministry->ministry);
-			if(!empty( $_POST[$postedTitle] ) )
-			{
-				$wpdb->query('UPDATE '.$wpdb->prefix.'church_admin_ministries SET safeguarding=1 WHERE ID="'.(int)$ministry->ID.'"');
-			}
-			else
-			{
-				$wpdb->query('UPDATE '.$wpdb->prefix.'church_admin_ministries SET safeguarding=0 WHERE ID="'.(int)$ministry->ID.'"');
-			}
-		}
-	}
-	echo'<h2 class="safeguardingministries-toggle">'.esc_html( __('Which ministries require safeguarding? (click to toggle)','church-admin' ) ).'</h2>';
-	echo '<script type="text/javascript">jQuery(function()  {  jQuery(".safeguardingministries-toggle").click(function()  {jQuery(".safeguardingministries").toggle();  });});</script>';
-	echo '<div class="safeguardingministries" ';
-	if ( empty( $_POST['safemin'] ) )echo ' style="display:none" ';
-	echo '>';
-
-	$ministries=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_ministries ORDER BY ministry');
-	if(!empty( $ministries) )
-	{
-		echo '<form action="" method="POST">';
-		echo '<table class="form-table">';
-		foreach( $ministries AS $ministry)
-		{
-			echo '<tr><th scope="row">'.esc_html( $ministry->ministry).'</th><td><input type="checkbox" name="'.esc_html(sanitize_title( $ministry->ministry) ).'" value=1';
-			if(!empty( $ministry->safeguarding) )echo ' checked="checked" ';
-			echo '/></td></tr>';
-		}
-		echo '<tr><td colspan="2"><input type="hidden" name="safemin" value=1/><input type="submit" name="submit" class="button-primary" value="'.esc_html( __('Save','church-admin' ) ).'" /></td></tr>';
-		echo '</table></form>';
-	}
-	else{echo '<p>'.esc_html( __('Please set up some ministries first','church-admin' ) ).'</p>';}
-	echo '</div>';
-	return;
-}
 
 /**
  * Validates a given latitude $lat
@@ -10798,83 +6787,7 @@ function church_admin_validate_latitude(float $latitude): bool
   }
 
 
-  function church_admin_modules_dropdown()
-  {
 
-    //favourites
-    $favourites = get_option('church_admin_favourites');
-    if(!empty($favourites)){
-        echo'<p class="church-admin-module-select">'.esc_html(__('Go to','church-admin')).'<select id="ca_favourite_select">'."\r\n";
-        echo'<option>'.esc_html(__('Go to favourite...','church-admin')).'</option>';
-        foreach($favourites AS $key=>$data){
-            echo '<option value="'.esc_url(wp_nonce_url($data['url'],$data['nonce'])).'">'.esc_html($data['title']).'</option>';
-        }
-        echo'</section>';
-    }
-
-
-
-    //church_admin_debug('**** church_admin_modules_dropdown ******');
-    $modules=get_option('church_admin_modules');
-    $licence = get_option('church_admin_app_new_licence');
-   
-    if(!empty($_GET['action'])){return;}//only on main menu page
-    echo'<p class="church-admin-module-select">'.esc_html(__('Go to','church-admin')).'<select id="ca_module_select">'."\r\n";
-    echo'<option>'.esc_html(__('Module...','church-admin')).'</option>';
-    if($licence=='premium'){echo'<option value="app">'.esc_html(__('App','church-admin')).'</option>';}
-    if(!empty($modules['Attendance']) AND ($licence=='standard'||$licence=='premium')){echo'<option value="attendance">'.esc_html(__('Attendance','church-admin')).'</option>';}
-    if(!empty($modules['Calendar']) AND ($licence=='basic'||$licence=='standard'||$licence=='premium')){echo'<option value="calendar">'.esc_html(__('Calendar','church-admin')).'</option>';}
-    if(!empty($modules['ChildProtection']) AND ($licence=='standard'||$licence=='premium')){echo'<option value="child-protection">'.esc_html(__('Child protection','church-admin')).'</option>';}
-    
-    if(!empty($modules['Children'])AND ($licence=='standard'||$licence=='premium')){echo'<option value="childrens-work">'.esc_html(__("Age related groups",'church-admin')).'</option>';}
-    if(!empty($modules['Contact'])AND ($licence=='standard'||$licence=='premium')){echo'<option value="contact-form">'.esc_html(__('Contact form','church-admin')).'</option>';}
-    if(!empty($modules['Classes'])AND ($licence=='standard'||$licence=='premium')){echo'<option value="classes">'.esc_html(__('Classes','church-admin')).'</option>';}
-    if(!empty($modules['Comms'])AND ($licence=='standard'||$licence=='premium')){echo'<option value="comms">'.esc_html(__('Communications','church-admin')).'</option>';}
-    echo'<option value="data-protection">'.esc_html(__('Data protection','church-admin')).'</option>';
-    if(!empty($modules['Events'])AND ($licence=='standard'||$licence=='premium')){echo'<option value="events">'.esc_html(__('Events','church-admin')).'</option>';}
-    if(!empty($modules['Facilities']) AND ($licence=='standard'||$licence=='premium')){echo'<option value="facilities">'.esc_html(__('Facilities','church-admin')).'</option>';}
-    if(!empty($modules['Followup']) AND ($licence=='standard'||$licence=='premium')){echo'<option value="follow-up">'.esc_html(__('Follow up','church-admin')).'</option>';}
-    if(!empty($modules['Giving']) AND ($licence=='standard'||$licence=='premium')){echo'<option value="giving">'.esc_html(__('Giving','church-admin')).'</option>';}
-    if(!empty($modules['Groups']) AND ($licence=='standard'||$licence=='premium')){echo'<option value="groups">'.esc_html(__('Groups','church-admin')).'</option>';}
-    if(!empty($modules['Inventory']) AND ($licence=='standard'||$licence=='premium')){echo'<option value="inventory">'.esc_html(__('Inventory','church-admin')).'</option>';}
-    if(!empty($modules['Kiosk-App']) AND ($licence=='standard'||$licence=='premium')){echo'<option value="kiosk-app">'.esc_html(__('Kiosk App','church-admin')).'</option>';}
-    
-    if(!empty($modules['Media'])AND ($licence=='basic'||$licence=='standard'||$licence=='premium')){echo'<option value="media">'.esc_html(__('Media','church-admin')).'</option>';}
-    if(!empty($modules['Ministries'])AND ($licence=='standard'||$licence=='premium')){echo'<option value="ministries">'.esc_html(__('Ministries','church-admin')).'</option>';}
-    if(!empty($modules['Pastoral'])AND $licence=='premium'){echo'<option value="pastoral">'.esc_html(__('Pastoral','church-admin')).'</option>';}
-    if(!empty($modules['People'])){echo'<option value="people">'.esc_html(__('People','church-admin')).'</option>';}
-    if(!empty($modules['Rota']) AND ($licence=='standard'||$licence=='premium')){echo'<option value="rota">'.esc_html(__('Schedule','church-admin')).'</option>';}
-    
-    if(!empty($modules['Children']) AND ($licence=='standard'||$licence=='premium') ){echo'<option value="services">'.esc_html(__('Services and sites','church-admin')).'</option>';}
-    if(!empty($modules['Sessions'])AND ($licence=='standard'||$licence=='premium')){ echo'<option value="sessions">'.esc_html(__('Sessions','church-admin')).'</option>';}
-    echo'<option value="settings">'.esc_html(__('Settings','church-admin')).'</option>';
-    if(!empty($modules['Gifts'])AND ($licence=='standard'||$licence=='premium')){ echo'<option value="spiritual-gifts">'.esc_html(__('Spiritual gifts','church-admin')).'</option>';}
-    if(!empty($modules['Units'])AND ($licence=='standard'||$licence=='premium')){echo'<option value="units">'.esc_html(__('Units','church-admin')).'</option>';}
-    echo'</select>';
-    echo'<script>
-   jQuery(document).ready(function($){ 
-    $(function(){
-      // bind change event to select
-      $("#ca_module_select").on("change", function () {
-          var url = "#" + $(this).val(); // get selected value
-          console.log(url);
-          if (url) { // require a URL
-              window.location = url; // redirect
-          }
-          return false;
-      });
-      $("#ca_favourite_select").on("change", function () {
-        var url =  $(this).val(); // get selected value
-        console.log(url);
-        if (url) { // require a URL
-            window.location = url; // redirect
-        }
-        return false;
-    });
-    });
-});
-</script>';
-}
 
   function church_admin_int_check($var){
     if ((is_int($var) || is_string($var)) && preg_match('/^[0-9]\d*\z/', $var)) { 
@@ -11384,6 +7297,7 @@ function church_admin_email_send($to,$subject,$message,$from_name=null,$from_ema
             if (isset( $phpmailer) ) {
                 church_admin_debug("**********\r\n Send error\r\n ".print_r( $phpmailer->ErrorInfo,TRUE)."\r\n");
                 //church_admin_debug($phpmailer);
+                //translators: %1$s is an email
                 return sprintf(__('Failed to send to %1$s','church-admin'),$to).' '.$phpmailer->ErrorInfo;
             }
         }
@@ -11838,4 +7752,363 @@ function church_admin_check_date($date, $format = 'Y-m-d H:i:s')
 {
       $d = DateTime::createFromFormat($format, $date);
       return $d && $d->format($format) == $date;
+}
+
+
+/*****************************
+ * ONBOARDING EMAIL SETUP
+ ****************************/
+function church_admin_registration_follow_up_email()
+{
+
+    church_admin_debug('***** church_admin_registration_follow_up_email ******');
+    global $wpdb,$church_admin_url;
+    $user=wp_get_current_user();
+    church_admin_debug($user);
+    $person = $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'church_admin_people WHERE user_id="'.(int)$user->ID.'"');
+    $household_id = $person->household_id;
+    church_admin_debug('Household id = '.$household_id);
+    $household_details = !empty($household_id) ? church_admin_household_details_table($household_id):NULL;
+    church_admin_debug($household_details);
+
+    echo'<h2>'.esc_html(__('Registration flow','church-admin') ).'</h2>'."\r\n";
+    echo'<p>'.esc_html(__("An easy way to get people onboarding to your church directory is to use the [church_admin type=register] shortcode or Register block on a page. People start wih entering their email and the plugin detects whether they need to register or login. Once they have registered, they will receive an email asking them to confirm their email address. You can set a follow up email to be sent if they don't. Then the admin receives an email about the new entry. You can opt whether the new registrant automatically gets a subscriber level user account, or an admin issues it. Once an account is created the new user receives details about their account. Below are the options and email  templates.",'church-admin') ).'</p>'."\r\n";
+    
+    
+    $followup_template = get_option('church_admin_followup_email_template');
+    if(!empty($_POST['save']))
+    {
+        //username_style
+        switch($_POST['username_style']){
+            default:
+            case 'firstnamelastname':
+                update_option('church_admin_username_style','firstnamelastname');
+            break;
+            case 'initiallastname':update_option('church_admin_username_style','initiallastname');break;
+            case 'firstname.lastname':update_option('church_admin_username_style','firstname.lastname');break;
+            case 'lastnamefirstname':update_option('church_admin_username_style','lastnamefirstname');break;
+        }
+        if(empty($_POST['username_style'])){update_option('church_admin_username_style','firstnamelastname');}
+        //confirmation
+        if(!empty($_POST['confirmation_subject']) && !empty($_POST['confirmation_message'])){
+            $from_name = church_admin_sanitize($_POST['confirmation_from_name']);
+            $from_email = church_admin_sanitize($_POST['confirmation_from_email']);
+            $subject = church_admin_sanitize($_POST['confirmation_subject']);
+            $message = wp_kses_post(wpautop(stripslashes($_POST['confirmation_message'])));
+            update_option('church_admin_confirm_email_template',array('from_name'=>$from_name,'from_email'=>$from_email,'subject'=>$subject,'message'=>$message) );
+        }
+        //admin approval
+        if ( empty( $_POST['admin-approval'] ) )
+        {
+            delete_option('church_admin_admin_approval_required');
+        }else{
+            update_option('church_admin_admin_approval_required',TRUE);
+        }
+        //admin new entry template
+        if(!empty($_POST['admin_new_entry_template'])){
+            update_option('church_admin_new_entry_admin_email',wp_kses_post(wpautop(stripslashes( $_POST['admin_new_entry_template'] ) ))) ;
+
+        }
+        //new user email template
+        if(!empty($_POST['user_template'])){
+            update_option('church_admin_user_created_email',wp_kses_post(wpautop(stripslashes( $_POST['user_template'] ) ))) ;
+        }
+
+
+
+        //followup email
+       
+        if(!empty($_POST['cancel_followup'])){
+            if(!empty($followup_template['days'])){ $args = array('days'=>$followup_template['days']);}
+            //undo set flag
+            $followup_template = get_option('church_admin_followup_email_template');
+            unset($followup_template['days']);
+            update_option('church_admin_followup_email_template',$followup_template);
+            wp_clear_scheduled_hook( 'church_admin_followup_email');
+        }
+        elseif(!empty($_POST['followup_subject']) && !empty($_POST['followup_message'])){
+           
+            $from_name = church_admin_sanitize($_POST['followup_from_name']);
+            $from_email = church_admin_sanitize($_POST['followup_from_email']);
+            $subject = church_admin_sanitize($_POST['followup_subject']);
+            $message = wp_kses_post(wpautop(stripslashes($_POST['followup_message'])));
+            $days = !empty($_POST['followup_days'])?(int)$_POST['followup_days']:2;
+            $args = array('set'=>1,'days'=>$days,'from_name'=>$from_name,'from_email'=>$from_email,'subject'=>$subject,'message'=>$message);
+          
+          
+            update_option('church_admin_followup_email_template',$args );
+
+            //setup cron job
+            $first_run = strtotime("0600 tomorrow");
+            
+			if (! wp_next_scheduled ( 'church_admin_followup_email')) {
+				wp_schedule_event( $first_run, 'daily','church_admin_followup_email');
+				
+			}
+        }
+        echo'<div class="notice notice-sucess"><h2>'.esc_html(__('Follow up email automation settings saved','church-admin')).'</h2></div>'."\r\n";
+    }
+
+    echo'<script>
+            var htmlbefore = "<html><head><style>*,::before,::after{box-sizing:border-box}html{font-family:system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\";line-height:1.15;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4}body{margin:0}hr{height:0;color:inherit}abbr[title]{text-decoration:underline dotted}b,strong{font-weight:bolder}code,kbd,samp,pre{font-family:ui-monospace,SFMono-Regular,Consolas,\"Liberation Mono\",Menlo,monospace;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit}button,input,optgroup,select,textarea,p,th,td{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button,select{text-transform:none}button,[type=\"button\"],[type=\"reset\"],[type=\"submit\"]{-webkit-appearance:button}::-moz-focus-inner{border-style:none;padding:0}p,table{margin-bottom:10px}:-moz-focusring{outline:1px dotted ButtonText}:-moz-ui-invalid{box-shadow:none}legend{padding:0}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=\"search\"]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}.play-button{box-sizing:border-box;position:relative;top:150px;left:200px;width: 22px;height: 22px}.gg-play-button-o {    box-sizing: border-box;position: relative;display: block;width: 60px;height: 60px;border: 2px solid;border-radius: 68px;color: red;}.gg-play-button-o::before {content: \"\";display: block;box-sizing: border-box;position: absolute;width: 0;height: 25px;border-top: 25px solid transparent;border-bottom: 25px solid transparent;border-left: 25px solid;top: 4px;left: 20px;}</style></head><body><div id=\"container\" style=\"width:90%;height:auto;margin:0 auto;padding:10px;background:#FFF\"><!--content-->";
+            var htmlafter="<!--end-content--><p style=\"font-family:Arial;font-size:1em;\"><a href=\"'.site_url().'/?action=user-email-settings\">'.esc_html( __('Update which emails you receive', 'church-admin' ) ).'</a></p></div></body></html>";
+            var household_details = "'. addslashes($household_details) .'";
+            
+    </script>'."\r\n";
+    /***********************************
+     * Confirmation email
+     ***********************************/
+    echo'<h2>'.__('Step 1 - new registration receives email so they can confirm their email address exists.','church-admin').'</h2>';
+    echo'<form action="admin.php?page=church_admin%2Findex.php&action=registration-followup-email-setup" method="POST">';
+    wp_nonce_field('registration-followup-email-setup');
+    
+    $registration_confirmation_template = get_option('church_admin_confirm_email_template');
+    echo'<div class="church-admin-email-template-wrapper">';
+        echo'<div class="church-admin-email-template-column">';
+            echo'<h3>'.esc_html(__('Confirmation email template','church-admin')).'</h3>';
+            echo '<div class="church-admin-form-group"><label>'.esc_html(__('From name','church-admin')).'</label>';
+            echo'<input type="text" class="church-admin-form-control" name="confirmation_from_name" ';
+            if(!empty($registration_confirmation_template['from_name']))
+            {
+                echo' value="'.esc_html($registration_confirmation_template['from_name']).'" ';
+            }else{
+                echo' value="'.esc_attr(get_option('blogname')).'" ';
+            }
+            echo'/></div>';
+            echo '<div class="church-admin-form-group"><label>'.esc_html(__('From email address','church-admin')).'</label>';
+            echo'<input type="text" class="church-admin-form-control" name="confirmation_from_email" ';
+            if(!empty($registration_confirmation_template['from_email']))
+            {
+                echo' value="'.esc_html($registration_confirmation_template['from_email']).'" ';
+            }else{
+                echo' value="'.esc_attr(get_option('church_admin_default_from_email')).'" ';
+            }
+            echo'/></div>';
+            echo '<div class="church-admin-form-group"><label>'.esc_html(__('"Confirm your email" subject','church-admin')).'</label>';
+            echo'<input type="text" class="church-admin-form-control" name="confirmation_subject" ';
+            if(!empty($registration_confirmation_template['subject'])) echo' value="'.esc_html($registration_confirmation_template['subject']).'" ';
+            echo'/></div>';
+            echo'<p>'.esc_html(__('Use html and these shortcodes [CONFIRM_LINK],[SITE_URL],[CHURCH_NAME],[CONFIRM_URL]','church-admin') ).'</p>';
+        
+            $content   = !empty($registration_confirmation_template['message']) ? $registration_confirmation_template['message'] :'';
+            $editor_id = 'confirmation_message';
+            echo'<p><strong>'.esc_html(__('"Confirm your email" message','church-admin')).'</strong></p>';
+            wp_editor( $content, $editor_id,array(
+                'tinymce' => array(
+                    'init_instance_callback' => 'function(editor) {
+                                editor.on("keyup", function(){
+                                  
+                                    console.log("Editor contents was modified. Contents: " + editor.getContent());
+                                    var newContent = editor.getContent();
+                                    newContent = newContent.replace("[HOUSEHOLD_DETAILS]",household_details);
+                                    newContent = newContent.replace("[CONFIRM_LINK]", "'.home_url().'?confirm_email='.md5( $person->email).'&amp;people_id='.md5( $person->people_id).'");
+                                    newContent = newContent.replace("[SITE_URL]", "'.home_url().'");
+                                    newContent = newContent.replace("[CONFIRM_URL]","<a target=\"_blank\" href=\"'.home_url().'?confirm_email='.md5( $person->email).'&amp;people_id='.md5( $person->people_id).'\">'.esc_html( __( 'Click to confirm','church-admin') ).'</a>");
+                                    document.getElementById("confirmation-email-preview").srcdoc = htmlbefore + newContent + htmlafter;
+                                });
+                        }'
+                    ) )
+                );
+                
+        echo'</div><!-- end of confirmation template form-->';
+        echo'<div class="church-admin-email-template-column">';
+            echo'<h3>'.__('Email Preview','church-admin').'</h3>';
+            $html_content = !empty($content) ? church_admin_prep_html_email($content,'Confirm your email') :'';
+            $html_content = str_replace('[HOUSEHOLD_DETAILS]',$household_details,$html_content);
+            $html_content =str_replace('[CONFIRM_LINK]', home_url().'?confirm_email='.md5( $person->email).'&amp;people_id='.md5( $person->people_id),$html_content);
+            $html_content =str_replace('[SITE_URL]',home_url(),$html_content);
+            $html_content =str_replace('[CHURCH_NAME]',get_bloginfo('name'),$html_content);
+            $html_content =str_replace('[CONFIRM_URL]',' <a target="_blank" href="'.home_url().'?confirm_email='.md5( $person->email).'&amp;people_id='.md5( $person->people_id).'">'.esc_html( __( 'Click to confirm','church-admin') ).'</a>',$html_content);
+            echo'<iframe id="confirmation-email-preview" class="church-admin-email-template-container" srcdoc=\''.$html_content.'\'></iframe>';
+            
+        echo'</div>';
+    echo'</div><!-- end of display result confirmation template -->';
+    echo'<hr/>';
+    /************************************
+     * Admin Approval
+     *************************************/
+    echo'<h2>'.__('Step 2 - administrators can receive an email informing them of the new site registration.','church-admin').'</h2>';
+    
+    echo'<p>'.esc_html('It is best practice for anyone in your congregation who has an email to have a username/password combination so they can view restricted content and edit their entry (if you use the register/login block and shortcode. Here you can choose whether that is automated or not. If unchecked, admins will need to edit the person and click "Create User" to give the individual an account.','church-admin').'</p>';
+    $adminApproval=get_option('church_admin_admin_approval_required');
+    echo'<div class="church-admin-checkbox">';
+    echo'<input type="checkbox" name="admin-approval" value="1" ';
+    if(!empty( $adminApproval) ) echo' checked="checked" ';
+    echo'/>';
+    echo'<label>'.esc_html( __('Do you want admin approval before account creation?','church-admin' ) ).'</label>';
+    
+    echo'</div>';
+    $username_style = get_option('church_admin_username_style');
+   
+    echo'<h3>'.__('Choose username format using "John Smith" as an example','church-admin').'</h3>';
+    echo'<div class="church-admin-checkbox"><input type="radio" name="username_style" value="firstnamelastname" '.checked('firstnamelastname',$username_style,FALSE).' ><label>'.esc_html(__('firstnamelastname e.g. johnsmith','church-admin')).'</label></div>';
+    echo'<div class="church-admin-checkbox"><input type="radio" name="username_style" value="initiallastname" '.checked('initiallastname',$username_style,FALSE).' ><label>'.esc_html(__('initiallastname e.g. jsmith','church-admin')).'</label></div>';
+    echo'<div class="church-admin-checkbox"><input type="radio" name="username_style" value="firstname.lastname" '.checked('firstname.lastname',$username_style,FALSE).' ><label>'.esc_html(__('firstname.lastname e.g. john.smith','church-admin')).'</label></div>';
+    echo'<div class="church-admin-checkbox"><input type="radio" name="username_style" value="lastnamefirstname" '.checked('lastnamefirstname',$username_style,FALSE).' ><label>'.esc_html(__('lastnamefirstname e.g. smithjohn','church-admin')).'</label></div>';
+
+    echo'<div class="church-admin-email-template-wrapper">';
+    echo'<div class="church-admin-email-template-column">';       
+    
+        echo'<h2>'.esc_html(__('Email template for admins when new entry has confirmed their email','church-admin')).'</h2>';
+        echo'<p>'.__('[HOUSEHOLD_DETAILS] will display a table of the household details','church-admin').'</p>';
+        $admin_email_message=get_option('church_admin_new_entry_admin_email');
+
+        $content   = !empty( $admin_email_message) ?  $admin_email_message :'';
+        $editor_id = 'admin_new_entry_template';
+        wp_editor( $content, $editor_id ,array(
+            'tinymce' => array(
+                'init_instance_callback' => 'function(editor) {
+                            editor.on("keyup", function(){
+                                console.log(household_details);
+                                console.log("Editor contents was modified. Contents: " + editor.getContent());
+                                var newContent = editor.getContent();
+                                newContent = newContent.replace("[HOUSEHOLD_DETAILS]",household_details);
+                                newContent = newContent.replace("[CHURCH_NAME]","'.get_bloginfo('name').'");
+                                newContent = newContent.replace("[CONFIRM_LINK]", "'.home_url().'?confirm_email='.md5( $person->email).'&amp;people_id='.md5( $person->people_id).'");
+                                newContent = newContent.replace("[SITE_URL]", "'.home_url().'");
+                                newContent = newContent.replace("[CONFIRM_URL]","<a target=\"_blank\" href=\"'.home_url().'?confirm_email='.md5( $person->email).'&amp;people_id='.md5( $person->people_id).'\">'.esc_html( __( 'Click to confirm','church-admin') ).'</a>");
+                                document.getElementById("admin-email-preview-container").srcdoc = htmlbefore + newContent + htmlafter;
+                            });
+                    }'
+                ) )
+            );
+    echo'</div>';
+   
+    echo'<div class="church-admin-email-template-column">';
+            echo'<p>'.esc_html(__('For demo purposes, your household details are displayed','church-admin') ).'</p>';
+            
+            if(!empty($household_details))$content = str_replace('[HOUSEHOLD_DETAILS]',$household_details,$content);
+            echo'<h3>'.__('Email Preview','church-admin').'</h3>';
+            $html_content = !empty($content) ? church_admin_prep_html_email($content,'Confirm your email') :'';
+           
+            echo'<iframe id="admin-email-preview-container" class="church-admin-email-template-container" srcdoc=\''.$html_content.'\'></iframe>';
+            
+        echo'</div>';
+    echo'</div><!-- end of amin email new registration template -->';
+    echo'<hr/>';
+
+
+     /***********************************
+     * Follow up Email
+     ***********************************/
+    
+    echo'<h2>'.esc_html(__('Step 3 Follow up email','church-admin')).'</h2>';
+    echo'<p>'.esc_html(__("If the new registrant, does not click on the confirmation email link, you can setup thisreminder email to get them to confirm their email address",'church-admin')).'</p>';
+    echo'<div class="church-admin-email-template-wrapper">';
+    echo'<div class="church-admin-email-template-column">'; 
+        $followup_template = get_option('church_admin_followup_email_template');
+        echo '<div class="church-admin-form-group"><label>'.esc_html(__('From name','church-admin')).'</label>';
+        echo'<input type="text" class="church-admin-form-control" name="followup_from_name" ';
+        if(!empty($followup_template['from_name']))
+        {
+            echo' value="'.esc_html($followup_template['from_name']).'" ';
+        }else{
+            echo' value="'.esc_attr(get_option('blogname')).'" ';
+        }
+        echo'/></div>';
+        echo '<div class="church-admin-form-group"><label>'.esc_html(__('From email address','church-admin')).'</label>';
+        echo'<input type="text" class="church-admin-form-control" name="followup_from_email" ';
+        if(!empty($followup_template['from_email']))
+        {
+            echo' value="'.esc_html($followup_template['from_email']).'" ';
+        }else{
+            echo' value="'.esc_attr(get_option('church_admin_default_from_email')).'" ';
+        }
+        echo'/></div>';
+
+        if(!empty($followup_template['set'])){
+            echo'<div class="church-admin-form-group"><label>'.__('Cancel automatic followup email','church-admin').'</label><input type="checkbox" name="cancel_followup"></div>';
+        }
+        else {
+            echo'<p>'.esc_html('No automation set currently','church-admin').'</p>';
+        }
+        echo'<div class="church-admin-form-group"><label>'.esc_html(__('How many days after first registering','church-admin')).'<label>';
+        echo'<input type="number" class="church-admin-form-control" name="followup_days" ';
+        if(!empty($followup_template['days'])){ echo ' value="'.(int)$followup_template['days'].'" ';}
+        echo'></div>';
+        echo '<div class="church-admin-form-group"><label>'.esc_html(__('Follow up email subject','church-admin')).'</label>';
+        echo'<input type="text" class="church-admin-form-control" name="followup_subject" ';
+        if(!empty($followup_template['subject'])) echo' value="'.esc_html($followup_template['subject']).'" ';
+        echo'/></div>';
+        echo'<p>'.esc_html(__('Use HTML and these shortcodes [CONFIRM_URL] (which nudges a confirmation email click),[NAME],[CHURCH_URL]','church-admin') ).'</p>';
+      
+        $content   = !empty($followup_template['message']) ? $followup_template['message']:'';
+        $editor_id = 'followup_message';
+        
+        wp_editor( $content, $editor_id ,array(
+            'tinymce' => array(
+                'init_instance_callback' => 'function(editor) {
+                            editor.on("keyup", function(){
+                                console.log(household_details);
+                                console.log("Editor contents was modified. Contents: " + editor.getContent());
+                                var newContent = editor.getContent();
+                                newContent = newContent.replace("[HOUSEHOLD_DETAILS]",household_details);
+                                newContent = newContent.replace("[CHURCH_NAME]","'.get_bloginfo('name').'");
+                                newContent = newContent.replace("[CONFIRM_LINK]", "'.home_url().'?confirm_email='.md5( $person->email).'&amp;people_id='.md5( $person->people_id).'");
+                                newContent = newContent.replace("[SITE_URL]", "'.home_url().'");
+                                newContent = newContent.replace("[CONFIRM_URL]","<a target=\"_blank\" href=\"'.home_url().'?confirm_email='.md5( $person->email).'&amp;people_id='.md5( $person->people_id).'\">'.esc_html( __( 'Click to confirm','church-admin') ).'</a>",newContent);
+                                document.getElementById("follow-up-email-template-preview").srcdoc = htmlbefore + newContent + htmlafter;
+                            });
+                    }'
+                ) ));        
+    echo'</div>';
+    echo'<div class="church-admin-email-template-column">';
+        echo'<h3>'.__('Email Preview','church-admin').'</h3>';
+        $html_content = !empty($content) ? church_admin_prep_html_email($content,'Confirm your email') :'';
+       
+        echo'<iframe id="follow-up-email-template-preview" class="church-admin-email-template-container" srcdoc=\''.$html_content.'\'></iframe>';
+    
+    echo'</div>';
+    echo'</div><!-- end of follow up email template -->';
+    echo'<hr/>';
+
+
+    echo'<h2>'.esc_html(__('Last step! New user email template','church-admin')).'</h2>';
+	echo'<p>'.wp_kses_post(__('This is the tempate for the email message that is sent when a new user is created from Church Admin plugin. You can use [SITE_URL], [USERNAME], [PASSWORD] as shortcodes to be replaced by the relevant data. Premium plugin users can also use [ANDROID] and [IOS] for app store links - although https://ourchurchapp.online takes users to the correct app store on their device.','church-admin')).'</p>';
+    echo'<div class="church-admin-email-template-wrapper">';
+    echo'<div class="church-admin-email-template-column">'; 
+        $user_email_message=get_option('church_admin_user_created_email');
+        $content   = !empty($user_email_message) ? $user_email_message :'';
+        $editor_id = 'user_template';
+        
+        wp_editor( $content, $editor_id,array(
+            'tinymce' => array(
+                'init_instance_callback' => 'function(editor) {
+                            editor.on("keyup", function(){
+                              
+                                console.log("Editor contents was modified. Contents: " + editor.getContent());
+                                var newContent = editor.getContent();
+                                newContent = newContent.replace("[HOUSEHOLD_DETAILS]",household_details);
+                                newContent = newContent.replace("[CHURCH_NAME]","'.get_bloginfo('name').'");
+                                newContent = newContent.replace("[CONFIRM_LINK]", "'.home_url().'?confirm_email='.md5( $person->email).'&amp;people_id='.md5( $person->people_id).'");
+                                newContent = newContent.replace("[SITE_URL]", "'.home_url().'");
+                                newContent = newContent.replace("[CONFIRM_URL]","<a target=\"_blank\" href=\"'.home_url().'?confirm_email='.md5( $person->email).'&amp;people_id='.md5( $person->people_id).'\">'.esc_html( __( 'Click to confirm','church-admin') ).'</a>",newContent);
+                                document.getElementById("new-user-email-preview").srcdoc = htmlbefore + newContent + htmlafter;
+                            });
+                    }'
+                ) ) );
+    echo'</div>';
+    echo'<div class="church-admin-email-template-column">';
+        echo'<h3>'.__('Email Preview','church-admin').'</h3>';
+        $html_content = !empty($content) ? church_admin_prep_html_email($content,'Confirm your email') :'';
+       
+        echo'<iframe id="new-user-email-preview" class="church-admin-email-template-container" srcdoc=\''.$html_content.'\'></iframe>';
+
+    echo'</div>';
+    echo'</div><!-- end of follow up email template -->';
+  
+   
+
+    echo'<p><input type="hidden" name="save" value="1"><input type="submit" class="button-primary" value="'.esc_html(__('Save','church-admin') ).'"></p>';
+    echo'</form>';
+    
+
+
+   
+
+
+
+
+
+
 }

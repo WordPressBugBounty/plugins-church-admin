@@ -28,7 +28,7 @@ class Elementor_church_admin_calendar_list_widget extends \Elementor\Widget_Base
     protected function register_controls() {
 
 		// Content Tab Start
-        $facilities=church_admin_calendar_facilities_array();
+        
 	    $categories=church_admin_calendar_categories_array();
 		$this->start_controls_section(
 			'calendar',

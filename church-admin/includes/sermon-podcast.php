@@ -266,7 +266,7 @@ function ca_podcast_list_files()
             echo'<p><a href="'.wp_nonce_url('admin.php?page=church_admin%2Findex.php&action=media&section=podcast','media').'">'.esc_html( __('View all sermons','church-admin' ) ).'</a></p>';
         }
         else
-        {
+        {//translators: %1$s is a search string, %2$s is a number 
             echo'<h2>'.sprintf(__('Your search for "%1$s" yielded %2$s results','church-admin' ) ,esc_html(sanitize_text_field(stripslashes( $_POST['sermon-search'] )) ),$searchCount).'</h2>';
             echo'<p><a href="'.wp_nonce_url('admin.php?page=church_admin%2Findex.php&action=media&section=podcast','media').'">'.esc_html( __('View all sermons','church-admin' ) ).'</a></p>';
             $theader='<tr><th class="column-primary">'.esc_html( __('Title','church-admin' ) ).'</th><th>'.esc_html( __('Edit','church-admin' ) ).'</th><th>'.esc_html( __('Delete','church-admin' ) ).'</th><th>'.esc_html( __('Publ. Date','church-admin' ) ).'</th><th>'.esc_html( __('Speakers','church-admin' ) ).'</th><th>'.esc_html( __('Mp3 File','church-admin' ) ).'</th></th><th>'.esc_html( __('Mp3 File Okay?','church-admin' ) ).'</th><th>'.esc_html( __('Length','church-admin' ) ).'</th><th>'.esc_html( __('Media','church-admin' ) ).'</th><th>'.esc_html( __('Embed','church-admin' ) ).'</th><th>'.esc_html( __('Series','church-admin' ) ).'</th><th>'.esc_html( __('Plays','church-admin' ) ).'</th><th>'.esc_html( __('Shortcode','church-admin' ) ).'</th></tr>';
@@ -307,11 +307,13 @@ function ca_podcast_list_files()
                     
                     $views=church_admin_youtube_views_api( $embed['id'] );
                     if(!empty( $views) )  {
+                        //translators: %1$s is a number
                         $videoPlays='<br>'.esc_html(sprintf(__('%1$s views','church-admin' ) ,$views));
                     }
                 }
                 $embed_code=!empty($row->embed_code)?__('Yes','church-admin'):__('No','church-admin');
                 //output table row
+                //translators: %1$s is a number
                 $table.='<tr>
                     <td data-colname="'.esc_html( __('Sermon title','church-admin' ) ).'" class="column-primary">'.esc_html( $row->file_title).'<button type="button" class="toggle-row"><span class="screen-reader-text">show details</span></button></td>
                     <td data-colname="'.esc_html( __('Edit','church-admin' ) ).'">'.$edit.'</td>
@@ -344,7 +346,10 @@ function ca_podcast_list_files()
             $count=$wpdb->get_var('SELECT SUM(plays) FROM '.$wpdb->prefix.'church_admin_sermon_files');
             $results=$wpdb->get_results('SELECT a.* FROM '.$wpdb->prefix.'church_admin_sermon_files a  ORDER BY pub_date DESC');
 
-            if(!empty( $count) )echo'<p>'.sprintf(__('%1$s total sermon plays','church_admin'),$count).'</p>';
+            if(!empty( $count) ){
+             //translators: %1$s is a number
+                echo'<p>'.sprintf(__('%1$s total sermon plays','church_admin'),$count).'</p>';
+            }
             $total_records= $wpdb->num_rows;
             echo '<p>total records: '.$total_records.'</p>';
             require_once(plugin_dir_path(dirname(__FILE__) ).'includes/pagination.class.php');
@@ -511,10 +516,12 @@ function ca_podcast_list_files()
                         
                         $views=church_admin_youtube_views_api( $embed['id'] );
                         if(!empty( $views) )  {
+                            //translators: %1$s is a number of video views
                             $videoPlays='<br>'.esc_html(sprintf(__('%1$s views','church-admin' ) ,$views));
                         }
                     }
                     $embed_code=!empty($row->embed_code)?__('Yes','church-admin'):__('No','church-admin');
+                    //translators: %1$s is a number
                     $table.='<tr>
                         <th class="check-column"><input type="checkbox" name="file_id[]" value="'.(int)$row->file_id.'" /></th>
                         <td data-colname="'.esc_html( __('Sermon title','church-admin' ) ).'" class="column-primary">'.esc_html( $row->file_title).'<button type="button" class="toggle-row"><span class="screen-reader-text">show details</span></button></td>
@@ -576,6 +583,7 @@ function ca_podcast_delete_media_file( $id=NULL)
         }//end sure so delete
         else
         {
+            //translators: %1$s is a title, %2$s is the series name
             echo'<p>'.esc_html(sprintf(__('Are you sure you want to delete %1$s sermon form %2s?','church-admin' ) , $data->file_title, $data->series_name) );
             echo'<form action="" method="post"><input type="hidden" name="sure" value="YES" /><input type="submit" value="'.esc_html( __('Yes','church-admin' ) ).'" class="button-primary" /></form></p>';
         }
@@ -662,6 +670,7 @@ function ca_podcast_file_add( $file_name=NULL)
     $file_name=basename( $file_name);
     $sanitizedFilename=sanitize_file_name( $file_name);
     $file_url=$url.$sanitizedFilename;
+    //translators: %1$s is a file name
     echo'<h2>'.esc_html(sprintf(__('Add File - %1$s','church-admin' ) ,$file_name)).'</h2>';
     if(!empty( $_POST['save_file'] )  )
     {//process form
@@ -1073,6 +1082,7 @@ function church_admin_send_sermon( $id)
     if(!empty( $data) )
     {
       $subject=__('Latest sermon available','church-admin');
+      //translators: %1$s is a speaker name, %2$s is title, %3$s is series name
       $message='<p>'.esc_html(sprintf(__('The latest sermon "%1$s" by %2$s in the %3$s series is online','church-admin' ) , $data->speaker, $data->file_title,  $data->series_name) ).'<p>';
       if(!empty( $data->video_url) )$message.='<p><a href="'.esc_url( $data->video_url).'">'.esc_html( __('Watch now','church-admin' ) ).'</p>';
       if(!empty( $data->file_name) && file_exists( $path.$data->file_name) )
@@ -1209,6 +1219,7 @@ function church_admin_edit_sermon( $file_id)
                         church_admin_debug("Upload error");
                         echo'<p>'.esc_html( __('File Upload issue','church-admin' ) ).'</p>';
                     }else{
+                        //translators: %1$s is a URL
                         echo'<p>'.esc_html(sprintf(__('File saved to %1$s','church-admin'),$url.$file_name)).'</p>';
                         church_admin_debug('Files saved: '.$path.$file_name);
                     }
@@ -1383,6 +1394,7 @@ function church_admin_sermon_form( $current_data,$errors)
     $max_post = (int)(ini_get('post_max_size') );
     $memory_limit = (int)(ini_get('memory_limit') );
     $upload_mb = min( $max_upload, $max_post, $memory_limit);
+    //translators: %1$s is a number
     echo'<p>'.esc_html(sprintf(__('You can upload a file up to %1$sMB','church-admin' ) ,$upload_mb)).'</p>';
     echo'<form action="" method="POST"  enctype="multipart/form-data" id="churchAdminForm">';
     echo'<table class="form-table"><tbody>';
@@ -1562,8 +1574,12 @@ function church_admin_migrate_advanced_sermons()
     global $wpdb;
     echo'<h2>'.esc_html( __('Migrate from "Advanced Sermons" plugin','church-admin' ) ).'</h2>';
     $sermons=$wpdb->get_results('SELECT * FROM '.$wpdb->posts.' WHERE post_type="sermons" AND post_status="publish" ORDER BY post_date DESC');
-    if (empty( $sermons) )return __('No advanced sermons plugins sermons to import','church-admin');
+    if (empty( $sermons) ){
+        echo'<p>'.esc_html( __('No advanced sermons plugins sermons to import','church-admin') ).'</p>';
+        return;
+    }
     $total=$wpdb->num_rows;
+    //translators: %1$s is a number
     echo'<div class="notice notice-info inline"><h2>'.esc_html(sprintf(__('%1$s possible sermon record(s) to import found','church-admin' ) ,$total)).'</h2></div>';
     $count=0;
     foreach( $sermons AS $sermon)
@@ -1619,11 +1635,13 @@ function church_admin_migrate_advanced_sermons()
             echo '<p> Sermon "'.esc_html( $title).'" preached by '.esc_html( $speaker).' on  '.mysql2date(get_option('date_format'),$date).' imported</p>';
         }else
         {
+            //translators: %1$s is a number
             echo'<p>'.esc_html(sprintf(__('Not enough data found to import for this record ID: %1$s','church-admin' ) ,$sermon->ID)).'</p>';
             
         }
     }
     //show completion message
+    //translators: %1$s  and %2$s numbers
     echo'<div class="notice notice-success"><h2>'.esc_html(sprintf(__('%1$s sermons out of %2$s successfully imported','church-admin' ) ,(int)$count,(int)$total)).'</h2></div>';
     
 }
@@ -1652,6 +1670,7 @@ function church_admin_migrate_sermon_manager()
         if(!empty( $results) )
 		{
             $count = $wpdb->num_rows;
+            //translators: %1$s is a number
             echo'<h3>'.esc_html(sprintf(__('Migrating %1$s sermons','church-admin'),(int)$count)).'</h3>';
 
 
@@ -1712,8 +1731,10 @@ function church_admin_migrate_sermon_manager()
                         echo $wpdb->last_query;
                         $wpdb->query('UPDATE '.$wpdb->prefix.'church_admin_sermon_series SET last_sermon="'.esc_sql( $pub_date).'" WHERE series_id="'.(int)$series_id.'"');
                         $display_date= !empty($pub_date)?mysql2date(get_option('date_format'),$pub_date):__('Unknown date','church-admin');
+                        //translators: %1$s is a sermon title, %2$s is a date
                         echo'<p>'.esc_html(sprintf(__('Sermon "%1$s" preached on %2$s migrated','church-admin'),$title,$display_date)).'</p>';
                     }else{
+                        //translators: %1$s is a sermon title
                         echo'<p>'.esc_html(sprintf(__('Sermon "%1$s"  already migrated','church-admin'),$title)).'</p>';
                     }
 
@@ -1737,6 +1758,13 @@ function church_admin_migrate_sermon_manager()
 function church_admin_migrate_sermon_browser()
 {
     global $wpdb;
+    echo'<h2>'.esc_html(__('Sermon Browser Import','church-admin')).'</h2>';
+    //check for a sermon browser table
+    if( $wpdb->get_var('SHOW TABLES LIKE "'.$wpdb->prefix.'sb_sermons"')!=$wpdb->prefix.'sb_sermons')
+    {
+        echo'<p>'.esc_html(__('No sermon browser database tables found, so nothing to import','church-admin')).'</p>';
+        return;
+    }
     $upload_dir = wp_upload_dir();
     $path=$upload_dir['basedir'].'/sermons/';
     $url=$upload_dir['baseurl'].'/sermons/';
@@ -1777,8 +1805,12 @@ function church_admin_migrate_sermon_browser()
                 {
                     $file_slug=sanitize_title( $row->title);
                     $wpdb->query('INSERT INTO '.$wpdb->prefix.'church_admin_sermon_files (file_name,file_title,pub_date,series_id,speaker, plays,length,file_slug,bible_texts)VALUES("'.esc_sql( $row->file_name).'","'.esc_sql( $row->title).'","'.esc_sql( $row->datetime).'","'.(int)$new_series_id.'","'.esc_sql( $row->preacher_name).'","'.(int)$row->count.'","'.esc_sql( $row->duration).'","'.esc_sql( $file_slug).'","'.esc_sql( $passage).'")');
-                    echo '<p>'.esc_html(sprintf(__('%1$s preached by %2$s on %3$s added','church-admin' ) ,$row->preacher_name,$row->preacher_name,mysql2date(get_option('date_format').' '.get_option('time_format'),$row->datetime) )).'</p>';
-                } else{echo '<p>'.esc_html(sprintf(__('%1$s preached by %2$s on %3$s already added','church-admin' ) ,$row->title,$row->preacher_name,mysql2date(get_option('date_format').' '.get_option('time_format'),$row->datetime) )).'</p>'; }
+                   //translators: %1$s is a sermon title, %2$s is a name. %3$s is a date 
+                    echo '<p>'.esc_html(sprintf(__('%1$s preached by %2$s on %3$s added','church-admin' ) ,$row->title,$row->preacher_name,mysql2date(get_option('date_format').' '.get_option('time_format'),$row->datetime) )).'</p>';
+                } else{
+                        //translators: %1$s is a sermon title, %2$s is a name. %3$s is a date 
+                    echo '<p>'.esc_html(sprintf(__('%1$s preached by %2$s on %3$s already added','church-admin' ) ,$row->title,$row->preacher_name,mysql2date(get_option('date_format').' '.get_option('time_format'),$row->datetime) )).'</p>'; 
+                }
             }
 
         }

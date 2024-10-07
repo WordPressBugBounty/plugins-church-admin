@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) exit('You need Jesus!'); // Exit if accessed direc
 function church_admin_permissions()
 {
 
-	global $wpdb,$church_admin_version;
+	global $wpdb;
 	if(!current_user_can('manage_options') )
 	{
 		echo '<div class="notice notice-danger"><h2>'.esc_html( __('Only site administrators can change options')).'</h2></div>';

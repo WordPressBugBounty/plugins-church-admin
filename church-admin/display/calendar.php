@@ -1,11 +1,7 @@
 <?php
 function church_admin_display_calendar( $facilities_id=NULL,$cat_id=null)
 {
-    $licence =get_option('church_admin_app_new_licence');
-		if($licence!='basic' && $licence!='standard' && $licence!='premium'){
-			return '<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="'.admin_url().'admin.php?page=church_admin/index.php#support">Upgrade</a></p></div>';
-			
-		}
+    
     global $current_user,$wpdb;
 
     if(!empty($cat_id) && church_admin_int_check($cat_id))
@@ -69,7 +65,7 @@ function church_admin_display_calendar( $facilities_id=NULL,$cat_id=null)
 
 
     $display_categories = $display_facilities = array();
-    $facilities=church_admin_calendar_facilities_array();
+    
 	$categories=church_admin_calendar_categories_array();
     if(!empty($cat_id))
     {

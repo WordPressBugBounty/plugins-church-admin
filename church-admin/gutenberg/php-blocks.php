@@ -23,10 +23,15 @@ add_action('wp_enqueue_scripts','church_admin_block_assets');
 function church_admin_block_assets()
 {
 	if(is_admin() ) return;
+	//check not doubling up with premium
+	$registry = WP_Block_Type_Registry::get_instance();
+	if ( $registry->get_registered( 'church-admin/address-list' ) ) {
+		return;
+	}
 	//enqueueing front end
 	//church_admin_debug("Function church_admin_block_assets");
 	global $post;
-	global $church_admin_version;
+
 	if(has_block('church-admin/address-list',$post)
 	||has_block('church-admin/basic-register',$post)
 	||has_block('church-admin/attendance',$post)
@@ -67,9 +72,8 @@ function church_admin_block_assets()
 
 			wp_enqueue_script('ca-draganddrop', plugins_url( '/', dirname(__FILE__ ) ) . 'includes/draganddrop.js', array( 'jquery' ), filemtime(plugin_dir_path(dirname(__FILE__) ).'includes/draganddrop.js'),TRUE);
 			wp_enqueue_script( 'jquery-ui-datepicker');//,plugins_url('church-admin/includes/jquery-ui.min.js',dirname(__FILE__) ),array('jquery'), filemtime(plugin_dir_path(dirname(__FILE__) ).'includes/jquery-ui.min.js'),TRUE );
-			wp_enqueue_style('church-admin-ui','https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.2/themes/smoothness/jquery-ui.css',false,"1.13.2",false);
-		}
-		
+			wp_enqueue_style('church-admin-ui',plugins_url('/',dirname(__FILE__) ). 'css/jquery-ui-1.13.2.css',false,"1.13.2",false);
+	}
 		
 		if(	has_block('church-admin/calendar',$post)
 		|| has_block('church-admin/calendar-list',$post)
@@ -128,13 +132,13 @@ function church_admin_block_assets()
 		if(has_block('church-admin/sermon-podcast',$post) )
 		{
 			church_admin_debug("Line 108");
-			wp_enqueue_script('ca_podcast_audio_use',plugins_url('includes/audio.use.js',dirname(__FILE__) ), array( 'jquery' ),$church_admin_version ,FALSE);
+			wp_enqueue_script('ca_podcast_audio_use',plugins_url('includes/audio.use.js',dirname(__FILE__) ), array( 'jquery' ),filemtime(plugin_dir_path(dirname(__FILE__) ).'includes/audio.use.js'),FALSE);
 		}
 		if(has_block('church-admin/sermons',$post) )
 		{
 			wp_enqueue_script('jquery-ui-datepicker');
 			
-			wp_enqueue_script('ca_podcast_audio_use',plugins_url('includes/audio.use.js',dirname(__FILE__) ), array( 'jquery' ),$church_admin_version ,FALSE);
+			wp_enqueue_script('ca_podcast_audio_use',plugins_url('includes/audio.use.js',dirname(__FILE__) ), array( 'jquery' ),filemtime(plugin_dir_path(dirname(__FILE__) ).'includes/audio.use.js'),FALSE);
 		}
 		if(has_block('church-admin/giving',$post) )
 		{
@@ -157,8 +161,16 @@ function church_admin_block_editor_assets()
 {
 	global $wpdb;
 	if(!is_admin() ) return;
+	
+	//check not doubling up with premium
+	$registry = WP_Block_Type_Registry::get_instance();
+	if ( $registry->get_registered( 'church-admin/address-list' ) ) {
+		return;
+	}
+
+
 	church_admin_debug("Function church_admin_block_editor_assets");
-	global $church_admin_version;
+	
 	if(function_exists('wp_get_jed_locale_data') )wp_add_inline_script(
 		'church-admin-gutenberg-translation',
 		'wp.i18n.setLocaleData( ' . json_encode(  wp_get_jed_locale_data( 'church-admin' ) ) . ', "church-admin" );',
@@ -186,17 +198,7 @@ function church_admin_block_editor_assets()
 		}
 	}
 	
-	$serviceArray=array('value'=>0,'label'=>esc_html( __('No service set up yet','church-admin') ));
-	$services=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_services');
-	if(!empty( $services) )
-	{
-		
-		$serviceArray=array();
-		foreach( $services AS $service)
-		{
-			$serviceArray[]=array('value'=>(int)$service->service_id,'label'=>esc_html( $service->service_name) );
-		}
-	}
+	
 	$peopleArray=array();
 	$people_type=get_option('church_admin_people_type');
 	foreach( $people_type AS $id=>$type)
@@ -226,7 +228,7 @@ function church_admin_block_editor_assets()
 	
 	wp_enqueue_script( 'jquery-ui-datepicker');//,plugins_url('church-admin/includes/jquery-ui.min.js',dirname(__FILE__) ),array('jquery'),NULL );
 	wp_enqueue_script('church-admin-giving-form',plugins_url( '/', dirname(__FILE__ ) ) . 'includes/giving.js',array( 'jquery' ),FALSE, TRUE);
-	wp_enqueue_script('ca_podcast_audio_use',plugins_url('includes/audio.use.js',dirname(__FILE__) ), array( 'jquery' ),$church_admin_version ,FALSE);
+	wp_enqueue_script('ca_podcast_audio_use',plugins_url('includes/audio.use.js',dirname(__FILE__) ), array( 'jquery' ),filemtime(plugin_dir_path(dirname(__FILE__) ).'includes/audio.use.js'),FALSE);
 		
 	$api_key=get_option('church_admin_google_api_key');
 	if(!empty($api_key))
@@ -250,7 +252,11 @@ function church_admin_block_editor_assets()
 add_action( 'init', 'ca_block_init' );
 function ca_block_init() {
 	
-
+	//check not doubling up with premium
+	$registry = WP_Block_Type_Registry::get_instance();
+	if ( $registry->get_registered( 'church-admin/address-list' ) ) {
+		return;
+	}
 	
 	/**************
 	*
@@ -1035,6 +1041,7 @@ function ca_block_video( $attributes ) {
     $out.='<div class="'.esc_attr($container).'"><div style="position:relative;padding-top:56.25%"><iframe class="ca-video" style="position:absolute;top:0;left:0;width:100%;height:100%;" src="'.esc_url($embed['embed']).'" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div></div>';
     $views=church_admin_youtube_views_api( esc_attr($embed['id']) );
     if(!empty( $views)&& !empty( $attribute['show_views'] ) ){
+		//translators: %1$s is a number of video views
 		$out.='<p>'.esc_html( sprintf(__('%1$s views','church-admin' ) ,$views) ).'</p>';
 	}
     $out.='</div>';

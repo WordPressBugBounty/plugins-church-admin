@@ -93,7 +93,7 @@ function church_admin_edit_member_type( $member_type_id=NULL)
         }
        
         echo'<div class="notice notice-success inline"><p>'.esc_html( __('Member Type Updated','church-admin' ) ).'</p></div>';
-		echo '<a href="'.wp_nonce_url('admin.php?page=church_admin/index.php&amp;action=church_admin_edit_member_type&amp;section=people','edit_member_type').'" class="button-primary">'.esc_html( __('Add a member type','church-admin' ) ).'</a>';
+		echo '<a href="'.wp_nonce_url('admin.php?page=church_admin/index.php&amp;action=edit-member-type&amp;section=people','edit-member-type').'" class="button-primary">'.esc_html( __('Add a member type','church-admin' ) ).'</a>';
         church_admin_member_type();
     }
     else
@@ -103,13 +103,13 @@ function church_admin_edit_member_type( $member_type_id=NULL)
         echo'<div class="wrap church_admin"><h2>';
         if( $member_type_id)  {echo' '.esc_html( __('Edit','church-admin' ) ).' ';}else{echo esc_html(__('Add','church-admin' ) ).' ';}
         echo esc_html(__('Member Type','church-admin' ) ).'</h2><form action="" method="POST">';
-        echo'<p><label>'.esc_html( __('Member Type','church-admin' ) ).'</label><input type="text" name="member_type" ';
+        echo'<div class="church-admin-form-group"><label>'.esc_html( __('Member Type','church-admin' ) ).'</label><input class="church-admin-form-control" type="text" name="member_type" ';
         if(!empty( $member_type_id) )
 	{
 	    $type=$wpdb->get_var('SELECT member_type FROM '.$wpdb->prefix.'church_admin_member_types WHERE member_type_id="'.esc_sql( $member_type_id).'"');
 	    echo'value="'.esc_html( $type).'" ';
 	}
-        echo'/></p>';
+        echo'/></div>';
         echo'<p class="submit"><input type="hidden" name="edit_member_type" value="yes" /><input type="submit" value="'.esc_html( __('Save Member Type','church-admin' ) ).' &raquo;" class="button-primary" /></p></form></div>';
 
     }

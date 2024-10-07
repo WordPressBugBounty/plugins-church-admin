@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) exit('You need Jesus!'); // Exit if accessed direc
 function church_admin_front_admin()
 {
     //variables for menu
-    global $church_admin_url,$church_admin_menu, $church_admin_version,$wpdb, $current_user;
+    global $church_admin_url,$church_admin_menu,$wpdb, $current_user;
     $modules=get_option('church_admin_modules');
     
 	$user_id = $current_user->ID;
