@@ -5942,7 +5942,7 @@ function church_admin_manual_advert()
     <input name="notify_url" type="hidden" value="https://www.churchadminplugin.com/wp-admin/admin-ajax.php?action=church_admin_ipn"> 
         <input type="hidden" name="custom" value="'.site_url().'">
         <input name="business" type="hidden" value="support@churchadminplugin.com"> 
-        <input type="hidden" name="a3" class="premium-price" value="99">
+        <input type="hidden" name="a3" class="premium-price" value="65">
        <input type="hidden" class="ca-recurring"  name="p3" value="1" /><input type="hidden" class="ca-recurring" name="t3" value="Y" /><input type="hidden" class="ca-recurring" name="src" value="1" /><input type="hidden" name="no_note" value=1>
        <div class="form-group"><select class="premium-currency_code" name="currency_code"><option value="USD">US Dollar $65 annually</option><option value="GBP">GB Pound Sterling £50 annually</option><option value="EUR">Euro €60 annually</option><option value="AUD">Australian Dollar $100 annually</option><option value="BRL">Brazilian Real 360 annually</option><option value="CAD">Canadian Dollar $90 annually</option><option value="MXN">Mexican Peso 1300 annually</option> <option value="CHF">Swiss Franc 55 annually</option></select></div><input class="button-primary" type="submit" value="Upgrade to Premium"></form></p><script>
                jQuery( document ).ready(function($) {

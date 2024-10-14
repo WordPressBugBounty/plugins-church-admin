@@ -5,7 +5,7 @@ Tags: church, sermons, membership,schedule,  calendar
 Requires at least: 5.0
 Requires PHP: 7.0
 Tested up to: 6.6
-Stable tag: 5.0.0
+Stable tag: 5.0.1
 Elementor tested up to: 3.24.1
 License: GNU General Public License (GPL) version 2 
 
@@ -58,6 +58,8 @@ You can report any security bugs found in the source code of the site-reviews pl
 
 
 == Changelog ==
+= 5.0.1 =
+* Pricing update for USD
 = 5.0.0 =
 * In line with WordPress plugin rules, Church Admin contains all the free stuff.
 * All premium features are now in a separate plugin downloadable from https://churchadminplugin.com

@@ -4,7 +4,7 @@
 Plugin Name: Church Admin
 Plugin URI: http://www.churchadminplugin.com/
 Description: Manage church life with address book, schedule, classes, small groups, and advanced communication tools - bulk email and sms. 
-Version: 5.0.0
+Version: 5.0.1
 Tags: sermons, sermons, prayer, membership, SMS, schedule, rota, Bible, events, calendar, email, small groups, contact form, giving, administration, management, child protection, safeguarding
 Author: Andy Moyle
 Text Domain: church-admin
@@ -50,7 +50,7 @@ Copyright (C) 2010-2022 Andy Moyle
 
 
 */
-if(!defined('CHURCH_ADMIN_VERSION')){define('CHURCH_ADMIN_VERSION','5.0.0');}
+if(!defined('CHURCH_ADMIN_VERSION')){define('CHURCH_ADMIN_VERSION','5.0.1');}
 
 define('CA_PAYPAL',"https://www.paypal.com/cgi-bin/webscr");
 require_once( plugin_dir_path( __FILE__ ) .'includes/functions.php');
@@ -1777,7 +1777,7 @@ function church_admin_public_header()
   \____|_| |_|\__,_|_|  \___|_| |_| /_/   \_\__,_|_| |_| |_|_|_| |_| |_|   |_|\__,_|\__, |_|_| |_|
                                                                                     |___/                   
 \r\n";
-    echo' Version: '.CHURCH_ADMIN_VERSION.' '.$licence.'-->
+    echo' FREE  Version: '.CHURCH_ADMIN_VERSION.' -->
         <style>table.church_admin_calendar{width:';
     if(get_option('church_admin_calendar_width') )  {
         echo (int)get_option('church_admin_calendar_width').'px}';
@@ -3627,7 +3627,7 @@ function church_admin_setup_auto_send_rota()
         
         $args=array('service_id'=>(int)$service_id);
         //church_admin_debug $args);
-        
+        update_option('church_admin_sms_rota_args',$args);
         update_option('church_admin_sms_rota_day',$sms_day);
         $first_run = strtotime( $en_rota_days[$sms_day].' '.$sms_time );
         wp_schedule_event( $first_run, 'weekly','church_admin_cron_sms_rota',$args);
@@ -3671,7 +3671,7 @@ function church_admin_debug($message)
 		$church_admin_fp = fopen( $debug_path.'debug_log.php', 'w');
 		if($church_admin_fp){
             fwrite( $church_admin_fp, $text."\r\n");
-            fclose($church_admin_fp);
+            
         }
 	}
 	if ( empty( $church_admin_fp) )$church_admin_fp = fopen( $debug_path.'debug_log.php', 'a');
