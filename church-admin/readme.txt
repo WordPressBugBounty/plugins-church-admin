@@ -5,7 +5,7 @@ Tags: church, sermons, membership,schedule,  calendar
 Requires at least: 5.0
 Requires PHP: 7.0
 Tested up to: 6.6
-Stable tag: 5.0.1
+Stable tag: 5.0.4
 Elementor tested up to: 3.24.1
 License: GNU General Public License (GPL) version 2 
 
@@ -58,6 +58,12 @@ You can report any security bugs found in the source code of the site-reviews pl
 
 
 == Changelog ==
+= 5.0.4 = 
+* Fix activation error on some sites
+= 5.0.3 =
+* Add missing elementor file
+= 5.0.2 =
+* Fix graph errors
 = 5.0.1 =
 * Pricing update for USD
 = 5.0.0 =

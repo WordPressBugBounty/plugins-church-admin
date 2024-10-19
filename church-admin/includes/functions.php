@@ -3567,7 +3567,7 @@ function church_admin_app_graph()
     return;
     //deprecated
     global $wpdb;
-    $pages=$wpdb->get_results('SELECT DISTINCT app_page FROM '.$wpdb-prefix.'church_admin_app_visits WHERE app_page!="" ORDER BY app_page');
+    $pages=$wpdb->get_results('SELECT DISTINCT app_page FROM '.$wpdb->prefix.'church_admin_app_visits WHERE app_page!="" ORDER BY app_page');
     if(!empty( $pages) )
     {
         echo'<h3>'.esc_html( __("App usage graph",'church-admin' ) ).'</h3>';
@@ -3586,13 +3586,13 @@ function church_admin_app_graph()
         }
         for ( $year=date('Y'); $year>=date('Y')-5; $year--)
         {
-            echo'<option value="'.intval( $year).'">'.intval( $year).'</option>';
+            echo'<option value="'.(int)$year.'">'.(int)$year.'</option>';
         }
         echo'</select>';
         echo'<input type="submit" class="button-primary"   value="'.esc_html( __('Show','church-admin' ) ).'" /></p></form>';
         $data=$columns=array();
 
-        $sql='SELECT visit_date FROM '.$wpdb-prefix.'church_admin_app_visits WHERE YEAR(visit_date)="'.esc_sql(wp_date('Y')).'" GROUP BY visit_date ORDER BY visit_date';
+        $sql='SELECT visit_date FROM '.$wpdb->prefix.'church_admin_app_visits WHERE YEAR(visit_date)="'.esc_sql(wp_date('Y')).'" GROUP BY visit_date ORDER BY visit_date';
         $dates=$wpdb->get_results( $sql);
         if ( empty( $_POST['app_page'] ) )
         {
@@ -3603,7 +3603,7 @@ function church_admin_app_graph()
         {
             $row=array();
 
-                $sql='SELECT visits  FROM '.$wpdb-prefix.'church_admin_app_visits WHERE visit_date="'.esc_sql( $date->visit_date).'" AND app_page="'.esc_sql( church_admin_sanitize($_POST['app_page'])).'"';
+                $sql='SELECT visits  FROM '.$wpdb->prefix.'church_admin_app_visits WHERE visit_date="'.esc_sql( $date->visit_date).'" AND app_page="'.esc_sql( church_admin_sanitize($_POST['app_page'])).'"';
                 //church_admin_debug( $sql);
                 $appPageCount=$wpdb->get_var( $sql);
                 //church_admin_debug( $date->visit_date.' '.$appPageCount);

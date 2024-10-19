@@ -932,20 +932,7 @@ function church_admin_sms_settings()
 			}
 
 		}
-		if(empty($_POST['remove-data-on-uninstall']))
-		{
-			if(file_exists(plugin_dir_path(dirname(__FILE__) ).'uninstall.php')){
-				rename(plugin_dir_path(dirname(__FILE__) ).'uninstall.php',plugin_dir_path(dirname(__FILE__) ).'dont_uninstall.php');
-				
-			}
-			update_option('church_admin_delete_data_on_uninstall',FALSE);
-		}
-		else{
-			if(file_exists(plugin_dir_path(dirname(__FILE__) ).'dont_uninstall.php')){
-				rename(plugin_dir_path(dirname(__FILE__) ).'dont_uninstall.php',plugin_dir_path(dirname(__FILE__) ).'/uninstall.php');
-			}
-			update_option('church_admin_delete_data_on_uninstall',TRUE);
-		}
+	
 
         if(!empty( $_POST['prayer-request-moderation'] ) ){
 			update_option('prayer-request-moderation',church_admin_sanitize( $_POST['prayer-request-moderation'] ) );
@@ -1102,10 +1089,7 @@ function church_admin_sms_settings()
 		
         echo'<h2>'.esc_html( __('General Settings','church-admin' ) ).'</h2>';
 		echo'<div class="church-admin-form-group"><label>'.esc_html( __('Remove data on plugin delete','church-admin' ) ).' </label>';
-		$uninstall=false;
-		$uninstall = get_option('church_admin_delete_data_on_uninstall');
-		echo'<input type="checkbox" name="remove-data-on-uninstall" value=1 '.checked($uninstall,TRUE,FALSE).'>';
-		echo'</div>';
+		
 		
      
 		//login redirect

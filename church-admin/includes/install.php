@@ -538,7 +538,9 @@ if( $peopleCount==$head)$wpdb->query('UPDATE '.$wpdb->prefix.'church_admin_peopl
 		$current = array();
 		$results= $wpdb->get_results('SHOW COLUMNS FROM '.$wpdb->prefix.'church_admin_custom_fields_meta');
 		foreach($results AS $row){$current[]=$row->Field;}
-		if(!in_array('household_id',$current)){	$wpdb->query('ALTER TABLE '.$wpdb->prefix.'church_admin_custom_fields_meta ADD `household_id` INT(11) NULL DEFAULT NULL AFTER `people_id`');}
+		if(!in_array('household_id',$current)){	
+			$wpdb->query('ALTER TABLE '.$wpdb->prefix.'church_admin_custom_fields_meta ADD `household_id` INT(11) NULL DEFAULT NULL');
+		}
 		$custom_fields=get_option('church_admin_custom_fields');
 		if(!empty( $custom_fields) )
 		{
@@ -565,14 +567,13 @@ if( $peopleCount==$head)$wpdb->query('UPDATE '.$wpdb->prefix.'church_admin_peopl
 			}
 		}
 	}
+//new install wouldn't have had the custom meta table so add both custom field tables
+if( $wpdb->get_var('show tables like "'.$wpdb->prefix.'church_admin_custom_fields"') != $wpdb->prefix.'church_admin_custom_fields')
+{
+	$sql='CREATE TABLE IF NOT EXISTS '.$wpdb->prefix.'church_admin_custom_fields (`name` TEXT NULL, `section` TEXT NULL, `type` TEXT NULL,`default_value` TEXT NULL,show_me INT(1) NULL, `ID` INT(11) AUTO_INCREMENT, PRIMARY KEY (ID) );';
+	$wpdb->query( $sql);
+}
 
-
-	//new install wouldn't have had the custom meta table so add both custom field tables
-	if( $wpdb->get_var('show tables like "'.$wpdb->prefix.'church_admin_custom_fields"') != $wpdb->prefix.'church_admin_custom_fields')
-	{
-		$sql='CREATE TABLE IF NOT EXISTS '.$wpdb->prefix.'church_admin_custom_fields (`name` TEXT NULL, `section` TEXT NULL, `type` TEXT NULL,`default_value` TEXT NULL,show_me INT(1) NULL, `ID` INT(11) AUTO_INCREMENT, PRIMARY KEY (ID) );';
-		$wpdb->query( $sql);
-	}
 	if( $wpdb->get_var('show tables like "'.$wpdb->prefix.'church_admin_custom_fields_meta"') != $wpdb->prefix.'church_admin_custom_fields_meta')
 	{
 
@@ -583,16 +584,19 @@ if( $peopleCount==$head)$wpdb->query('UPDATE '.$wpdb->prefix.'church_admin_peopl
 	}    
 	$current = array();
 	$results= $wpdb->get_results('SHOW COLUMNS FROM '.$wpdb->prefix.'church_admin_custom_fields');
-	foreach($results AS $row){$current[]=$row->Field;}
+	foreach($results AS $row){
+		$current[]=$row->Field;
+	}
 	if(!in_array('options',$current)){$wpdb->query('ALTER TABLE '.$wpdb->prefix.'church_admin_custom_fields ADD options TEXT NULL AFTER default_value');}
 	if(!in_array('onboarding',$current)){$wpdb->query('ALTER TABLE '.$wpdb->prefix.'church_admin_custom_fields ADD onboarding INT(1) NULL AFTER options');}
 	if(!in_array('custom_order',$current)){$wpdb->query('ALTER TABLE '.$wpdb->prefix.'church_admin_custom_fields ADD custom_order INT(11) NULL AFTER show_me');}
 	$current = array();
 	$results= $wpdb->get_results('SHOW COLUMNS FROM '.$wpdb->prefix.'church_admin_custom_fields_meta');
 	foreach($results AS $row){$current[]=$row->Field;}
-	if(!in_array('gift_id',$current)){$wpdb->query('ALTER TABLE '.$wpdb->prefix.'church_admin_custom_fields_meta ADD gift_id INT(11) NULL AFTER household_id');}
+	if(!in_array('household_id',$current)){$wpdb->query('ALTER TABLE '.$wpdb->prefix.'church_admin_custom_fields_meta ADD household_id INT(11) NULL ');}
+	if(!in_array('gift_id',$current)){$wpdb->query('ALTER TABLE '.$wpdb->prefix.'church_admin_custom_fields_meta ADD gift_id INT(11) NULL');}
 	if(!in_array('section',$current)){
-		$wpdb->query('ALTER TABLE '.$wpdb->prefix.'church_admin_custom_fields_meta ADD section TEXT NULL AFTER household_id');
+		$wpdb->query('ALTER TABLE '.$wpdb->prefix.'church_admin_custom_fields_meta ADD section TEXT NULL');
 		$results=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_custom_fields');
 		if(!empty($results)){
 			foreach($results AS $row){
@@ -602,6 +606,7 @@ if( $peopleCount==$head)$wpdb->query('UPDATE '.$wpdb->prefix.'church_admin_peopl
 			}
 		}
 	}
+	
 
 
 
@@ -970,7 +975,7 @@ if(OLD_CHURCH_ADMIN_VERSION<=2.4290)  {delete_option('church-admin-directory-out
 $wpdb->query('ALTER TABLE '.$wpdb->prefix.'church_admin_calendar_date ALTER start_date DROP DEFAULT');
 //$wpdb->query('ALTER TABLE '.$wpdb->prefix.'church_admin_calendar_date ALTER end_date DROP DEFAULT');    
 
-$wpdb->query('ALTER TABLE '.$wpdb->prefix.'church_admin_follow_up ALTER `assigned_date` DROP DEFAULT');
+
    
 $wpdb->query('UPDATE '.$wpdb->prefix.'church_admin_people SET date_of_birth = "1000-01-01" WHERE date_of_birth<"1000-01-01"');
 $wpdb->query('ALTER TABLE '.$wpdb->prefix.'church_admin_people MODIFY date_of_birth DATE NULL');
@@ -1069,11 +1074,7 @@ $wpdb->query('UPDATE '.$wpdb->prefix.'church_admin_people SET date_of_birth = NU
 		}
 	}
 
-	//handle uninstall.php
-	$uninstall = get_option('church_admin_delete_data_on_uninstall');
-	if(empty($uninstall) && file_exists(plugin_dir_path(dirname(__FILE__) ).'/uninstall.php')){
-		rename(plugin_dir_path(dirname(__FILE__) ).'/uninstall.php',plugin_dir_path(dirname(__FILE__) ).'/dont_uninstall.php');
-	}
+	
 	//force app cache reset
 	delete_option('church_admin_app_address_cache');
 	delete_option('church_admin_app_admin_address_cache');
