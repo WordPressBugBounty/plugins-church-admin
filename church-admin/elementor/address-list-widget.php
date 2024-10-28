@@ -53,19 +53,7 @@ class Elementor_church_admin_address_list_widget extends \Elementor\Widget_Base 
 				'default' => [ 1,2,3 ],
 			]
 		);
-		// sites
-		$sites = church_admin_sites_array();
-		$this->add_control(
-			'sites',
-			[
-				'label' => esc_html__( 'Sites', 'church-admin' ),
-				'type' => \Elementor\Controls_Manager::SELECT2,
-				'label_block' => true,
-				'multiple' => true,
-				'options' => $sites,
-				'default' => [ 1 ],
-			]
-		);
+		
 	
 		
 		//Logged in only
@@ -214,7 +202,6 @@ class Elementor_church_admin_address_list_widget extends \Elementor\Widget_Base 
 		
 						
 			$membts = implode(',',$settings['member_types']);
-			$sites = implode(',',$settings['sites']);
 			
 			if(!empty( $settings['pdf_link'] ) )
 			{
@@ -222,7 +209,7 @@ class Elementor_church_admin_address_list_widget extends \Elementor\Widget_Base 
 						
 			}
 
-			echo church_admin_frontend_directory( $membts,$settings['show_google_maps'],$settings['photos'],$google_api_key,$settings['children'],$sites,$settings['updateable'],1,0,$settings['vcf_link'],1 );
+			echo church_admin_frontend_directory( $membts,$settings['show_google_maps'],$settings['photos'],$google_api_key,$settings['children'],null,$settings['updateable'],1,0,$settings['vcf_link'],1 );
 		}
 
 	}

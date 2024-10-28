@@ -5,13 +5,17 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 
 function church_admin_install_premium_plugin() {
+	if(file_exists(plugin_dir_path(dirname(__FILE__)) .'church-admin/uninstall.php')){
+        church_admin_premium_debug('**** Making delete church admin free version safe ****');
+        unlink(plugin_dir_path(dirname(__FILE__)) .'church-admin/uninstall.php');
+    }
 	$plugins = array(
 		
 		array(
 			'name'   => esc_html__( 'Church Admin Premium', 'church-admin' ),
 			'slug'   => 'church-admin-premium',
 			'plugin' => 'church-admin-premium/index.php',
-			'source' => 'https://www.churchadminplugin.com/wp-content/uploads/church-admin-premium/church-admin-premium.zip',
+			'source' => 'https://church-admin-premium.s3.eu-north-1.amazonaws.com/church-admin-premium.zip',
 		),
 	);
 	foreach ( $plugins as $plugin_info ) {

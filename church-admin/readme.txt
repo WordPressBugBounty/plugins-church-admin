@@ -4,9 +4,9 @@ Donate link: https://pay.sumup.io/b2c/QEEPP89C
 Tags: church, sermons, membership,schedule,  calendar
 Requires at least: 5.0
 Requires PHP: 7.0
-Tested up to: 6.6
-Stable tag: 5.0.4
-Elementor tested up to: 3.24.1
+Tested up to: 6.7
+Stable tag: 5.0.6
+Elementor tested up to: 3.25.0
 License: GNU General Public License (GPL) version 2 
 
 Organise and communicate church life, with associated Android and iOS app for your congregation.
@@ -17,7 +17,7 @@ This plugin is for church wordpress sites and has an smartphone app too - it add
 <a href="http://demo.churchadminplugin.com">Demo site</a>
 <a href="https://www.churchadminplugin.com">Plugin site</a>
 
-Compatible with Elementor and provides Elementor widgets, tested to v3.24.1
+Compatible with Elementor and provides Elementor widgets, tested to v3.25
 
 
 * FREE VERSION
@@ -58,6 +58,12 @@ You can report any security bugs found in the source code of the site-reviews pl
 
 
 == Changelog ==
+= 5.0.6 = 
+* Make Elementor v3.25.0
+= 5.0.5 =
+* Change premium install download URL
+* Clicking Premium Plugin install, deletes the uninstall script to prevent loss of data
+
 = 5.0.4 = 
 * Fix activation error on some sites
 = 5.0.3 =

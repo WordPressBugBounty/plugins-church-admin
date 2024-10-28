@@ -847,7 +847,7 @@ function ca_podcast_file_add( $file_name=NULL)
        
 	
         echo'<div class="church-admin-form-group"><label>'.esc_html( __('Publication Date','church-admin' ) ).'</label>'.church_admin_date_picker(NULL,'pub_date',FALSE,date('Y-m-d',strtotime("-15 years") ),NULL,'pub_date','pub_date',FALSE).'</div>';
-        echo '<div class="church-admin-form-group"><label>'.esc_html( __('Publication Time','church-admin' ) ).'</label><input type="time" name="pub_time"';
+        echo '<div class="church-admin-form-group"><label>'.esc_html( __('Publication Time','church-admin' ) ).'</label><input type="time" step=1 name="pub_time"';
          echo ' value="'.mysql2date('H:i:s',$current_time).'" ';
         echo'/></div>';
         
@@ -1465,7 +1465,7 @@ function church_admin_sermon_form( $current_data,$errors)
     }
     //javascript to bring up date picker
     echo'<div class="church-admin-form-group"><label>'.esc_html( __('Publication Date','church-admin' ) ).'</label>'.church_admin_date_picker( $pub_date,'pub_date',FALSE,date('Y-m-d',strtotime("-15 years") ),NULL,'pub_date','pub_date',FALSE).'</div>';
-    echo '<div class="church-admin-form-group"><label>'.esc_html( __('Publication Time','church-admin' ) ).'</label> <input class="church-admin-form-control" type="time" name="pub_time"';
+    echo '<div class="church-admin-form-group"><label>'.esc_html( __('Publication Time','church-admin' ) ).'</label> <input class="church-admin-form-control" type="time" step=1 name="pub_time"';
     echo ' value="'.mysql2date('H:i:s',$current_time).'" ';
     echo'/></div>';
     //file name
