@@ -123,29 +123,7 @@ function church_admin_calendar_container($cat_id,$fac_ids)
     }
      $out.='</div></div><!-- End of Church Admin Calendar -->'."\r\n";
     $out.='<script>var caCalendar=1;</script>'."\r\n";
-    $out.='<script>
-    var nonce = "'.wp_create_nonce("calendar").'";
-	jQuery(document).ready(function($){
-        
-		$("body").on("click",".rota-expander",function(){
-			console.log("click");
-			$(".rota-details").hide();
-			var id	=$(this).attr("data-id");
-			console.log(id);
-			var what = $(this).attr("data-what");
-			if(what==="show"){
-				$(this).attr("data-what","hide");
-				$(".date"+id).show();
-				$("#toggle"+id).removeClass("dashicons-arrow-up-alt2");
-				$("#toggle"+id).addClass("dashicons-arrow-down-alt2");
-			}else
-			{
-				$(this).attr("data-what","show");
-				$("#toggle"+id).addClass("dashicons-arrow-up-alt2");
-				$("#toggle"+id).removeClass("dashicons-arrow-down-alt2");
-			}
-		});
-	})</script>'."\r\n";
+    
      return $out;
  }
 
@@ -344,9 +322,7 @@ function church_admin_day_events_array( $date,$cat_id,$fac_ids)
         $output=array('<li style="font-size:larger;margin-bottom:20px">'.esc_html(mysql2date(get_option('date_format'),$date)).'</li>');
         foreach( $results AS $row)
         {
-            if(!empty($row->service_id)){
-                $row->rota = church_admin_retrieve_rota_data_array($row->service_id,$row->start_date,'service');
-            }
+            
             $day[$row->event_id]='<p style="border-left:5px solid '.esc_attr($row->bgcolor).';padding-left:3px;"><strong>'.esc_html( $row->title).'</strong><br>';
             if(!empty($row->event_image))
             {
@@ -370,22 +346,8 @@ function church_admin_day_events_array( $date,$cat_id,$fac_ids)
                 if(!empty( $row->link_title) )  {$title=esc_html( $row->link_title);}else{$title=esc_html(__('More information...','church-admin'));}
                 $day[$row->event_id].='<a href="'.esc_url( $row->link).'">'.$title.'</a>'.'<br>';
             }
-            if(!empty($row->rota)){
-				$day[$row->event_id].='<table><tr ><th scope="row" data-id="'.(int)$row->event_id.'">'.esc_html('Who is doing what','church-admin').'</th><td><span class="rota-expander dashicons dashicons-arrow-up-alt2" id="toggle'.(int)$row->event_id.'" data-what="show" data-id="'.(int)$row->event_id.'" ></span></td></tr>';
-				foreach($row->rota AS $job=>$who){
-					$day[$row->event_id].='<tr class="rota-details date'.(int)$row->event_id.'" style="display:none"><th scope="row">'.esc_html($job).'</th><td>'.esc_html($who).'</td></tr>';
-				}
-				$day[$row->event_id].='</table>';
-			}
-            if(!empty($row->service_id)){
-                //add link to rota for this service
-               if(church_admin_level_check('Rota')){
-                    $day[$row->event_id].='<p><a href="'.wp_nonce_url(admin_url().'admin.php?page=church_admin/index.php&action=edit-rota&service_id='.(int)$row->service_id.'&rota_date='.esc_attr($row->start_date),'edit-rota').'">'.esc_html(__('Edit schedule','church-admin')).'</a></p>';
-               }
-               
-               $day[$row->event_id].=church_admin_rota_popup($row->service_id,$row->start_date);
-               
-            }
+           
+           
 
             $day[$row->event_id].='<a  rel="nofollow" class="vcf-link" href="'.esc_url(site_url().'?ca_download=ical&date_id='.(int)$row->date_id).'"><span class="ca-dashicons dashicons dashicons-download"></span>'.esc_html(__('iCal download','church-admin')).'</a></p>';
 

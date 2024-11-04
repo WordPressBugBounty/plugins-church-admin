@@ -1108,11 +1108,7 @@ function church_admin_frontend_people_form( $data,$people_id,$exclude,$allow,$en
         $out.='/> '.esc_html( __('To receive email','church-admin' ) ).'</label></div>';
         $out.='<div class="church-admin-form-group"><label>'.esc_html( __('Refine type of email you can receive','church-admin' ) ).'</label></div>';
 
-         //Schedule emails
-         $out.='<div class="checkbox"><label ><input type="checkbox" value="1" id="rota_email" data-name="rota-email"  class="email-permissions"  name="rota_email" ';
-         if(!empty( $data->rota_email) ) $out.=' checked="checked" ';
-         $out.=' /> '.esc_html( __('To receive email schedule reminders','church-admin' ) ).'</label></div>';
-
+         
         $out.='<div class="checkbox"><label ><input type="checkbox" name="news_send" id="news_send" value="TRUE"  class="email-permissions" data-name="news_send"  ';
         if(!empty($data->news_send)){
             $out.=' checked="checked" ';
@@ -1190,7 +1186,7 @@ function church_admin_frontend_people_form( $data,$people_id,$exclude,$allow,$en
                 $("#news_send").prop( "checked", false );
                 $("#prayer_requests").prop( "checked", false );
                 $("#bible_readings").prop( "checked", false );
-                $("#rota_email").prop( "checked", false );
+               
             }
             $(".email-permissions").change(function()
             {
@@ -1204,7 +1200,7 @@ function church_admin_frontend_people_form( $data,$people_id,$exclude,$allow,$en
                             $("#news_send").prop( "checked", false );
                             $("#prayer_requests").prop( "checked", false );
                             $("#bible_readings").prop( "checked", false );
-                            $("#rota_email").prop( "checked", false );
+                          
                         }
                     break;
                     case "news_send":
@@ -1453,12 +1449,12 @@ function church_admin_frontend_save_person( $household_id,$people_id,$head_of_ho
         if(!empty( $_POST['people_id'] ) )$people_id=(int)$_POST['people_id'];
         $form['show_me'] = !empty($form['show_me']) ? 1 : 0;
         $form['email_send'] = !empty($form['email_send']) ? 1 : 0;
-        $form['rota_email'] = !empty($form['rota_email']) ? 1 : 0;
+       
         $form['mail_send'] = !empty($form['mail_send']) ? 1 : 0;
         $form['news_send'] = !empty($form['news_send']) ? 1 : 0;
         $form['sms_send'] = !empty($form['sms_send']) ? 1 : 0;
         $form['photo_permission'] = !empty($form['photo_permission']) ? 1 : 0;
-        $form['rota_email'] = !empty($form['rota_email']) ? 1 : 0;
+       
        
         if(!empty( $_POST['date_of_birth'] ) && church_admin_checkdate( $_POST['date_of_birth'] ) )
         {
@@ -1480,7 +1476,7 @@ function church_admin_frontend_save_person( $household_id,$people_id,$head_of_ho
         /*****************************
          * Array of expected data
          ****************************/
-        $expected_data = array('title'=>null,'first_name'=>null,'prefix'=>'','last_name'=>null,'email'=>null,'mobile'=>null,'sex'=>1,'mail_send'=>0,'people_type_id'=>1,'email_send'=>0,'sms_send'=>0,'news_send'=>0,'photo_permission'=>0,'attachment_id'=>null,'show_me'=>0,'rota_email'=>0,'date_of_birth'=>null,'household_id'=>$household_id,'head_of_household'=>0,'last_updated'=>wp_date('Y-m-d'),'attachment_id'=>null,'privacy'=>serialize($privacy),'member_type_id'=>$member_type_id);
+        $expected_data = array('title'=>null,'first_name'=>null,'prefix'=>'','last_name'=>null,'email'=>null,'mobile'=>null,'sex'=>1,'mail_send'=>0,'people_type_id'=>1,'email_send'=>0,'sms_send'=>0,'news_send'=>0,'photo_permission'=>0,'attachment_id'=>null,'show_me'=>0,'date_of_birth'=>null,'household_id'=>$household_id,'head_of_household'=>0,'last_updated'=>wp_date('Y-m-d'),'attachment_id'=>null,'privacy'=>serialize($privacy),'member_type_id'=>$member_type_id);
         foreach($expected_data AS $key =>$value){
             $expected_data[$key]= isset($form[$key])? $form[$key] : $value; //uses form data or default value
         }
@@ -1493,7 +1489,7 @@ function church_admin_frontend_save_person( $household_id,$people_id,$head_of_ho
         ***********************/
         if ( empty( $people_id) )
         {
-            $people_id=$wpdb->get_var('SELECT people_id FROM '.$wpdb->prefix.'church_admin_people WHERE title="'.esc_sql( $form['title'] ).'" AND first_name="'.esc_sql( $form['first_name'] ).'" AND prefix="'.esc_sql( $form['prefix'] ).'" AND last_name="'.esc_sql( $form['last_name'] ).'" AND email="'.esc_sql( $form['email'] ).'" AND mobile="'.esc_sql( $form['mobile'] ).'" AND sex="'.esc_sql( $form['sex'] ).'" AND mail_send="'.(int)$expected_data['mail_send'].'" AND people_type_id="'.esc_sql( $form['people_type_id'] ).'" AND sex="'.esc_sql( $form['sex'] ).'" AND email_send="'.(int)$expected_data['email_send'].'" AND sms_send="'.(int)$expected_data['sms_send'].'" AND photo_permission="'.(int)$expected_data['photo_permission'].'" AND attachment_id="'.(int)$expected_data['attachment_id'].'" AND show_me="'.(int)$expected_data['show_me'].'" AND rota_email="'.(int)$expected_data['rota_email'].'" AND date_of_birth="'.esc_sql( $expected_data['date_of_birth'] ).'" AND household_id="'.(int)$household_id.'"');
+            $people_id=$wpdb->get_var('SELECT people_id FROM '.$wpdb->prefix.'church_admin_people WHERE title="'.esc_sql( $form['title'] ).'" AND first_name="'.esc_sql( $form['first_name'] ).'" AND prefix="'.esc_sql( $form['prefix'] ).'" AND last_name="'.esc_sql( $form['last_name'] ).'" AND email="'.esc_sql( $form['email'] ).'" AND mobile="'.esc_sql( $form['mobile'] ).'" AND sex="'.esc_sql( $form['sex'] ).'" AND mail_send="'.(int)$expected_data['mail_send'].'" AND people_type_id="'.esc_sql( $form['people_type_id'] ).'" AND sex="'.esc_sql( $form['sex'] ).'" AND email_send="'.(int)$expected_data['email_send'].'" AND sms_send="'.(int)$expected_data['sms_send'].'" AND photo_permission="'.(int)$expected_data['photo_permission'].'" AND attachment_id="'.(int)$expected_data['attachment_id'].'" AND show_me="'.(int)$expected_data['show_me'].'"  AND date_of_birth="'.esc_sql( $expected_data['date_of_birth'] ).'" AND household_id="'.(int)$household_id.'"');
         }
         /**********************
         *  Save 

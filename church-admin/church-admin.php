@@ -4,8 +4,8 @@
 Plugin Name: Church Admin
 Plugin URI: http://www.churchadminplugin.com/
 Description: Manage church life with address book, schedule, classes, small groups, and advanced communication tools - bulk email and sms. 
-Version: 5.0.6
-Tags: sermons, sermons, prayer, membership, SMS, schedule, rota, Bible, events, calendar, email, small groups, contact form, giving, administration, management, child protection, safeguarding
+Version: 5.0.7
+Tags: sermons, sermons, prayer, membership, SMS, Bible, events, calendar, email, small groups, contact form, giving, administration, management, child protection, safeguarding
 Author: Andy Moyle
 Text Domain: church-admin
 Elementor tested up to: 3.21.4
@@ -50,7 +50,7 @@ Copyright (C) 2010-2022 Andy Moyle
 
 
 */
-if(!defined('CHURCH_ADMIN_VERSION')){define('CHURCH_ADMIN_VERSION','5.0.6');}
+if(!defined('CHURCH_ADMIN_VERSION')){define('CHURCH_ADMIN_VERSION','5.0.7');}
 
 define('CA_PAYPAL',"https://www.paypal.com/cgi-bin/webscr");
 require_once( plugin_dir_path( __FILE__ ) .'includes/functions.php');
@@ -988,40 +988,6 @@ function church_admin_initialise() {
 	
 	
 
-
-	//temp fix fo bug in app
-	if(isset( $_GET['action'] )&&$_GET['action']=='ca_classes')  {
-        require_once( plugin_dir_path( __FILE__ ).'app/app-admin.php');
-        ca_classes();exit();
-    }
-
-
-	
-	//remove cron auto email rotas
-	if(isset( $_GET['action'] )&&$_GET['action']=="delete-cron")
-	{
-        if(!is_user_logged_in() )return;
-		check_admin_referer('delete-cron');
-		
-        //update sanitize, validate,escape v 3.7.25 2023-05-08
-        //sanitize
-        $ts=!empty($_GET['ts'])?sanitize_text_field(stripslashes($_GET['ts']) ) : null;
-        $key=!empty($_GET['key'])?sanitize_text_field(stripslashes($_GET['key'] ) ) : null;
-        $which=!empty($_GET['which'])?sanitize_text_field(stripslashes($_GET['which'] ) ) :null;
-        //validate
-        $validated = TRUE;
-        if(empty($ts)){$validated = FALSE;}
-        if(!church_admin_int_check($ts)){$validated = FALSE;}
-        if(empty($which) || ($which!='email' && $which!='sms')){$validated = FALSE;}
-        
-        if(!empty($validated))
-        {
-            require_once( plugin_dir_path( __FILE__ ).'includes/rota.new.php');
-            church_admin_delete_cron( $ts,$key,$which );
-            $url=wp_nonce_url(admin_url().'admin.php?page=church_admin%2Findex.php&action=show-cron&section=rota','show-cron');
-            wp_redirect( $url );
-        }
-	}
 	if(!empty( $_POST['ind_att_csv'] ) )  {
         require_once( plugin_dir_path( __FILE__ ).'includes/individual_attendance.php');
         $out = church_admin_output_ind_att_csv();
@@ -1039,7 +1005,7 @@ function church_admin_initialise() {
         if ( empty( $level['Directory'] ) )$level['Directory']='administrator';
         if ( empty( $level['Kidswork'] ) )$level['Kidswork']='administrator';
         if ( empty( $level['Small Groups'] ) )$level['Small Groups']='administrator';
-        if ( empty( $level['Rota'] ) )$level['Rota']='administrator';
+        
         if ( empty( $level['Funnel'] ) ) $level['Funnel']='administrator';
         if ( empty( $level['Bulk Email'] ) )$level['Bulk Email']='administrator';
         if ( empty( $level['Sermons'] ) )$level['Sermons']='administrator';
@@ -1073,30 +1039,7 @@ function church_admin_initialise() {
 
 
 
-    
-	//upgrade rota for 1.095
-	 if(!empty( $_GET['page'] )&&( $_GET['page']=='church_admin/index.php')&&!empty( $_GET['action'] )&& $_GET['action']=='upgrade_rota')
-	{
-		check_admin_referer('upgrade_rota');
-
-		delete_option("church_admin_version");
-		$wpdb->query('TRUNCATE TABLE '.$wpdb->prefix.'church_admin_new_rota');
-		$url=admin_url().'admin.php?page=church_admin%2Findex.php&message=Rota+Table+Reset';
-		wp_redirect( $url );
-		exit;
-	}
-		//upgrade rota for 1.095
-	 if(!empty( $_GET['page'] )&&( $_GET['page']=='church_admin/index.php')&&!empty( $_GET['action'] )&& $_GET['action']=='clear_debug')
-	{
-		check_admin_referer('clear_debug');
-
-		$upload_dir = wp_upload_dir();
-		$debug_path=$upload_dir['basedir'].'/church-admin-cache/debug_log.php';
-		if(file_exists( $debug_path) )unlink( $debug_path);
-		$url=wp_nonce_url(admin_url().'admin.php?page=church_admin%2Findex.php&action=settings&section=general-settings&message=Church+Admin+Debug+Log+has+been+deleted.','settings');
-		wp_redirect( $url );
-		exit;
-	}
+   
     //save the church admin note before any display happens
 
 	if(!empty( $_POST['save-ca-comment'] ) )
@@ -1450,8 +1393,7 @@ function church_admin_init()
 	{
 		switch( $_GET['action'] )
 		{
-            case 'edit-rota-job':
-            case 'edit-rota':
+          
             case 'send-email':
                 church_admin_autocomplete_script();
                 church_admin_date_picker_script();
@@ -1484,7 +1426,7 @@ function church_admin_init()
            
 			case'church_admin_add_calendar':
             case 'add-calendar':
-            case 'view-rota':
+           
             case'church_admin_series_event_edit':   
             case'church_admin_single_event_edit':
             case 'show-attendance':
@@ -1499,14 +1441,13 @@ function church_admin_init()
             case 'individual_attendance':
             case 'individual-attendance-list':
             case 'edit-individual-attendance':
-            case 'csv-rota':
+          
             case 'import-ics':
 			case'giving-csv':
             case'edit-service':
             case'add-event':
             case'edit_safeguarding':
-            case 'rota':
-            case 'church_admin_rota_list':
+        
             case 'add-three-months':
 			case 'edit_event':
             case 'edit_ticket_type':
@@ -1632,18 +1573,13 @@ function church_admin_init()
             case 'app-visits':
                 church_admin_date_picker_script();
             break;
-			//rota
-			case'rota';church_admin_editable_script();break;
-            case 'church_admin_edit_rota_settings':
-                church_admin_autocomplete_script();
-            break;
-            case'edit_rota';church_admin_editable_script();church_admin_autocomplete_script();church_admin_date_picker_script();break;
-			case'list';church_admin_editable_script();break;
-            case'church_admin_rota_settings_list':
+			
+          case'list';church_admin_editable_script();break;
+            
             case 'app':
                 case'custom-fields':
             case 'edit-custom-field':
-            case'church_admin_edit_rota_settings':
+           
                 church_admin_sortable_script();break;
 			
 			//directory
@@ -2018,16 +1954,7 @@ function church_admin_shortcode( $atts, $content = null)
                 require_once( plugin_dir_path( __FILE__ ).'display/mailing-list.php');
                 $out.=church_admin_mailing_list($member_type_id);
             break;
-            case 'ministry-rota':
-                if(is_user_logged_in()){
-                    require_once( plugin_dir_path( __FILE__ ).'includes/rota.new.php');
-                    $out.=church_admin_edit_ministry_rota('service',$service_id);
-                }
-                else{
-                    $out.=wp_login_form();
-                }
-
-            break;
+            
             case 'not-logged-in':
             case 'not-logged-in':
                     if(!is_user_logged_in() ){
@@ -2120,7 +2047,7 @@ function church_admin_shortcode( $atts, $content = null)
                 wp_enqueue_script('ca_podcast_audio_use');
                 require_once( plugin_dir_path( __FILE__ ).'display/sermon-podcast.php');
                 //$file_id=(int)church_admin_sanitize($_REQUEST['id']);
-                $out.=church_admin_podcast_file_detail( $file_id , NULL);
+                $out.=church_admin_podcast_file_detail( $file_id , $exclude);
           
             break;
             case 'latest-sermon':
@@ -2435,34 +2362,7 @@ function church_admin_shortcode( $atts, $content = null)
             	require_once( plugin_dir_path( __FILE__ ).'/display/ministries.php');
             	$out.=church_admin_frontend_ministries( $ministry_id,$member_type_id);
       break;
-      case 'my_rota':case 'my-rota':
-				if ( empty( $loggedin)||is_user_logged_in() )
-				{
-            	require_once( plugin_dir_path( __FILE__ ).'/display/rota.php');
-            	$out.=church_admin_my_rota();
-				}
-				else //login required
-				{
-					$out.='<div class="login"><h2>'.esc_html( __('Please login','church-admin') ).'</h2>'.wp_login_form(array('echo'=>FALSE,'redirect'=>get_permalink()) ).'</div>'.'<p><a href="'.esc_url( wp_lostpassword_url(get_permalink() ) ).'" title="Lost Password">'.esc_html( __('Help! I don\'t know my password','church-admin') ).'</a></p>';
-				}
-			break;
-	case 'rota':
-            if ( empty( $loggedin)||is_user_logged_in() )
-            {
-                require_once( plugin_dir_path( __FILE__ ).'/display/rota.php');
-                if(!empty( $_REQUEST['rota_date'] ) )  {
-                    $date=sanitize_text_field(stripslashes($_REQUEST['rota_date']));
-                }else{
-                    $date=date('Y-m-d');
-                }
-                    //$out.=church_admin_front_end_rota( $service_id,$weeks,$pdf_font_resize,$date,$title,$initials);
-                    $out.=church_admin_front_end_rota( $service_id,$weeks,FALSE,$date,$title,$initials,$links,$name_style);
-            }
-            else //login required
-            {
-                            $out.='<div class="login"><h2>'.esc_html( __('Please login','church-admin' ) ).'</h2>'.wp_login_form(array('echo'=>FALSE,'redirect'=>get_permalink()) ).'</div>'.'<p><a href="'.esc_url( wp_lostpassword_url(get_permalink() ) ).'" title="Lost Password">'.esc_html( __('Help! I don\'t know my password','church-admin') ).'</a></p>';
-            }
-        break;
+     
       case 'rolling-average':
       case 'weekly-attendance':
       case 'monthly-attendance':
@@ -2592,19 +2492,7 @@ function church_admin_shortcode( $atts, $content = null)
 					  
                 }
             break;
-            case 'service-booking-pdf':
-            case 'covid-prebooking-pdf':
-                if(is_user_logged_in()&& (church_admin_level_check('Rota')||church_admin_level_check('Service') ))
-                {
-                    require_once( plugin_dir_path( __FILE__ ).'includes/covid-prebooking.php');
-                    $out.=church_admin_service_booking_pdf_form();
-                }
-                else
-                {
-                    $out.='<div class="login"><h2>'.esc_html( __('Please login','church-admin') ).'</h2>'.wp_login_form(array('echo'=>FALSE,'redirect'=>get_permalink()) ).'</div>'.'<p><a href="'.esc_url( wp_lostpassword_url( get_permalink() ) ).'" title="Lost Password">'.esc_html( __('Help! I don\'t know my password','church-admin' ) ).'</a></p>';
-					  
-                }
-            break;
+            
             case 'how-much':
                
                 require_once( plugin_dir_path( __FILE__ ).'display/giving.php');
@@ -2845,8 +2733,7 @@ function church_admin_download()
 				$wpdb->query('DELETE FROM '.$wpdb->prefix.'church_admin_app WHERE people_id="'.(int)$loginStatus->people_id.'"');
 				$wpdb->query('DELETE FROM '.$wpdb->prefix.'church_admin_people_meta WHERE people_id="'.(int)$loginStatus->people_id.'"');
 				$wpdb->query('DELETE FROM '.$wpdb->prefix.'church_admin_people WHERE people_id="'.(int)$loginStatus->people_id.'"');
-				$wpdb->query('DELETE FROM '.$wpdb->prefix.'church_admin_new_rota WHERE people_id="'.(int)$loginStatus->people_id.'"');
-                require_once(ABSPATH.'wp-admin/includes/user.php');
+				require_once(ABSPATH.'wp-admin/includes/user.php');
 				if(!user_can($loginStatus->user_id,'manage_options') ){
 
                     if(empty(count_user_posts($loginStatus->user_id))){
@@ -2933,10 +2820,7 @@ function church_admin_download()
         $facilities_id = !empty($_REQUEST['facilities_id'])? church_admin_sanitize($_REQUEST['facilities_id']) : null;
         $cat_id = !empty($_REQUEST['cat_id'])? church_admin_sanitize($_REQUEST['cat_id']) : null;
 
-        if(!empty( $_REQUEST['rota_id'] ) )  {
-            $rota_id=sanitize_text_field(stripslashes($_REQUEST['rota_id']));
-            if(!church_admin_int_check($rota_id)){$rota_id=null;}
-        }else{$rota_id=NULL;}
+      
         $kids=!empty($_REQUEST['kids'])?1:0;
         $id = !empty($_REQUEST['id'])?church_admin_sanitize($_REQUEST['id']):0;
         
@@ -3197,20 +3081,7 @@ function church_admin_download()
                 require_once( plugin_dir_path( __FILE__ ).'includes/pdf_creator.php');
                 church_admin_kidswork_pdf( $member_type_id,$loggedin);
             break;
-            //Rotas
-            case 'rota-csv':
-            case'rotacsv':
-                require_once( plugin_dir_path( __FILE__ ).'includes/rota.new.php');
-                church_admin_rota_csv( $start_date,$end_date,$service_id,$initials);
-                
-            break;
-            case'rota':
-            case'horizontal_rota_pdf':
-                require_once( plugin_dir_path( __FILE__ ).'includes/pdf_creator.php');
-                church_admin_new_rota_pdf( $service_id,$date);
-                break;
-        
-
+            
             case'ministries_pdf':
                 if(wp_verify_nonce( $_REQUEST['_wpnonce'],'ministries_pdf') )  {
                     require_once( plugin_dir_path( __FILE__ ).'includes/pdf_creator.php');
@@ -3410,230 +3281,6 @@ function church_admin_activation_log_clear()
 
 
 
-// Add a new interval of a week
-// See http://codex.wordpress.org/Plugin_API/Filter_Reference/cron_schedules
-add_filter( 'cron_schedules', 'church_admin_add_weekly_cron_schedule' );
-function church_admin_add_weekly_cron_schedule( $schedules ) {
-    $schedules['weekly'] = array(
-        'interval' => 604800, // 1 week in seconds
-        'display'  => __( 'Once Weekly' ),
-    );
-
-    return $schedules;
-}
-
-/**************************
- *END Auto Email rota
- **************************/
-
-
-
-
-
-add_action('church_admin_cron_email_rota','church_admin_auto_email_rota',1,2);
-
-
-  /**
- *
- * Cron email rota
- *
- * @author  Andy Moyle, Mick Wall
- * @param    $service_id
- * @return   string
- * @version  0.1
- *
- */
-function church_admin_auto_email_rota( $service_id,$user_message=NULL)
-{
-    global $wpdb,$wp_locale;
-		//church_admin_debug("Cron email of rota fired\r\n ".print_r( $user_message,TRUE) );
-		//church_admin_debug('Service id '.$service_id);
-  		if ( empty( $service_id) )return FALSE;
-          $days=array(0=>'Sunday',1=>'Monday',2=>'Tuesday',3=>'Wednesday',4=>'Thursday',5=>'Friday',6=>'Saturday');
-		
-        $service=$wpdb->get_row('SELECT a.*,b.venue FROM '.$wpdb->prefix.'church_admin_services a, '.$wpdb->prefix.'church_admin_sites b WHERE a.site_id=b.site_id AND a.service_id="'.(int) $service_id.'"');
-        //church_admin_debug $wpdb->last_query);
-        //church_admin_debug $service);
-		
-		require_once(plugin_dir_path(dirname(__FILE__) ).'church-admin/includes/rota.new.php');
-		$rotaJobs=church_admin_required_rota_jobs( $service_id);
-
-		//$rotaJobs is an array rota_task_id=>rota_task
-		
-		//MICK WALL
-		//Change the SQL to look for DISTINCT dates in the next 1 week and then send rotas for all the dates
-        //church_admin_debug("Look for services...");
-		$results=$wpdb->get_results('SELECT DISTINCT(rota_date), service_time FROM  '.$wpdb->prefix.'church_admin_new_rota WHERE mtg_type="service" AND  service_id="'.(int)$service_id.'"  AND rota_date BETWEEN CURDATE() AND date_add(CURDATE(), INTERVAL 1 WEEK) ORDER BY service_id,rota_date ASC');
-        //church_admin_debug $wpdb->last_query);
-        //church_admin_debug $results);
-        if ( empty( $results) )
-        {
-            //church_admin_debug("No services in next 1 week");
-            return;
-        }
-		foreach( $results as $rota_data)
-		{
-			$rota_date=$rota_data->rota_date;;
-			//build email
-			//church_admin_debug("******************************\r\nRota send for $rota_date");
-
-			//build rota with jobs
-			
-			//fix floated images for email
-			$user_message=str_replace('class="alignleft ','style="float:left;margin-right:20px;" class="',$user_message);
-			$user_message=str_replace('class="alignright ','style="float:right;margin-left:20px;" class="',$user_message);
-			
-			if( $service->service_day!=8)  {
-                //transators %1$s is service name, %2$s is venue. %3$s is the date. %4$s is the time 
-                $sendMessage=$user_message.'<h4>'.esc_html(sprintf(__( 'Schedule for %1$s at %2$s on %3$s at %4$s', 'church-admin' ), $service->service_name, $service->venue,$days[$service->service_day].' '.mysql2date(get_option('date_format'),$rota_date),$service->service_time ) ).'</h4>';
-            }
-			//MICK WALL 
-			//Update else to send date / time option.
-            //transators %1$s is service name, %2$s is venue. %3$s is the date. %4$s is the time 
-			else{$sendMessage=$message.'<h4>'. esc_html(sprintf(__( 'Schedule for %1$s at %2$s on %3$s at %4$s', 'church-admin' ), $service->service_name, $service->venue, mysql2date(get_option('date_format'),$rota_date),$rota_data->service_time) ).'</h4>';}
-
-			
-			$sendMessage.='<table><thead><tr><th>'.esc_html( __('Job', 'church-admin' ) ).'</th><th>'.esc_html( __('Who', 'church-admin' ) ).'</th></tr></thead><tbody>';
-			$recipients=array();
-			foreach( $rotaJobs AS $rota_task_id=>$jobName)
-			{
-					$people='';
-
-					$people=church_admin_rota_people_array( $rota_date,$rota_task_id,$service_id,'service');
-                    //church_admin_debug("**********\r\nPeople Array");
-                    //church_admin_debug $people);
-					if(!empty( $people) )
-					{
-						foreach( $people AS $people_id=>$name)
-						{
-
-                            
-							$email=$wpdb->get_var('SELECT email FROM '.$wpdb->prefix.'church_admin_people WHERE people_id="'.(int)$people_id.'" AND email!="" AND email_send=1 && gdpr_reason!=""');
-                            if(!empty( $email)&& !in_array( $email,$recipients) )$recipients[$name]=$email;
-                           //send copy to parent if a child
-                            $moreData=$wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'church_admin_people WHERE people_id="'.(int)$people_id.'"');
-                            if(!empty( $moreData)&&$moreData->people_type_id!=1)
-                            {
-                                $parentEmail=$wpdb->get_var('SELECT email FROM '.$wpdb->prefix.'church_admin_people WHERE household_id="'.(int)$moreData->household_id.'" AND email!="" AND email_send=1 AND head_of_household=1 AND gdpr_reason!=""  LIMIT 1');
-                                //translators: %1$s is a name of the child
-                                $parentName=sprintf(__('Parent of %1$s',"church-admin"),$name);
-                                if(!empty( $parentEmail)&& !in_array( $parentEmail,$recipients) )$recipients[$parentName]=$parentEmail;
-                            }
-							
-						}
-						$sendMessage.='<tr><td>'.esc_html( $jobName ).'</td><td>'.esc_html(implode(", ",$people) ).'</td></tr>';
-					}
-			}
-			$sendMessage.='</table>';
-            //church_admin_debug('Recipient array');
-			//church_admin_debug $recipients);
-            //church_admin_debug $sendMessage);
-			//start emailing the message
-			$sendMessage.='';
-			if(!empty( $recipients) )
-			{
-
-				foreach( $recipients AS $name=>$email)
-				{
-                    //translators: %1$s is a name 
-					 	$email_content='<p>'.esc_html( sprintf( __('Dear %1$s,','church-admin') , $name ) ) .'</p>'.$sendMessage;
-                        church_admin_email_send($email,esc_html(__("This weeks service schedule for ",'church-admin' ) ).mysql2date(get_option('date_format'),$rota_date) ,$email_content,null,null,null,null,null,FALSE);
-				}
-			}
-		}	
-		//church_admin_debug('Cron rota send finished');
-		exit();
-}
-/**************************
- *END Auto Email rota
- **************************/
-
-/**************************
- * Auto SMS/EMAIL rota
- **************************/
-add_action('init','church_admin_setup_auto_send_rota');
-function church_admin_setup_auto_send_rota()
-{
-     /*****************************
-     * EMAIL ROTA
-     ****************************/
-    if(!empty( $_POST['email_rota_day'] ) )
-    {
-        //church_admin_debug('************** Start Saving auto email rota **************');
-        //initialize variables
-        $en_rota_days=array(1=>'Monday',2=>'Tuesday',3=>'Wednesday',4=>'Thursday',5=>'Friday',6=>'Saturday',7=>'Sunday');
-        //sanitize
-        $service_id=!empty($_POST['service_id'])?(int)$_POST['service_id']:null;
-        $email_day=!empty($_POST['email_rota_day'])?(int)$_POST['email_rota_day']:null;
-        $message=!empty($_POST['auto-rota-message'])?wp_kses_post($_POST['auto-rota-message']):null;
-        
-        //validate email day
-        if(empty($email_day)||$email_day>7){
-            //church_admin_debug("Invalid day");
-            return;
-        }
-        //validate service_id
-        $services = church_admin_services_array();
-        if(empty($service_id) || empty($services[$service_id])){
-            //church_admin_debug("Invalid service id");
-            return;
-        }
-       
-        $args=array('service_id'=>(int)$service_id,'user_message'=>$message);
-        //church_admin_debug $args);
-        update_option('church_admin_auto_rota_email_message',$message);
-    
-            update_option('church_admin_email_rota_day',$email_day);
-            $first_run = strtotime( $en_rota_days[$email_day] );
-            wp_schedule_event( $first_run, 'weekly','church_admin_cron_email_rota',$args);
-            //church_admin_debug('************** End Saving auto email rota **************');
-    }
-    /*****************************
-     * SMS ROTA
-     ****************************/
-    if(!empty( $_POST['sms_rota_day'] ) )
-    {
-        //church_admin_debug('************** Start Saving auto sms rota **************');
-        //initialize variables
-        $en_rota_days=array(1=>'Monday',2=>'Tuesday',3=>'Wednesday',4=>'Thursday',5=>'Friday',6=>'Saturday',7=>'Sunday');
-        //sanitize
-        $service_id=!empty($_POST['service_id'])?(int)$_POST['service_id']:null;
-        $sms_day=!empty($_POST['sms_rota_day'])?(int)$_POST['sms_rota_day']:null;
-        $sms_time=!empty($_POST['sms_time'])?sanitize_text_field(stripslashes($_POST['sms_time'] ) ):null;
-        //validate sms day
-        if(empty($sms_day)||$sms_day>7){
-            //church_admin_debug("Invalid day");
-            return;
-        }
-        //validate service_id
-        $services = church_admin_services_array();
-        if(empty($service_id) || empty($services[$service_id])){
-            //church_admin_debug("Invalid service id");
-            return;
-        }
-        //validate time
-        if(empty($sms_time)){
-            //church_admin_debug("No time");
-            return;
-        }
-        $matches =  preg_match("/^(?:2[0-3]|[01][0-9]):[0-5][0-9]$/", $sms_time);
-        if(empty($matches)){
-            //church_admin_debug("Invalid time time");
-            return;
-    
-        }
-        
-        //safe to proceed
-        
-        $args=array('service_id'=>(int)$service_id);
-        //church_admin_debug $args);
-        update_option('church_admin_sms_rota_args',$args);
-        update_option('church_admin_sms_rota_day',$sms_day);
-        $first_run = strtotime( $en_rota_days[$sms_day].' '.$sms_time );
-        wp_schedule_event( $first_run, 'weekly','church_admin_cron_sms_rota',$args);
-        //church_admin_debug('************** End Saving auto sms rota **************');
-    }
-}
 
 
 
@@ -3704,12 +3351,7 @@ function church_admin_deactivation() {
         if(!empty($cron[$id]['church_admin_bulk_email'])){
             unset($cron[$id]['church_admin_bulk_email']);
         }
-        if(!empty($cron[$id]['church_admin_cron_sms_rota'])){
-            unset($cron[$id]['church_admin_cron_sms_rota']);
-        }
-        if(!empty($cron[$id]['church_admin_cron_email_rota'])){
-            unset($cron[$id]['church_admin_cron_email_rota']);
-        }
+      
     }
 
     update_option('cron',$cron);
@@ -4521,63 +4163,8 @@ function church_admin_ajax_handler()
 		switch ( $_REQUEST['method'] )
 		{
 
-            case 'create-calendar-event-from-rota':
-                check_ajax_referer('edit_rota','nonce');
-                church_admin_debug('AJAX create calendar date from rota ');
-                $start_date = !empty($_REQUEST['start_date']) ? church_admin_sanitize($_REQUEST['start_date']): null;
-                $event_id= !empty($_REQUEST['event_id']) ? church_admin_sanitize($_REQUEST['event_id']): null;
-                $service_id= !empty($_REQUEST['service_id']) ? church_admin_sanitize($_REQUEST['service_id']): null;
-
-                if(empty($start_date)){
-                    church_admin_debug('Missing Start date');
-                    exit();
-                }
-                if(empty($service_id)){
-                    church_admin_debug('Missing Service id');
-                    echo json_encode(array('id'=>$start_date,'html'=>__('Calendar event exists already','church-admin')));
-                    exit();
-                }
-
-                $check = $wpdb->get_var('SELECT date_id FROM '.$wpdb->prefix.'church_admin_calendar_date WHERE event_id="'.$event_id.'" AND start_date="'.esc_sql($start_date).'"');
-                if(!empty($check)){
-                    church_admin_debug('Date already exists');
-                    echo json_encode(array('id'=>$start_date,'html'=>__('Calendar event exists already','church-admin')));
-                    exit();
-                }
-
-                $calendar_data=array();
-                $event= $wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'church_admin_calendar_date WHERE event_id="'.(int)$event_id.'" ORDER BY start_date DESC LIMIT 1');
-               
-                church_admin_debug($event);
-                $wpdb->query('INSERT INTO '.$wpdb->prefix.'church_admin_calendar_date (title,location,start_date,start_time,end_time,event_id,service_id,link,link_title,general_calendar,recurring,how_many,facilities_id,event_image,description,cat_id) VALUES("'.esc_sql($event->title).'","'.esc_sql($event->location).'","'.esc_sql($start_date).'","'.esc_sql($event->start_time).'","'.esc_sql($event->end_time).'","'.esc_sql($event->event_id).'","'.(int)$service_id.'","'.esc_sql($event->link).'","'.esc_sql($event->link_title).'","'.esc_sql($event->general_calendar).'","'.esc_sql($event->recurring).'","'.esc_sql($event->how_many).'","'.esc_sql($event->facilities_id).'","'.esc_sql($calendar_data->event_image).'","'.esc_sql($event->description).'","'.esc_sql($event->cat_id).'")');
-                church_admin_debug($wpdb->last_query);
-                echo json_encode(array('id'=>$start_date,'html'=>'<span class="dashicons dashicons-yes"></span>'));
-                exit();
-
-
-            break;
-            case 'ticket-checkin':
-                check_ajax_referer('ticket-checkin','nonce');
-                church_admin_debug('**** ticket checkin ****');
-                church_admin_debug($_POST);
-                $ID=church_admin_sanitize($_POST['ticketid']);
-                if(!empty($ID)){
-                    $wpdb->query('UPDATE '.$wpdb->prefix.'church_admin_bookings SET check_in=NOW() WHERE ticket_id="'.(int)$ID.'"');
-                    echo (int)$ID;
-                    exit();
-                }
-            break;
-            case 'undo-ticket-checkin':
-                check_ajax_referer('ticket-checkin','nonce');
-                church_admin_debug('**** undo ticket checkin ****');
-                church_admin_debug($_POST);
-                $ID=church_admin_sanitize($_POST['ticketid']);
-                if(!empty($ID)){
-                    $wpdb->query('UPDATE '.$wpdb->prefix.'church_admin_bookings SET check_in=NULL WHERE ticket_id="'.(int)$ID.'"');
-                    echo (int)$ID;
-                    exit();
-                }
-            break;
+            
+           
             case 'kiosk-app-delete':
                 church_admin_debug('**** kiosk-app-delete ****');
                 check_ajax_referer('kiosk-app-ajax','nonce');
@@ -4683,69 +4270,7 @@ function church_admin_ajax_handler()
                 }
                 exit();
             break;
-            case 'rota_get_edit':
-                
-                check_ajax_referer('edit_rota','nonce');
-                if(!$current_user||!church_admin_level_check('rota',$current_user->ID) )
-                {
-                    echo'Not allowed';
-                    exit();
-                }
-                //church_admin_debug $_REQUEST);
-                //sanitize
-                $premium=get_option('church_admin_payment_gateway');
-                $rota_task_id=!empty($_REQUEST['rota_task_id'])? sanitize_text_field( stripslashes( $_REQUEST['rota_task_id'])):null;
-                $service_id=!empty($_REQUEST['service_id'])? sanitize_text_field( stripslashes( $_REQUEST['service_id'])):null;
-                $id=sanitize_text_field( stripslashes( $_REQUEST['id'] ) );
-                $time=sanitize_text_field( stripslashes($_REQUEST['time'] ));
-                $rota_date=sanitize_text_field( stripslashes($_REQUEST['rota_date'] ));
-                $idtochange=sanitize_text_field( stripslashes($_REQUEST['idtochange'] ));
-                $current = !empty($_REQUEST['current']) ? church_admin_sanitize($_REQUEST['current']) : null;
-                //validate
-                if(empty($rota_task_id) ||!church_admin_int_check($rota_task_id)){exit();}
-                if(empty($service_id) ||!church_admin_int_check($service_id)){exit();}
-
-                
-                $ministry_id=$wpdb->get_var('SELECT ministries FROM '.$wpdb->prefix.'church_admin_rota_settings WHERE rota_id="'.(int)$rota_task_id.'"');
-                $out='<input type="text" data-service_id="'.(int)$service_id.'" data-id="'.esc_html( $idtochange).'" data-data="'.$current.'" value="'.$current.'" data-time="'.esc_html( $time).'" data-rota_date="'.esc_html( $rota_date).'" data-rota_task_id="'.(int)$rota_task_id.'"  class="editable_rota" autofocus placeholder="'.esc_html( __('Add people','church-admin' ) ).'" /><br>';
-                //church_admin_debug $wpdb->last_query);
-                if(!empty( $ministry_id) )
-                {
-                    $people=array();
-                    //church_admin_debug('looking for '.$ministry_id);
-                    $people=church_admin_ministry_people_array( $ministry_id);
-                    //church_admin_debug("people ids hopefully");
-                
-                    //church_admin_debug $people);
-                   
-                    if( $people)
-                    {
-                        
-                        $out.='<select class="rota-dropdown" data-rota_task_id="'.(int)$rota_task_id.'" data-time="'.esc_html( $time).'" data-rota_date="'.esc_html( $rota_date).'" data-service_id="'.(int)$service_id.'" data-id="'.esc_html( $id).'"><option>'.esc_html( __('Or please choose','church-admin' ) ).'</option>';
-                        foreach( $people AS $id=>$people)
-                        {
-                            $check=FALSE;
-                            if(!empty( $premium) )
-                            {
-                                $check=$wpdb->get_var('SELECT not_id FROM '.$wpdb->prefix.'church_admin_not_available WHERE unavailable="'.esc_sql( $rota_date).'" AND people_id="'.(int)$id.'"');
-                                //church_admin_debug $wpdb->last_query);
-                            }
-                            if ( empty( $check) )$out.='<option value="'.esc_html( $people).'">'.esc_html( $people).'</option>';
-                        }
-                        $out.='</select><br>';
-                    }
-
-                }
-              
-                $output=array('id'=>$idtochange,'html'=>$out);
-                header('Access-Control-Max-Age: 1728000');
-                header('Access-Control-Allow-Origin: *');
-                header('Access-Control-Allow-Methods: *');
-                header('Access-Control-Allow-Headers: Content-MD5, X-Alt-Referer');
-                header('Access-Control-Allow-Credentials: true');
-                echo json_encode( $output);
-                die();
-            break;
+            
 
             case 'facility-booking':
                 check_ajax_referer('facility-booking','nonce');
@@ -5114,27 +4639,7 @@ function church_admin_ajax_handler()
                 
                 exit();
             break;
-            case 'rota-dates':
-                check_ajax_referer('rota-dates','nonce');
-                $service_id=!empty($_REQUEST['service_id'])?sanitize_text_field(stripslashes($_REQUEST['service_id'])):null;
-                if(empty($service_id)){exit();}
-
-                $sql='SELECT rota_date FROM '.$wpdb->prefix.'church_admin_new_rota WHERE mtg_type="service" AND service_id="'.(int)$service_id.'" AND rota_date>=CURDATE() GROUP BY rota_date ORDER BY rota_date ASC LIMIT 12';
-
-                $results=$wpdb->get_results( $sql);
-                if(!empty( $results) )
-                {
-                    $out='<select name="rota_date">';
-                    foreach( $results AS $row)
-                    {
-                        $out.='<option value="'.esc_html( $row->rota_date).'">'.mysql2date(get_option('date_format'),$row->rota_date).'</option>';
-                    }
-                    $out.='</select>';
-
-                }else{$out=__('No dates yet, create some first!','church-admin');}
-                echo $out;
-                exit();
-            break;
+            
             case 'edit-app-menu':
                 check_ajax_referer('edit-app-menu','nonce');
                 $chosenMenu=get_option('church_admin_app_new_menu');
@@ -5743,69 +5248,7 @@ function church_admin_ajax_handler()
 				exit();
 			break;
            
-			case 'edit_rota':
-                $premium=get_option('church_admin_payment_gateway');
-                if(!$current_user||!church_admin_level_check('rota',$current_user->ID) )
-                {
-                    exit();
-                }
-				//church_admin_debug("Edit rota Ajax\r\n".print_r( $_POST,TRUE) );
-				//check_ajax_referer('edit_rota','nonce',TRUE);
-				$rota_task_id=!empty($_POST['rota_task_id'])?sanitize_text_field(stripslashes($_POST['rota_task_id'])):null;
-                $rota_date=!empty($_POST['rota_date'])?sanitize_text_field(stripslashes($_POST['rota_date'])):null;
-                $content=!empty($_POST['content'])?sanitize_text_field(stripslashes($_POST['content'])):null;
-                $idtochange=!empty($_POST['idtochange'])?sanitize_text_field(stripslashes($_POST['idtochange'])):null;
-				$service_id=!empty($_POST['service_id'])?sanitize_text_field(stripslashes($_POST['service_id'])):null;
-				$service_time=!empty($_POST['time'])?sanitize_text_field(stripslashes($_POST['time'])):null;
 			
-			
-				//delete current entry
-				$wpdb->query('DELETE FROM '.$wpdb->prefix.'church_admin_new_rota WHERE rota_task_id="'.(int)$rota_task_id.'" AND rota_date="'.esc_sql( $rota_date).'" AND service_time="'.esc_sql( $service_time).'" AND service_id="'.(int)$service_id.'" AND mtg_type="service"');
-				//church_admin_debug $wpdb->last_query);
-				$people=unserialize(church_admin_get_people_id( $content) );
-                //church_admin_debug("people ids hopefully");
-                //church_admin_debug $people);
-				$peopleIDs=array_unique( $people);//prevent duplication
-				foreach( $peopleIDs AS $key=>$people_id)
-				{
-					
-					$check=FALSE;
-                    if(!empty( $premium) )
-                    {
-                        //church_admin_debug('CHECK availability');
-                        $check=$wpdb->get_var('SELECT not_id FROM '.$wpdb->prefix.'church_admin_not_available WHERE unavailable="'.esc_sql( $rota_date).'" AND people_id="'.(int)$people_id.'"');
-                        //church_admin_debug $wpdb->last_query);
-                        //church_admin_debug('CHECK - '.$check);
-                    }
-                    if ( empty( $check) )
-                    {
-                        //church_admin_debug('OKAY to save');
-                        church_admin_update_rota_entry( $rota_task_id,$rota_date,$people_id,'service',$service_id,$service_time);
-                    }
-                    else
-                    {
-                        $person=$wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'church_admin_people WHERE people_id="'.(int)$people_id.'"');
-                        //translators: %1$s is a name
-                        $errors[]='<strong>'.esc_html(sprintf(__('%1$s not added ','church-admin' ) ,church_admin_formatted_name( $person)) ).'</strong>';
-                        $content='';
-                    }
-					
-				}
-                //$idOfSpan=esc_html('rota-item-'.$rota_date.'-'.$service_id.'-'.$id);
-				$newContent='';
-                
-                $newContent.='<span data-service_id="'.(int)$service_id.'" data-time="'.esc_html( $service_time).'" data-id="'.esc_html( $idtochange).'" data-rota_date="'.$rota_date.'" data-rota_task_id="'.(int)$rota_task_id.'" class="rota_edit">';
-                if(!empty( $errors) )
-                {
-                    $newContent.=implode("<br>",$errors);
-                }
-                $newContent.=esc_html( $content).'</span>'; 
-				
-                $output=json_encode(array('idtochange'=>esc_html( $idtochange),'content'=>$newContent,'persondata'=>esc_html( $content) ));
-				//church_admin_debug $output);
-                echo $output;
-				exit();
-			break;
 		}
 
 

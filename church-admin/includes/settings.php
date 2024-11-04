@@ -43,7 +43,7 @@ function church_admin_modules()
 				case 'Support':$display=__('Support Church Admin','church-admin');break;
 				case'Contact':$display=__('Contact','church-admin');break;
 				case'People':$display=__('People','church-admin');break;
-				case'Rota':$display=__('Rota','church-admin');break;
+				
 				case'Children':$display=__('Children','church-admin');break;
 				case'Comms':$display=__('Comms','church-admin');break;
 				case'Groups':$display=__('Groups','church-admin');break;
@@ -531,7 +531,7 @@ function church_admin_roles(){
 					'Ministries'=>__('Ministries','church-admin'),
 					'Pastoral'=>__('Pastoral','church-admin'),
 					'Push'=>__('Push','church-admin'),
-					'Rotas'=>__('Schedules','church-admin'),
+					
 					'Service'=>__('Services','church-admin'),
 					'Sessions'=>__('Sessions','church-admin'),
 					
@@ -639,7 +639,7 @@ function church_admin_roles_old()
 				case 'Prayer':$display=__('Prayer Requests','church-admin');break;
 				
 				case'Directory':$display=__('People','church-admin');break;
-				case'Rota':$display=__('Rota','church-admin');break;
+				
 				case'Children':$display=__('Children','church-admin');break;
 				case 'Contact form':$display=__('Contact form','church-admin'); break;
 				case'Comms':$display=__('Comms','church-admin');break;
@@ -917,13 +917,7 @@ function church_admin_sms_settings()
 	//echo wp_login_url().'</br/>';
 	if(!empty( $_POST['save-general-settings'] ) )
 	{
-		if(!empty($_POST['rota_sms_message'])){
-			$message = church_admin_sanitize($_POST['rota_sms_message']);
-			update_option('church_admin_sms_rota_reply_mesage',$message);
-		}
-		else{
-			delete_option('church_admin_sms_rota_reply_mesage');
-		}
+		
 		if(!empty($_POST['member_type_id'])){
 
 			$member_type_id = (int)church_admin_sanitize($_POST['member_type_id']);

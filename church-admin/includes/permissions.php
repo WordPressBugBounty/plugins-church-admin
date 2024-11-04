@@ -77,11 +77,7 @@ function church_admin_permissions()
 					if(!empty( $calendar) )$user_permissions['Calendar']=$calendar;
 				}
 
-				if(!empty( $_POST['Rota'] ) )
-				{
-					$rota=church_admin_get_user_id( church_admin_sanitize($_POST['Rota']) );
-					if(!empty( $rota) )$user_permissions['Rota']=$rota;
-				}
+				
 				if(!empty( $_POST['Sermons'] ) )
 				{
 					$sermons=church_admin_get_user_id( church_admin_sanitize($_POST['Sermons']) );
@@ -199,7 +195,7 @@ function church_admin_permissions()
 			if(empty($user_permissions)){$user_permissions=array();}
 			if ( empty( $user_permissions['Directory'] ) )$user_permissions['Directory']='';
 			if ( empty( $user_permissions['Classes'] ) )$user_permissions['Classes']='';
-			if ( empty( $user_permissions['Rota'] ) ) $user_permissions['Rota']='';
+			
 			if ( empty( $user_permissions['Bible'] ) ) $user_permissions['Bible']='';
 			if ( empty( $user_permissions['Bulk_SMS'] ) ) $user_permissions['Bulk_SMS']='';
 			if ( empty( $user_permissions['Events'] ) ) $user_permissions['Events'] ='';
@@ -295,9 +291,7 @@ function church_admin_permissions()
 			echo'<tr><th scope="row" >'.esc_html( __('Push Messaging','church-admin' ) ).'</th><td>';
 			echo church_admin_autocomplete('Push','auto-prayer-chain','pr',$user_permissions['Push'],TRUE);
 			echo '</td></tr>';
-			echo'<tr><th scope="row" >'.esc_html( __('Rota','church-admin' ) ).'</th><td>';
-			echo church_admin_autocomplete('Rota','auto-rota','ro',$user_permissions['Rota'],TRUE);
-			echo '</td></tr>';
+			
 
 			echo'<tr><th scope="row" >'.esc_html( __('Sermons','church-admin' ) ).'</th><td>';
 			echo church_admin_autocomplete('Sermons','auto-sermons','ser',$user_permissions['Sermons'],TRUE);

@@ -82,7 +82,7 @@ function church_admin_calendar_list( $days=28,$category=NULL,$fac_ids=NULL)
 		//build $data for outputing
 		foreach( $results AS $row)
 		{
-			$rota = null;
+			
 		
 			if($row->bgcolor=='#FFFFFF'){$row->bgcolor="#CCCCCC";}
 			if( $row->start_time=='00:00:00' && $row->end_time=='23:59:00')
@@ -173,27 +173,7 @@ function church_admin_calendar_list( $days=28,$category=NULL,$fac_ids=NULL)
 		}
 		$out.='</tbody></table>';
 	}
-	$out.='<script>
-	jQuery(document).ready(function($){
-		$(".rota-expander").click(function(){
-			console.log("click");
-			$(".rota-details").hide();
-			var id	=$(this).attr("data-id");
-			console.log(id);
-			var what = $(this).attr("data-what");
-			if(what==="show"){
-				$(this).attr("data-what","hide");
-				$(".date"+id).show();
-				$("#toggle"+id).removeClass("dashicons-arrow-up-alt2");
-				$("#toggle"+id).addClass("dashicons-arrow-down-alt2");
-			}else
-			{
-				$(this).attr("data-what","show");
-				$("#toggle"+id).addClass("dashicons-arrow-up-alt2");
-				$("#toggle"+id).removeClass("dashicons-arrow-down-alt2");
-			}
-		});
-	})</script>';
+	
 	
 	
 	return $out;

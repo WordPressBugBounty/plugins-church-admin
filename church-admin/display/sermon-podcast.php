@@ -2,15 +2,19 @@
 if ( ! defined( 'ABSPATH' ) ) exit('You need Jesus!'); // Exit if accessed directly
 
 
-function church_admin_podcast_display( $series_id=NULL,$file_id=NULL,$exclude=NULL,$most_popular=TRUE,$order='DESC',$limit=5,$nowhite=FALSE)
+function church_admin_premium_podcast_display( $series_id=NULL,$file_id=NULL,$exclude=array(),$most_popular=TRUE,$order='DESC',$limit=5,$nowhite=FALSE)
 {
     
-    church_admin_debug('***** church_admin_podcast_display *****');
-    church_admin_debug(func_get_args());
-   
+    church_admin_premium_debug('***** church_admin_premium_podcast_display *****');
+    church_admin_premium_debug(func_get_args());
+    $licence =get_option('church_admin_new_licence');
+    if($licence!='basic' && $licence!='standard' && $licence!='premium'){
+        return '<div class="error"><p>'.esc_html( __("This feature is for premium and standard versions only",'church-admin' ) ).'<br><a class="button-primary" href="https://buy.stripe.com/fZedSB9ErbQRcjm14V">Upgrade</a></p></div>';
+        
+    }
      global $wpdb;
     if(!is_user_logged_in() )  {$private=' AND private="0" ';}else{$private='';}
-    if(!empty( $exclude)&&!is_array( $exclude) )$exclude=explode(",",$exclude);
+    if(!empty( $exclude) && !is_array( $exclude) )$exclude=explode(",",$exclude);
     $out='<!-- sermon-podcast.php -->'."\r\n";
     $out.='<script>var nonce="'.wp_create_nonce('sermon-display').'";</script>'."\r\n";
     $out.='<div class="church-admin-sermons">'."\r\n";
@@ -23,9 +27,9 @@ function church_admin_podcast_display( $series_id=NULL,$file_id=NULL,$exclude=NU
         $order='DESC';
     }
     $latest_sermon=$wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'church_admin_sermon_files WHERE 1=1 '.$private.' ORDER BY pub_date '.$order.' LIMIT 1');
-    $speaker = !empty($_REQUEST['speaker'])? church_admin_sanitize($_REQUEST['speaker']):null;
-    $search = !empty($_REQUEST['search'])? church_admin_sanitize($_REQUEST['search']):null;
-    $series_id =!empty($_REQUEST['series_id'])? church_admin_sanitize($_REQUEST['series_id']):$series_id;
+    $speaker = !empty($_REQUEST['speaker'])? church_admin_premium_sanitize($_REQUEST['speaker']):null;
+    $search = !empty($_REQUEST['search'])? church_admin_premium_sanitize($_REQUEST['search']):null;
+    $series_id =!empty($_REQUEST['series_id'])? church_admin_premium_sanitize($_REQUEST['series_id']):$series_id;
     $file_id=null;
     $series_sql='';
     $series_sql_array=array();
@@ -67,8 +71,8 @@ function church_admin_podcast_display( $series_id=NULL,$file_id=NULL,$exclude=NU
         }
     }
     $page=!empty( $_GET['page'] )?sanitize_text_field((int)$_GET['page']):1;
-    if(defined('CA_DEBUG') )church_admin_debug('latest file query...');
-    if(defined('CA_DEBUG') )church_admin_debug( $wpdb->last_query);
+    if(defined('CA_DEBUG') )church_admin_premium_debug('latest file query...');
+    if(defined('CA_DEBUG') )church_admin_premium_debug( $wpdb->last_query);
    
     //if ( empty( $series_id) )$series_id=$latest_sermon->series_id;
     /********************************************************
@@ -78,29 +82,29 @@ function church_admin_podcast_display( $series_id=NULL,$file_id=NULL,$exclude=NU
     *********************************************************/
     $out.='<div class="ca-podcast clearfix" id="ca-sermons">';
     $out.='<div class="ca-podcast-left-column">
-                <div class="ca-series-current">'.church_admin_podcast_series_detail( $series_id,$exclude,$limit).'</div>
-                <div class="ca-podcast-current">'.church_admin_podcast_file_detail( $file_id,$exclude,$nowhite).'</div>
+                <div class="ca-series-current">'.church_admin_premium_podcast_series_detail( $series_id,$exclude,$limit).'</div>
+                <div class="ca-podcast-current">'.church_admin_premium_podcast_file_detail( $file_id,$exclude,$nowhite).'</div>
                
                 </div><!--.ca-podcast-list-->
             <div class="ca-podcast-list">
-                <div class="ca-menu-area">'.church_admin_podcast_menu( $page,$limit,$series_id).'</div>
-                <div class="ca-media-file-list">'.church_admin_podcast_files_list( $series_id,$page,$limit,$speaker,$search,$order,$series_sql).'</div>
+                <div class="ca-menu-area">'.church_admin_premium_podcast_menu( $page,$limit,$series_id).'</div>
+                <div class="ca-media-file-list">'.church_admin_premium_podcast_files_list( $series_id,$page,$limit,$speaker,$search,$order,$series_sql).'</div>
             </div><!--.ca-podcast-list-->'; 
     
     $out.='</div><!--#ca-sermons-->';
-    $out.='<script>var mp3nonce="'.esc_attr(wp_create_nonce("church_admin_mp3_play")).'"</script>';
+    $out.='<script>var mp3nonce="'.esc_attr(wp_create_nonce("church_admin_premium_mp3_play")).'"</script>';
     $out.='</div>';
     return $out;
 }
 
 
 
-function church_admin_podcast_files_list( $series_id=null,$page=1,$limit=5,$speaker=NULL,$search=NULL,$order='DESC',$series_sql=null)
+function church_admin_premium_podcast_files_list( $series_id=null,$page=1,$limit=5,$speaker=NULL,$search=NULL,$order='DESC',$series_sql=null)
 {
     if(defined('CA_DEBUG') )
     {
-        church_admin_debug('FUNCTION church_admin_podcast_files_list');
-        church_admin_debug(print_r(get_defined_vars(),TRUE) );
+        church_admin_premium_debug('FUNCTION church_admin_premium_podcast_files_list');
+        church_admin_premium_debug(print_r(get_defined_vars(),TRUE) );
     }
     global $wpdb;
     if(!empty( $order) )
@@ -141,15 +145,15 @@ function church_admin_podcast_files_list( $series_id=null,$page=1,$limit=5,$spea
             */
             if(!empty( $series_id) )$SQL[]= 'AND '.$series_sql;//series_id="'.(int)$series_id.'"';
         }
-        if(!empty($series_id)&& church_admin_int_check($series_id) ) {$SQL[]='AND series_id="'.(int)$series_id.'"';}
+        if(!empty($series_id)&& church_admin_premium_int_check($series_id) ) {$SQL[]='AND series_id="'.(int)$series_id.'"';}
         $sql='SELECT * FROM '.$wpdb->prefix.'church_admin_sermon_files WHERE 1=1 '.implode(' ',$SQL).' '.$private.' ORDER BY pub_date '.$order; 
     }
-    if(defined('CA_DEBUG') )church_admin_debug("List files SQL");
-    if(defined('CA_DEBUG') )church_admin_debug( $sql);
+    if(defined('CA_DEBUG') )church_admin_premium_debug("List files SQL");
+    if(defined('CA_DEBUG') )church_admin_premium_debug( $sql);
     $countResult=$wpdb->get_results( $sql);
     $count=$wpdb->num_rows;
-    if(defined('CA_DEBUG') )church_admin_debug("File Count: $count");
-    if(defined('CA_DEBUG') )church_admin_debug("Page: $page");
+    if(defined('CA_DEBUG') )church_admin_premium_debug("File Count: $count");
+    if(defined('CA_DEBUG') )church_admin_premium_debug("Page: $page");
     if ( empty( $limit) )$limit=5;
     if( $page==0)
     {
@@ -159,7 +163,7 @@ function church_admin_podcast_files_list( $series_id=null,$page=1,$limit=5,$spea
         $paged=( $page-1)*$limit;
     }
     $newSQL=$sql.' LIMIT '.( $paged).','.$limit;
-    if(defined('CA_DEBUG') )church_admin_debug("QUERY WITH  LIMIT ADDED\r\n".$newSQL);
+    if(defined('CA_DEBUG') )church_admin_premium_debug("QUERY WITH  LIMIT ADDED\r\n".$newSQL);
     $results=$wpdb->get_results( $newSQL);
    
     if ( empty( $results) )return __('No sermons found');
@@ -185,24 +189,24 @@ function church_admin_podcast_files_list( $series_id=null,$page=1,$limit=5,$spea
         }
     if(defined('CA_DEBUG') )
     {
-        church_admin_debug("OUTPUT\r\n $out \r\n*****************");
-        church_admin_debug('END OF church_admin_podcast_files_list');
+        church_admin_premium_debug("OUTPUT\r\n $out \r\n*****************");
+        church_admin_premium_debug('END OF church_admin_premium_podcast_files_list');
     }
     return $out; 
 }
-function church_admin_podcast_menu( $page,$limit,$series_id)
+function church_admin_premium_podcast_menu( $page,$limit,$series_id)
 {
     global $wpdb;
     $out='';
-    $ca_podcast_settings=get_option('ca_podcast_settings');
-    if(!empty( $ca_podcast_settings['itunes_link'] )||!empty( $ca_podcast_settings['spotify_link'] ) )$out.='<div class="ca-podcast-links">';
-	if(!empty( $ca_podcast_settings['itunes_link'] ) )$out.='<a title="Download on Itunes" href="'.esc_url($ca_podcast_settings['itunes_link']).'">
+    $church_admin_podcast_settings=get_option('church_admin_podcast_settings');
+    if(!empty( $church_admin_podcast_settings['itunes_link'] )||!empty( $church_admin_podcast_settings['spotify_link'] ) )$out.='<div class="ca-podcast-links">';
+	if(!empty( $church_admin_podcast_settings['itunes_link'] ) )$out.='<a title="Download on Itunes" href="'.esc_url($church_admin_podcast_settings['itunes_link']).'">
 <img  alt="Apple Podcasts" src="'.esc_url(plugins_url('/images/apple-podcasts.png',dirname(__FILE__) )).'" width="155" height="40" /></a>';
-    if(!empty( $ca_podcast_settings['spotify_link'] ) )$out.='&nbsp; <a title="Download on Spotify" href="'.esc_url($ca_podcast_settings['spotify_link']).'">
+    if(!empty( $church_admin_podcast_settings['spotify_link'] ) )$out.='&nbsp; <a title="Download on Spotify" href="'.esc_url($church_admin_podcast_settings['spotify_link']).'">
 <img alt="Spotify" class="ca-podcast-logo" src="'.esc_url(plugins_url('/images/spotify.png',dirname(__FILE__) )).'" width="110" height="40" /></a>';
-if(!empty( $ca_podcast_settings['amazon_link'] ) )$out.='&nbsp; <a title="Download on Amazon" href="'.esc_url($ca_podcast_settings['amazon_link']).'">
+if(!empty( $church_admin_podcast_settings['amazon_link'] ) )$out.='&nbsp; <a title="Download on Amazon" href="'.esc_url($church_admin_podcast_settings['amazon_link']).'">
 <img alt="Amazon Music" class="ca-podcast-logo" src="'.esc_url(plugins_url('/images/amazon-podcast.png',dirname(__FILE__) )).'" width="110" height="40" /></a>';
-    if(!empty( $ca_podcast_settings['itunes_link'] )||!empty( $ca_podcast_settings['spotify_link'] ) )$out.='</div>';
+    if(!empty( $church_admin_podcast_settings['itunes_link'] )||!empty( $church_admin_podcast_settings['spotify_link'] ) )$out.='</div>';
     //search
     $out.='<div class="ca-podcast-search church-admin-form-group">
     <input type="text" class="sermon-search" name="sermon-search" placeholder="'.esc_html( __('Search sermons','church-admin' ) ).'"><button class="ca-sermon-search btn btn-secondary" data-page="'.(int)$page.'" data-limit="'.(int)$limit.'"  type="button">?</button></div>';
@@ -255,10 +259,11 @@ if(!empty( $ca_podcast_settings['amazon_link'] ) )$out.='&nbsp; <a title="Downlo
     return $out;
 }
 
- function church_admin_podcast_series_detail( $series_id=NULL,$exclude=array() )
+ function church_admin_premium_podcast_series_detail( $series_id=NULL,$exclude=array() )
  {
  		global $wpdb,$podcastSettings;
-        if ( empty( $exclude) )$exclude=array();
+        if(!empty( $exclude) && !is_array( $exclude) )$exclude=explode(",",$exclude);
+
  		$out='';
 
  		if(!empty( $series_id) )
@@ -286,12 +291,12 @@ if(!empty( $ca_podcast_settings['amazon_link'] ) )$out.='&nbsp; <a title="Downlo
 
  }
   
-function church_admin_podcast_file_detail( $fileID,$exclude=NULL,$nowhite=FALSE)
+function church_admin_premium_podcast_file_detail( $fileID,$exclude=array(),$nowhite=FALSE)
 {
     
 	global $wpdb,$wp_embed,$post;
-    $podcastSettings=get_option('ca_podcast_settings');
-	if ( empty( $exclude) )$exclude=array();
+    $podcastSettings=get_option('church_admin_podcast_settings');
+	if(!empty( $exclude) && !is_array( $exclude) )$exclude=explode(",",$exclude);
 	$out='';
 	$upload_dir = wp_upload_dir();
 		$path=$upload_dir['basedir'].'/sermons/';
@@ -321,7 +326,7 @@ function church_admin_podcast_file_detail( $fileID,$exclude=NULL,$nowhite=FALSE)
                        $out.='<video class="ca-video" width="560" height="315" controls><source src="'.esc_url($data->video_url).'" type="video/mp4">Your browser does not support the video tag./video>'."\r\n"; 
                     }else
                     {
-                        $video=church_admin_generateVideoEmbedUrl( $data->video_url);
+                        $video=church_admin_premium_generateVideoEmbedUrl( $data->video_url);
                         $videoUrl=$video['embed'];
                         if(!empty( $nowhite) )
                         {
@@ -331,7 +336,7 @@ function church_admin_podcast_file_detail( $fileID,$exclude=NULL,$nowhite=FALSE)
                         {
                             $out.='<div style="width:100%"><div style="position:relative;padding-top:56.25%"><iframe class="ca-video" style="position:absolute;top:0;left:0;width:100%;height:100%;" src="'.esc_url($video['embed']).'" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div></div>'."\r\n";
                         }
-                        $views=church_admin_youtube_views_api( $video['id'] );
+                        $views=church_admin_premium_youtube_views_api( $video['id'] );
                     }
                 }
 
@@ -378,7 +383,7 @@ function church_admin_podcast_file_detail( $fileID,$exclude=NULL,$nowhite=FALSE)
 							
 					
 						
-						$plays=church_admin_plays( $data->file_id);
+						$plays=church_admin_premium_plays( $data->file_id);
 						$out.='<div class="ca-podcast-file-content ca-tab-content">';
 							if(!empty( $data->file_description)&&!in_array('fileDescription',$exclude) )$out.='<div class="sermon-file-description">'.wp_kses_post($data->file_description).'</div>';
 							$out.='<table>';
@@ -411,11 +416,11 @@ function church_admin_podcast_file_detail( $fileID,$exclude=NULL,$nowhite=FALSE)
 								}
                                 if(!empty( $data->transcript) )
                                 {
-                                    $out.='<tr><td>'.esc_html( __('Sermon Notes','church-admin' ) ).':&nbsp;</td><td><a  rel="nofollow" href="'.site_url().'?ca_download=sermon-notes&amp;file_id='.(int)$data->file_id.'">PDF</a></td></tr>';
+                                    $out.='<tr><td>'.esc_html( __('Sermon Notes','church-admin' ) ).':&nbsp;</td><td><a  rel="nofollow" href="'.site_url().'?church_admin_download=sermon-notes&amp;file_id='.(int)$data->file_id.'">PDF</a></td></tr>';
                                 }
                                 if(!in_array('sharing',$exclude) )
                                 {
-                                    $URL=church_admin_find_sermon_page(); 
+                                    $URL=church_admin_premium_find_sermon_page(); 
                                     $url=esc_url( $URL.'?sermon='.$data->file_slug);
                                     $title=urlencode(str_replace('"','',$data->file_title) );
                                     //facebook
@@ -450,13 +455,13 @@ function church_admin_podcast_file_detail( $fileID,$exclude=NULL,$nowhite=FALSE)
 				
 		}
 	
-    $out.='<script>var mp3nonce="'.wp_create_nonce("church_admin_mp3_play").'";</script>'."\r\n";
+    $out.='<script>var mp3nonce="'.wp_create_nonce("church_admin_premium_mp3_play").'";</script>'."\r\n";
 	$out=do_shortcode( $out);
 	return $out;
 }
 
 
-function church_admin_player( $file_id)
+function church_admin_premium_player( $file_id)
 {
     global $wpdb,$podcastSettings;
     if(!is_user_logged_in() )  {$private=' AND a.private="0" ';}else{$private='';}
@@ -469,7 +474,7 @@ function church_admin_player( $file_id)
         if(!empty( $sermon) )
         {
             $out='<p><audio class="sermonmp3" data-id="'.esc_html( $file_id).'" src="'.esc_url( $url.$sermon).'" preload="auto" controls></audio></p>';
-            $out.='<script>var mp3nonce="'.esc_attr(wp_create_nonce("church_admin_mp3_play")).'";</script>';
+            $out.='<script>var mp3nonce="'.esc_attr(wp_create_nonce("church_admin_premium_mp3_play")).'";</script>';
         }
     }else{$out=__('No sermon file found','church-admin');}
     return $out;

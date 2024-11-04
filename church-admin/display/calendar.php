@@ -275,15 +275,7 @@ for( $counter = 1; $counter <= $numdaysinmonth; $counter ++ )
                 $popup.='<a href="'.esc_url( $row->link).'">'.esc_html($title).'</a>';
             }
             
-            $rota = church_admin_retrieve_rota_data_array($row->service_id,$row->start_date,'service');
-            if(!empty($rota)){
-                $popup.='<p><strong>'.esc_html('Who is doing what','church-admin').'<br>';
-				foreach($rota AS $job=>$who){
-					$popup.=esc_html($job).': '.esc_html($who).'<br>';
-				}
-				$popup.='</p>';
-                
-            }
+           
 
 
 

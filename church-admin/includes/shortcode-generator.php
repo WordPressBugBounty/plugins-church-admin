@@ -11,14 +11,12 @@ function church_admin_shortcode_generator()
     $facilities=church_admin_facilities_array();
     $series=church_admin_sermon_series_array();
     $sermons=church_admin_sermon_sermons_array();
-    $sites=church_admin_sites_array();
-    $services = church_admin_services_array();
-    $groups=church_admin_groups_array();
+   
 	$member_types=church_admin_member_types_array();
     $people_types=get_option('church_admin_people_type');
     $map_api_key=get_option('church_admin_google_api_key');
     $categories=church_admin_calendar_categories_array();
-    $units = church_admin_units_array();
+   
     $exclude=array('seriesName'=>esc_html( __('Series name','church-admin' ) ),
                     'seriesDescription'=>esc_html( __('Series description','church-admin' ) ),
                     'seriesImage'=>esc_html( __('Series image','church-admin' ) ),
@@ -47,11 +45,7 @@ function church_admin_shortcode_generator()
                 'options'=>NULL,
                 'type'=>'no-content'
         ),
-        'bible-readings' =>array('title'=>esc_html( __(' Bible readings','church-admin' ) ),
-                'description'=>esc_html( __('Bible readings','church-admin' ) ),
-                'options'=>NULL,
-                'type'=>'no-content'
-        ),
+        
         'birthdays'=>array('title'=>esc_html( __(' Birthdays','church-admin' ) ),
                 'description'=>esc_html( __('Show birthdays for different categories, with option to show age and how many days ahead to show.','church-admin' ) ),
                 'options'=>array('loggedin','member_type_id','people_type_id','days','show_age','show_phone','show_email'),
@@ -72,41 +66,14 @@ function church_admin_shortcode_generator()
                 'options'=>array('days','cat_id'),
                 'type'=>'no-content'
         ),
-        'classes' =>array('title'=>esc_html( __('Classes','church-admin' ) ),
-                'description'=>esc_html( __('Displays current classes.','church-admin' ) ),
-                'options'=>array('registration'),
-                'type'=>'no-content'
-        ),
-        'class' =>array('title'=>esc_html( __('Class display','church-admin' ) ),
-                'description'=>esc_html( __('Displays a particular class','church-admin' ) ),
-                'options'=>array('registration','class_id'),
-                'type'=>'no-content'
-        ),
+        
         'contact-form' =>array('title'=>esc_html( __('Contact form','church-admin' ) ),
                 'description'=>esc_html( __('Displays the contact form','church-admin' ) ),
                 'options'=>array(),
                 'type'=>'no-content'
         ),
-        'event-booking' =>array('title'=>esc_html( __('Event display','church-admin' ) ),
-                'description'=>esc_html( __('Displays an event','church-admin' ) ),
-                'options'=>array('event'),
-                'type'=>'no-content'
-        ),
-        'follow-up' =>array('title'=>esc_html( __('Follow up','church-admin' ) ),
-                'description'=>esc_html( __('Displays follow up actions','church-admin' ) ),
-                'options'=>null,
-                'type'=>'no-content'
-        ),
-        'giving' =>array('title'=>esc_html( __('Giving form','church-admin' ) ),
-            'description'=>esc_html( __('Shows giving form (Premium only)','church-admin' ) ),
-            'options'=>array(),
-            'type'=>'no-content'
-        ),
-        'giving-totals' =>array('title'=>esc_html( __('Giving totals','church-admin' ) ),
-            'description'=>esc_html( __('Shows pledges and giving totals for year and forms','church-admin' ) ),
-            'options'=>array(),
-            'type'=>'no-content'
-        ),
+        
+        
         'hello' =>array('title'=>esc_html( __('Hello user','church-admin' ) ),
                 'description'=>esc_html( __('Displays a welcome to a logged in user','church-admin' ) ),
                 'options'=>null,
@@ -127,26 +94,9 @@ function church_admin_shortcode_generator()
                 'options'=>array('save_as_member_type_id'),
                 'type'=>'no-content'
         ),              
-        'ministries'=>array('title'=>esc_html( __('Ministries','church-admin' ) ),
-                'description'=>esc_html( __('Displays ministries and who is in each ministry team','church-admin' ) ),
-                'options'=>array('ministry_id','member_type_id'),
-                'type'=>'no-content'
-        ),
-        'ministry-rota'=>array('title'=>esc_html( __('Ministry schedule ','church-admin' ) ),
-        'description'=>esc_html( __('Allows the team contact for a ministry to create their own schedule for their schedule task, optionally add a service id or they can pick the service to work on.','church-admin' ) ),
-        'options'=>array('service_id'),
-        'type'=>'no-content'
-),
-        'my-group' =>array('title'=>esc_html( __('My Group','church-admin' ) ),
-                        'description'=>esc_html(__("Displays the members of a user's small group",'church-admin' ) ),
-                        'options'=>NULL,
-                        'type'=>'no-content'
-        ),
-        'my-rota' =>array('title'=>esc_html( __('My Schedule','church-admin' ) ),
-                        'description'=>esc_html( __('Displays services a user is scheduled to be involved in','church-admin' ) ),
-                        'options'=>NULL,
-                        'type'=>'no-content'
-        ),
+       
+     
+       
         'names' =>array('title'=>esc_html( __('Names','church-admin' ) ),
                 'description'=>esc_html( __('Displays a list of names','church-admin' ) ),
                 'options'=>array('member_type_id','people_type_id'),
@@ -191,11 +141,7 @@ function church_admin_shortcode_generator()
                 'options'=>array('member_type_id'),
                 'type'=>'content'
         ),
-        'rota' =>array('title'=>esc_html( __('Schedule','church-admin' ) ),
-                        'description'=>esc_html( __('Displays services schedules','church-admin' ) ),
-                        'options'=>array('service_id','weeks','initials'),
-                        'type'=>'no-content'
-        ),
+        
         'sermons' =>array('title'=>esc_html( __('Sermons (new style)','church-admin' ) ),
                 'description'=>esc_html( __('New style sermons display','church-admin' ) ),
                 'options'=>array('how_many','nowhite','start_date','rolling'),
@@ -217,31 +163,10 @@ function church_admin_shortcode_generator()
                 'options'=>array('file_id'),
                 'type'=>'no-content'
         ),
-        'small-groups-list' =>array('title'=>esc_html( __('Small group list','church-admin' ) ),
-            'description'=>esc_html( __('Display list of small groups','church-admin' ) ),
-            'options'=>array('map','zoom','photo','title','pdf','no-address'),
-            'type'=>'no-content'
-        ),
-        'small-group-signup'=>array('title'=>esc_html( __('Small group signup form','church-admin' ) ),
-            'description'=>esc_html( __('Display sign up form for small groups','church-admin' ) ),
-            'options'=>array('people_type_id'),
-            'type'=>'no-content'
-        ),
-        'spiritual-gifts' =>array('title'=>esc_html( __('Spiritual Gifts Questionnaire','church-admin' ) ),
-                        'description'=>esc_html( __('Displays Spiritual Gifts Questionnaire with optional results email to admin email','church-admin' ) ),
-                        'options'=>array('admin_email'),
-                        'type'=>'no-content'
-                ),
-        'toilet-message'=>array('title'=>esc_html( __('Toilet messaging','church-admin' ) ),
-                        'description'=>esc_html( __('For childrens workers to SMS a parent when a child needs taking to the toilet. Choose the right ministry to restrict access!','church-admin' ) ),
-                        'options'=>array('ministry_id' ),
-                        'type'=>'no-content'
-                ),
-        'unit'=>array('title'=>esc_html( __('Units','church-admin' ) ),
-                        'description'=>esc_html( __('Displays details for a unit','church-admin' ) ),
-                        'options'=>array('unit_id' ),
-                        'type'=>'no-content'
-                ),
+        
+        
+       
+        
         'video' =>array('title'=>esc_html( __('Video embed','church-admin' ) ),
                         'description'=>esc_html( __('Video embed with aspect ratio','church-admin' ) ),
                         'options'=>array('video_url'),
@@ -753,64 +678,8 @@ function church_admin_shortcode_generator()
             $out.='<p><input type="checkbox"  name="people_type_id[]" checked="checked" value="'.(int)$id.'" /><label> '.esc_html( $type ).'</label></p>';
         }
         $out.='</div>'."\r\n";
-        //groups
-        $out.='<div class="church-admin-form-group shortcode-option" id="groups" ><h3>'.esc_html( __('Groups','church-admin' ) ).'</h3>';
-        foreach( $groups AS $id => $name ){
-            $out.='<p><input type="checkbox"  name="people_type_id[]" value="'.(int)$id.'" /><label> '.esc_html( $name ).'</label></p>';
-        }
-        $out.='</div>'."\r\n";
-         //units
-         
-            $out.='<div class="church-admin-form-group shortcode-option" id="units" ><h3>'.esc_html( __('Units','church-admin' ) ).'</h3>';
-            if( !empty( $units ) ) {
-                foreach( $units AS $id => $type ){
-                    $out.='<p><input type="checkbox"  name="people_type_id[]" value="'.(int)$id.'" /><label> '.esc_html( $type ).'</label></p>';
-                }
-            
-            }
-            else{
-                $out.='<p><a href="'.wp_nonce_url('admin.php?page=church_admin/index.php&action=edit_unit','edit-unit').'" target="_blank">'.esc_html( __('Please set up a unit','church-admin' ) ).'</a></p>';
-            }
-            $out.='</div>'."\r\n";
-        //sites
        
-        $out.='<div class="church-admin-form-group shortcode-option" id="sites" ><h3>'.esc_html( __('Sites','church-admin' ) ).'</h3>';
-        if( !empty( $sites ) ){
-            foreach( $sites AS $id => $site ){
-                $out.='<p><input type="checkbox"  name="site_id[]" value="'.(int)$id.'" /><label> '.esc_html( $site ).'</label></p>';
-            }
-            
-        }else{
-            $out.='<p><a href="admin.php?page=church_admin/index.php&action=edit_site" target="_blank">'.esc_html( __('Please set up a site','church-admin' ) ).'</a></p>';
-        }
-        $out.='</div>'."\r\n";
-        //event
-        
-            $out.='<div class="church-admin-form-group shortcode-option" id="event" ><h3>'.esc_html( __('Events','church-admin' ) ).'</h3>';
-            if( !empty( $events ) ){
-                foreach( $events AS $id => $title ){
-                    $out.='<p><input type="radio"  name="event_id" value="'.(int)$id.'" /><label> '.esc_html( $title ).'</label></p>';
-                }
-                
-            }else{
-                $out.='<p><a href="admin.php?page=church_admin/index.php&action=edit_event" target="_blank">'.esc_html( __('Please set up an event','church-admin' ) ).'</a></p>';
-            }
-
-
-            $out.='</div>'."\r\n";
-         //services
-         
-            $out.='<div class="church-admin-form-group shortcode-option" id="service_id" ><h3>'.esc_html( __('Services','church-admin' ) ).'</h3>';
-            if( !empty( $services) ){
-                if(count($services)==1){$selected=' checked="checked" ';}else{$selected='';}
-                foreach( $services AS $id => $service ){
-                    $out.='<p><input type="radio"  name="service_id" '.$selected.' value="'.(int)$id.'" /><label> '.esc_html( $service ).'</label></p>';
-                }
-            }else{
-                $out.='<p><a href="'.wp_nonce_url('admin.php?page=church_admin/index.php&action=edit-service','edit-service').'" target="_blank">'.esc_html( __('Please set up a service','church-admin' ) ).'</a></p>';
-            }
-            $out.='</div>'."\r\n";
-         
+      
          //sermon series
          
             $out.='<div class="church-admin-form-group shortcode-option" id="series" ><h3>'.esc_html( __('Sermon Series','church-admin' ) ).'</h3>';
@@ -930,7 +799,7 @@ function church_admin_shortcode_generator()
         $out.='</div>'."\r\n";
 
         //submit
-        $out.='<p><input class="button-primary" type="hidden" name="create-shortcode" value="yes" /><input type="submit" class="church-admin-form-groupbutton-primary" /></p></form>'."\r\n";
+        $out.='<p><input class="button-primary" type="hidden" name="create-shortcode" value="yes" /><input type="submit" class="button-primary" /></p></form>'."\r\n";
     }
  return $out;
 }

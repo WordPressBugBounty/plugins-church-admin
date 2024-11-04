@@ -1306,7 +1306,7 @@ function church_admin_get_capabilities( $id)
  */
 function church_admin_search( $search)
 {
-    global $wpdb,$rota_order;
+    global $wpdb;
 	$people_types=get_option('church_admin_people_type');
     //$wpdb->show_errors();
     echo '<p><a class="button-primary" href="'.wp_nonce_url('admin.php?page=church_admin/index.php&amp;section=people&action=add-household','add-household').'">'.esc_html( __( 'Add a Household','church-admin') ).'</a> </p>';
@@ -2794,10 +2794,8 @@ function church_admin_edit_people_form( $x=1,$data=null,$exclude=array(),$onboar
 		$out.=' /> '.esc_html( __( 'To receive new Bible Reading notes by email','church-admin') ).'</label></div>';
 		
 	}
-	//Schedule emails
-	$out.='<div class="checkbox"><label ><input type="checkbox" value="1" id="rota_email" data-name="rota-email"  class="email-permissions"  name="rota_email'.(int)$x.'" ';
-	if(!empty( $data->rota_email) ) $out.=' checked="checked" ';
-	$out.=' /> '.esc_html( __('To receive email schedule reminders','church-admin' ) ).'</label></div>';
+
+	
 		   
 	$out.='<p><strong>'.esc_html( __( 'Other privacy permissions','church-admin') ).'</strong></p>';
 	$out.='<div class="checkbox"><label ><input type="checkbox" name="sms_send'.$x.'" value="TRUE" data-name="sms_send"  ';
@@ -2894,7 +2892,7 @@ function church_admin_edit_people_form( $x=1,$data=null,$exclude=array(),$onboar
 			$("#news_send").prop( "checked", false );
 			$("#prayer_requests").prop( "checked", false );
 			$("#bible_readings").prop( "checked", false );
-			$("#rota_emails").prop( "checked", false );
+			
 		}
 		
 		$(".email-permissions").change(function()
@@ -2909,7 +2907,7 @@ function church_admin_edit_people_form( $x=1,$data=null,$exclude=array(),$onboar
 						$("#news_send").prop( "checked", false );
 						$("#prayer_requests").prop( "checked", false );
 						$("#bible_readings").prop( "checked", false );
-						$("#rota_emails").prop( "checked", false );
+					
 					}
 				break;
 				case "news_send":
@@ -3137,7 +3135,7 @@ function church_admin_save_person( $x=1,$people_id=NULL,$household_id=NULL,$excl
 		$data['show_me']			= 	!empty( $form['show_me'.$x] )?1:0;
     	$data['gdpr_reason']		=	!empty( $form['gdpr'.$x] )?$form['gdpr'.$x]:"";
      	$data['kidswork_override']	=	!empty( $form['kidswork_override'.$x] )?$form['kidswork_override'.$x]:"0";
-		$data['rota_email']			=	!empty( $form['rota_email'.$x]) ? 1 : 0;
+		
 		if ( empty( $form['people_order'.$x] ) )
         {
             $data['people_order']=(int)$x;
@@ -3168,7 +3166,7 @@ function church_admin_save_person( $x=1,$people_id=NULL,$household_id=NULL,$excl
 		$data['household_id'] = (int)$household_id;
 		$data['last_updated'] = wp_date('Y-m-d H:i:s');
 		$data['updated_by'] = !empty($user->ID) ? (int)$user->ID:1;
-		$people_table_columns = array('household_id','title','first_name','middle_name','nickname','prefix','last_name','email','mobile','e164cell','date_of_birth','marital_status','attachment_id','site_id','email_send','sms_send','news_send','phone_calls','mail_send','photo_permission','show_me','gdpr_reason','kidswork_override','rota_email','people_order','people_type_id','member_type_id','sex','privacy','last_updated','updated_by');
+		$people_table_columns = array('household_id','title','first_name','middle_name','nickname','prefix','last_name','email','mobile','e164cell','date_of_birth','marital_status','attachment_id','site_id','email_send','sms_send','news_send','phone_calls','mail_send','photo_permission','show_me','gdpr_reason','kidswork_override','people_order','people_type_id','member_type_id','sex','privacy','last_updated','updated_by');
 		
 
 		if(!empty( $people_id) )
@@ -4319,7 +4317,7 @@ function church_admin_merge_people( $person1_id,$person2_id)
 						'sms_send'=>array('type'=>'boolean','display'=>esc_html( __( 'SMS send','church-admin') ) ),
 						'mail_send'=>array('type'=>'boolean','display'=>esc_html( __( 'Mail send','church-admin') ) ),
 						'gdpr_reason'=>array('type'=>'boolean','display'=>esc_html( __( 'GDPR reason','church-admin') ) ),
-						'rota_email'=>array('type'=>'boolean','display'=>esc_html( __( 'Send schedule emails','church-admin') ) ),
+						
 						'photo_permission'=>array('type'=>'boolean','display'=>esc_html( __( 'Photo permission?','church-admin') ) ),
 						'phone_calls'=>array('type'=>'boolean','display'=>esc_html( __( 'Phone calls?','church-admin') ) ),
 						'gift_aid'=>array('type'=>'boolean','display'=>esc_html( __( 'UK gift Aid','church-admin') ) ),
@@ -4799,13 +4797,7 @@ function church_admin_bulk_edit_comms_settings(){
 		$wpdb->query('DELETE FROM '.$wpdb->prefix.'church_admin_people_meta WHERE meta_type="prayer-requests"');
 		$wpdb->query('DELETE FROM '.$wpdb->prefix.'church_admin_people_meta WHERE meta_type="bible-readings"');
 		$wpdb->query('DELETE FROM '.$wpdb->prefix.'church_admin_people_meta WHERE meta_type="posts"');
-		if(!empty($_POST['rota_email'])){
-			$wpdb->query('UPDATE '.$wpdb->prefix.'church_admin_people SET rota_email=1');
-		}
-		else
-		{
-			$wpdb->query('UPDATE '.$wpdb->prefix.'church_admin_people SET rota_email=0');
-		}
+		
 		$people=$wpdb->get_results('SELECT people_id FROM '.$wpdb->prefix.'church_admin_people');
 		if(!empty($people)){
 			$values=array();
@@ -4832,7 +4824,7 @@ function church_admin_bulk_edit_comms_settings(){
 		echo'<p><input type="checkbox" name="news_send">&nbsp;'.esc_html('Blog posts by email','church-admin').'</p>';
 		echo'<p><input type="checkbox" name="prayer_requests">&nbsp;'.esc_html('New Prayer requests by email','church-admin').'</p>';
 		echo'<p><input type="checkbox" name="bible_readings">&nbsp;'.esc_html('New Bible readings by email','church-admin').'</p>';
-		echo'<p><input type="checkbox" name="rota_email">&nbsp;'.esc_html('Schedule participation details for a service by email','church-admin').'</p>';
+		
 		echo'<p><input type="hidden" name="save" value="yes"><input type="submit" class="button-primary" value="'.__('Save','church-admin').'"></p></form>';
 	}
 }

@@ -752,7 +752,7 @@ function church_admin_update_order( $which='member_type')
             case 'custom_fields':$tb=$wpdb->prefix.'church_admin_custom_fields';$field='custom_order';$id='ID';break;
 			case'facilities':$tb=$wpdb->prefix.'church_admin_facilities'; $field='facilities_order'; $id='facility_id';break;
             case'member_type':$tb=$wpdb->prefix.'church_admin_member_types'; $field='member_type_order'; $id='member_type_id';break;
-            case'rota_settings':$tb=$wpdb->prefix.'church_admin_rota_settings'; $field='rota_order'; $id='rota_id';break;
+            
             case'small_groups':$tb=$wpdb->prefix.'church_admin_smallgroup'; $field='smallgroup_order'; $id='id';break;
 			case'people':$tb=$wpdb->prefix.'church_admin_people'; $field='people_order'; $id='people_id';break;
             case'funnel':$tb=$wpdb->prefix.'church_admin_funnels'; $field='funnel_order'; $id='funnel_id';break;
@@ -1344,53 +1344,7 @@ function church_admin_adjust_brightness( $hex, $steps)
 
     return $return;
 }
- /**
- *
- * Replace rota entry
- *
- * @author  Andy Moyle
- * @param    $people_id,$date,$mtg_type,$service_id,$rota_task_id
- * @return   BOOL
- * @version  0.1
- *
- */
- function church_admin_update_rota_entry( $rota_task_id,$rota_date,$people_id,$mtg_type,$service_id,$service_time)
- {
- 	global $wpdb;
-    //church_admin_debug('******** church_admin_update_rota_entry **********');
- 	$table=$wpdb->prefix.'church_admin_new_rota';
-	
- 	$data=array(
- 			'rota_task_id'=>$rota_task_id,
- 			'people_id'=>$people_id,
- 			'mtg_type'=>$mtg_type,
- 			'service_id'=>$service_id,
- 			'rota_date'=>$rota_date,
-			'service_time'=>$service_time
- 	);
-
- 	$format=array(
- 			'%d',
- 			'%s',
- 			'%s',
- 			'%d',
- 			'%s',
-		'%s'
- 	);
-	 $rota_id=$wpdb->get_var('SELECT rota_id FROM '.$wpdb->prefix.'church_admin_new_rota WHERE rota_task_id="'.esc_sql( $rota_task_id).'" AND people_id="'.(int)$people_id.'" AND mtg_type="'.esc_sql( $mtg_type).'" AND service_id="'.(int)$service_id.'" AND rota_date="'.esc_sql( $rota_date).'"');
-
- 	if ( empty( $rota_id) )
- 	{
- 		$wpdb->insert( $table,$data,$format);
- 	}
- 	else
- 	{
- 		$where=array('rota_id'=>$rota_id);
- 		$wpdb->update( $table, $data, $where, $format  );
-
-	}
-    church_admin_debug( $wpdb->last_query);
- }
+ 
   /**
  *
  * Grab array of people_ids for particular ministry_id
@@ -3676,9 +3630,9 @@ function church_admin_actions()
     $gift_id=isset( $_GET['gift_id'] )?church_admin_sanitize($_GET['gift_id'])  :NULL;
     $giving_id=isset( $_GET['giving_id'] )?church_admin_sanitize($_GET['giving_id'])  :NULL;
 	$mtg_type=!empty( $_GET['mtg_type'] )?church_admin_sanitize($_GET['mtg_type'])  :'service';
-	$rota_date=!empty( $_GET['rota_date'] )?church_admin_sanitize($_GET['rota_date'])  :NULL;
+
     $date=!empty( $_GET['date'] )?church_admin_sanitize($_GET['date'])  :NULL;
-	$rota_id=!empty( $_GET['rota_id'] )?church_admin_sanitize($_GET['rota_id'])  :NULL;
+
 	$copy_id=!empty( $_GET['copy_id'] )?church_admin_sanitize($_GET['copy_id'])  :NULL;
     $date_id=!empty( $_GET['date_id'] )?church_admin_sanitize($_GET['date_id'])  :NULL;
     $event_id=!empty( $_GET['event_id'] )?church_admin_sanitize($_GET['event_id'])  :NULL;
@@ -6666,9 +6620,7 @@ function church_admin_sanitize($array_or_string) {
         'messages'=>array('edit'=>TRUE,'item'=>esc_html( __('Messages','church-admin' ) ),'order'=>13,'show'=>TRUE,'type'=>'app','loggedinOnly'=>0),
         'myprayer'=>array('edit'=>TRUE,'item'=>esc_html( __('My prayer','church-admin' ) ),'order'=>15,'show'=>TRUE,'type'=>'app','loggedinOnly'=>1),
         'news'=>array('edit'=>true,'item'=>esc_html( __('News','church-admin' ) ),'order'=>16,'show'=>TRUE,'type'=>'app','loggedinOnly'=>0),
-        
-        'rota'=>array('edit'=>true,'item'=>esc_html( __('Schedule','church-admin' ) ),'order'=>17,'show'=>TRUE,'type'=>'app','loggedinOnly'=>0),
-        'notifications'=>array('edit'=>false,'item'=>esc_html( __('Notification settings','church-admin' ) ),'order'=>18,'show'=>TRUE,'type'=>'app','loggedinOnly'=>0),
+         'notifications'=>array('edit'=>false,'item'=>esc_html( __('Notification settings','church-admin' ) ),'order'=>18,'show'=>TRUE,'type'=>'app','loggedinOnly'=>0),
         'service-prebooking'=>array('edit'=>TRUE,'item'=>esc_html( __('Service Prebooking','church-admin' ) ),'order'=>19,'show'=>TRUE,'type'=>'app','loggedinOnly'=>1),
         'notifications'=>array('edit'=>false,'item'=>esc_html( __('Notification Settings','church-admin' ) ),'order'=>20,'show'=>TRUE,'type'=>'app','loggedinOnly'=>0),
         '3circles'=>array('edit'=>false,'item'=>esc_html( __('3 circles','church-admin' ) ),'order'=>21,'show'=>TRUE,'type'=>'app','loggedinOnly'=>0),
@@ -7062,11 +7014,6 @@ function church_admin_update_meta_fields($section,$people_id,$household_id,$onbo
     }
 }
 
-function church_admin_rota_popup($service_id,$start_date)
-{
-    $out='Schedule popup';
-    return $out;
-}
 
 
 

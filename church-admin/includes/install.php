@@ -259,7 +259,7 @@ if(!in_array('attachment_id',$current)){ $wpdb->query('ALTER TABLE  '.$wpdb->pre
 	if(!in_array('user_id',$current)){$wpdb->query('ALTER TABLE '.$wpdb->prefix.'church_admin_people ADD `member_type_id` INT(11)  NOT NULL DEFAULT "1" ');}
 	if(!in_array('ignore_last_name_check',$current)){$wpdb->query('ALTER TABLE '.$wpdb->prefix.'church_admin_people ADD `ignore_last_name_check` INT(11)  NOT NULL DEFAULT "0" ');}
 	if(!in_array('kidswork_override',$current)){$wpdb->query('ALTER TABLE '.$wpdb->prefix.'church_admin_people ADD `kidswork_override` INT(11)  NOT NULL DEFAULT "0" ');}
-	if(!in_array('rota_email',$current)){$wpdb->query('ALTER TABLE '.$wpdb->prefix.'church_admin_people ADD `rota_email` INT(11)  NOT NULL DEFAULT "1" ');}
+
 	if(!in_array('mail_send',$current)){$wpdb->query('ALTER TABLE '.$wpdb->prefix.'church_admin_people ADD `mail_send` INT(11)  NOT NULL DEFAULT "1" ');}
 	if(!in_array('email_send',$current)){$wpdb->query('ALTER TABLE '.$wpdb->prefix.'church_admin_people ADD `email_send` INT(11)  NOT NULL DEFAULT "0" ');}
 	if(!in_array('news_send',$current)){$wpdb->query('ALTER TABLE '.$wpdb->prefix.'church_admin_people ADD `news_send` INT(11)  NOT NULL DEFAULT "0" ');}
@@ -722,14 +722,16 @@ if( $wpdb->get_var('show tables like "'.$wpdb->prefix.'church_admin_custom_field
     $table_name = $wpdb->prefix.'church_admin_calendar_category';
     if( $wpdb->get_var("show tables like '$table_name'") != $table_name)
     {
-        $sql="CREATE TABLE IF NOT EXISTS ". $table_name ."  (category varchar(255)  NOT NULL DEFAULT '',  fgcolor varchar(7)  NOT NULL DEFAULT '', bgcolor varchar(7)  NOT NULL DEFAULT '', cat_id int(11) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`cat_id`) )" ;
+        $sql="CREATE TABLE IF NOT EXISTS ". $table_name ."  (category varchar(255)  NOT NULL DEFAULT '',  fgcolor varchar(7)  NOT NULL DEFAULT '', bgcolor varchar(7)  NOT NULL DEFAULT '',textcolor varchar(7)  NOT NULL DEFAULT '', cat_id int(11) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`cat_id`) )" ;
         $wpdb->query( $sql);
         $wpdb->query("INSERT INTO $table_name (category,bgcolor,cat_id) VALUES('Unused','#FFFFFF','0')");
     }
+	$results= $wpdb->get_results('SHOW COLUMNS FROM '.$wpdb->prefix.'church_admin_email_build');
+	
 	$results= $wpdb->get_results('SHOW COLUMNS FROM '.$wpdb->prefix.'church_admin_calendar_category');
 	foreach($results AS $row){$current[]=$row->Field;}
-	if(!in_array('text_color',$current)){
-		$wpdb->query('ALTER TABLE  '.$wpdb->prefix.'church_admin_calendar_category ADD text_color TEXT NULL DEFAULT NULL');
+	if(!in_array('textcolor',$current)){
+		$wpdb->query('ALTER TABLE  '.$wpdb->prefix.'church_admin_calendar_category ADD textcolor TEXT NULL DEFAULT NULL');
 		$results = $wpdb->get_results('SELECT * FROM  '.$wpdb->prefix.'church_admin_calendar_category');
 		if(!empty($results)){
 			foreach($results AS $row){
@@ -767,7 +769,7 @@ if(empty($levels['Prayer'])){$levels['Prayer']='administrator';}
 if(empty($levels['Automations'])){$levels['Automations']='administrator';}
 if(empty($levels['Pastoral'])){$levels['Pastoral']='administrator';}
 if(empty($levels['Directory'])){$levels['Directory']='administrator';}
-if(empty($levels['Rota'])){$levels['Rota']='administrator';};
+
 if(empty($levels['Children'])){$levels['Children']='administrator';}
 if(empty($levels['Contact form'])){$levels['Contact form']='administrator';}
 if(empty($levels['Comms'])){$levels['Comms']='administrator';}
