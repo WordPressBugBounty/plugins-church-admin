@@ -34,7 +34,8 @@ function church_admin_display_new_calendar($cat_id,$fac_ids)
     
     
      $out.= church_admin_calendar_container($cat_id,$fac_ids);
-    return $out;
+    $out.='<script>var nonce="'.wp_create_nonce('calendar').'";</script>';
+     return $out;
 }
 
 

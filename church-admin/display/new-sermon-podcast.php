@@ -251,7 +251,7 @@ function church_admin_new_sermons_display($how_many=9,$nowhite=false,$playnoshow
     $sql='SELECT a.*, b.* FROM '.$wpdb->prefix.'church_admin_sermon_files a, '.$wpdb->prefix.'church_admin_sermon_series b WHERE a.series_id=b.series_id '.$dateSQL.$searchSQL.$speakerSQL.$seriesSQL.$sermonTitleSQL.$loggedinSQL.$fromSQL.$orderSQL.$limitSQL;
     church_admin_debug($sql);
     $results = $wpdb->get_results( $sql );
-
+    $num_rows = $wpdb->num_rows;
     //podcasts
     $ca_podcast_settings=get_option('ca_podcast_settings');
     
@@ -315,7 +315,7 @@ function church_admin_new_sermons_display($how_many=9,$nowhite=false,$playnoshow
     //sermons
     if(!empty($results))
     {
-        $num_rows=$wpdb->num_rows;
+        
         if($num_rows==1)
         {
             
