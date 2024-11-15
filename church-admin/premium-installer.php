@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 function church_admin_install_premium_plugin() {
 	if(file_exists(plugin_dir_path(dirname(__FILE__)) .'church-admin/uninstall.php')){
-        church_admin_premium_debug('**** Making delete church admin free version safe ****');
+        church_admin_debug('**** Making delete church admin free version safe ****');
         unlink(plugin_dir_path(dirname(__FILE__)) .'church-admin/uninstall.php');
     }
 	$plugins = array(

@@ -238,8 +238,8 @@ $url=$upload_dir['baseurl'].'/sermons/';
                 case 'yes':$xml['explicit']='yes';break;
                 default:$xml['explicit']='no';
             }
-            $image=wp_get_attachment_image_src( church_admin_premium_sanitize($_POST['image_id']),'full' );
-            //church_admin_premium_debug(print_r( $image,TRUE) );
+            $image=wp_get_attachment_image_src( church_admin_sanitize($_POST['image_id']),'full' );
+            //church_admin_debug(print_r( $image,TRUE) );
             if(!empty( $image) )  {$image_path=$image[0];}else{$image_path="";}
             //only allow valid category
             if(in_array( $_POST['category'],$cats) )  {$xml['category']=sanitize_text_field( stripslashes($_POST['category'] ) );}else{$xml['category']='Religion &amp; Spirituality -Christianity';}
@@ -256,7 +256,7 @@ $url=$upload_dir['baseurl'].'/sermons/';
                 'summary'=>$xml['summary'],
                 'description'=>$xml['description'],
                 'owner_name'=>$xml['owner_name'],
-                'owner_email'=>church_admin_premium_sanitize( $_POST['owner_email'] ),
+                'owner_email'=>church_admin_sanitize( $_POST['owner_email'] ),
                 'image_id'=>$xml['image_id'],
                 'image'=>$image_path,
                 'category'=>$xml['category'],

@@ -4,7 +4,7 @@
 Plugin Name: Church Admin
 Plugin URI: http://www.churchadminplugin.com/
 Description: Manage church life with address book, schedule, classes, small groups, and advanced communication tools - bulk email and sms. 
-Version: 5.0.8
+Version: 5.0.9
 Tags: sermons, sermons, prayer, membership, SMS, Bible, events, calendar, email, small groups, contact form, giving, administration, management, child protection, safeguarding
 Author: Andy Moyle
 Text Domain: church-admin
@@ -50,7 +50,7 @@ Copyright (C) 2010-2022 Andy Moyle
 
 
 */
-if(!defined('CHURCH_ADMIN_VERSION')){define('CHURCH_ADMIN_VERSION','5.0.7');}
+if(!defined('CHURCH_ADMIN_VERSION')){define('CHURCH_ADMIN_VERSION','5.0.9');}
 
 define('CA_PAYPAL',"https://www.paypal.com/cgi-bin/webscr");
 require_once( plugin_dir_path( __FILE__ ) .'includes/functions.php');
@@ -4042,14 +4042,6 @@ add_filter( 'the_content', 'ca_bible_reading_passage' );
 *
 *
 *****************************/
-
-//Bulk email
-add_action('wp_ajax_nopriv_church_admin_cronemail', 'church_admin_bulk_email');
-add_action('wp_ajax_church_admin_cronemail', 'church_admin_bulk_email');
-
-
-
-
 
 
 add_action('wp_ajax_church_admin_calendar_date_display','church_admin_date');
