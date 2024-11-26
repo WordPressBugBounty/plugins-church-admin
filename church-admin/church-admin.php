@@ -4,7 +4,7 @@
 Plugin Name: Church Admin
 Plugin URI: http://www.churchadminplugin.com/
 Description: Manage church life with address book, schedule, classes, small groups, and advanced communication tools - bulk email and sms. 
-Version: 5.0.9
+Version: 5.0.10
 Tags: sermons, sermons, prayer, membership, SMS, Bible, events, calendar, email, small groups, contact form, giving, administration, management, child protection, safeguarding
 Author: Andy Moyle
 Text Domain: church-admin
@@ -50,7 +50,7 @@ Copyright (C) 2010-2022 Andy Moyle
 
 
 */
-if(!defined('CHURCH_ADMIN_VERSION')){define('CHURCH_ADMIN_VERSION','5.0.9');}
+if(!defined('CHURCH_ADMIN_VERSION')){define('CHURCH_ADMIN_VERSION','5.0.10');}
 
 define('CA_PAYPAL',"https://www.paypal.com/cgi-bin/webscr");
 require_once( plugin_dir_path( __FILE__ ) .'includes/functions.php');
@@ -1443,7 +1443,7 @@ function church_admin_init()
             case 'edit-individual-attendance':
           
             case 'import-ics':
-			case'giving-csv':
+	
             case'edit-service':
             case'add-event':
             case'edit_safeguarding':
@@ -2896,15 +2896,7 @@ function church_admin_download()
                 require_once(plugin_dir_path(__FILE__ ).'includes/pdf_creator.php');
                 church_admin_weekly_calendar_pdf($facilities_id,$cat_id,$start_date);
             break;
-            case 'visitation-pdf':
-                if(church_admin_level_check('Directory') )
-                {
-                    require_once(plugin_dir_path(__FILE__ ).'includes/visitation.php');
-                    church_admin_visitation_pdf($people_id,FALSE);
-                }else{
-                    echo'<div class="error"><p>'.esc_html( __("You don't have permissions",'church-admin' ) ).'</p></div>';
-                }
-            break;
+           
             case 'photo-permissions-pdf':
                             //church_admin_debug('photo-permissions-pdf');
                 if(church_admin_level_check('Directory') )
@@ -2925,101 +2917,10 @@ function church_admin_download()
                 require_once( plugin_dir_path( __FILE__ ).'includes/pdf_creator.php');
                 church_admin_sermon_notes_pdf( $file_id);
             break;
-            case 'giving-csv':
-                require_once( plugin_dir_path( __FILE__ ).'includes/csv.php');
-                church_admin_giving_csv( $start_date,$end_date,$people_id);
-                
-            break;
-            case 'gift-aid-csv':
-                require_once( plugin_dir_path( __FILE__ ).'includes/csv.php');
-                church_admin_gift_aid_csv( $start_date,$end_date,$fund);
-                
-            break;
-            case 'service_booking_bubble_pdf':
-                if(church_admin_level_check('Directory') )
-                {
-                require_once( plugin_dir_path( __FILE__ ).'includes/pdf_creator.php');
-                    church_admin_service_bubble_pdf( $date_id,$service_id,FALSE); 
-                }
-            break;
-            case 'service_booking_pdf':
-                
-                if(church_admin_level_check('Directory') )
-                {
-                require_once( plugin_dir_path( __FILE__ ).'includes/pdf_creator.php');
-                    church_admin_service_booking_pdf( $date_id,$service_id,FALSE); 
-                }
-            break;
-            case 'service_booking_csv':
-                
-                if(church_admin_level_check('Directory') )
-                {
-                require_once( plugin_dir_path( __FILE__ ).'includes/csv.php');
-                    church_admin_service_booking_csv( $date_id,$service_id,FALSE); 
-                }
-            break;
-            case 'service_booking_alphabetical_pdf':
-                
-                if(church_admin_level_check('Directory') )
-                {
-                require_once( plugin_dir_path( __FILE__ ).'includes/pdf_creator.php');
-                    church_admin_service_booking_pdf( $date_id,$service_id,TRUE); 
-                }
-            break;
-            case 'unit-pdf':
-                require_once( plugin_dir_path( __FILE__ ).'includes/pdf_creator.php');
-                church_admin_unit_pdf( $unit_id);
-            break;
-            case 'ical':
-                require_once( plugin_dir_path( __FILE__ ).'includes/pdf_creator.php');
-                church_admin_ical( $date_id);
-                exit();
-            break;
             
-            case 'bookings_csv':
-                if(wp_verify_nonce( $_REQUEST['_wpnonce'],'bookings_csv') )
-                {
-                    require_once( plugin_dir_path( __FILE__ ).'includes/events.php');
-                    church_admin_bookings_csv( $event_id );
-                }
-            break;
-            case 'bookings_pdf':
-                if(wp_verify_nonce( $_REQUEST['_wpnonce'],'bookings_pdf') )
-                {
-                    require_once( plugin_dir_path( __FILE__ ).'includes/events.php');
-                    church_admin_bookings_pdf( $event_id );
-                }
-            break;
-            case 'tickets':
-                
-                require_once( plugin_dir_path( __FILE__ ).'includes/pdf_creator.php');
-                if ( empty( $_REQUEST['booking_ref'] ) ) return __('Oops no booking reference','church-admin');
-                church_admin_tickets_pdf( $booking_ref );
-            break;
-            case 'pdf-filter':
-                if(church_admin_level_check('Directory') )
-                {
-                    //church_admin_debug("PDF filter");
-                    require_once( plugin_dir_path( __FILE__ ).'includes/pdf_creator.php');
-                    church_admin_filter_pdf();
-                }else{
-                    echo esc_html(  __("You don't have permissions to do that",'church-admin') );
-                }
-            break;
-            case'kidswork-checkin':
-                if(church_admin_level_check('Kidswork') )
-                {
-                    require_once( plugin_dir_path( __FILE__ ).'includes/pdf_creator.php');
-                    church_admin_kidswork_checkin_pdf( $id,$service_id,$date);
-                }else{
-                    echo esc_html(  __("You don't have permissions to do that",'church-admin') );
-                }
-            break;
-            case'gdpr-pdf':
-                if(church_admin_level_check('Directory') ){
-                    require_once( plugin_dir_path( __FILE__ ).'includes/directory.php');church_admin_gdpr_pdf();
-                }
-            break;
+       
+         
+    
             case'address-list':
             case'addresslist':
                 
@@ -3077,19 +2978,9 @@ function church_admin_download()
                     echo'<p>'.esc_html(__('You can only download if coming from a valid link',' church-admin') ).'</p>';
                 }
             break;	
-            case'kidswork_pdf':
-                require_once( plugin_dir_path( __FILE__ ).'includes/pdf_creator.php');
-                church_admin_kidswork_pdf( $member_type_id,$loggedin);
-            break;
+      
             
-            case'ministries_pdf':
-                if(wp_verify_nonce( $_REQUEST['_wpnonce'],'ministries_pdf') )  {
-                    require_once( plugin_dir_path( __FILE__ ).'includes/pdf_creator.php');
-                    church_admin_ministry_pdf();
-                }else{
-                    echo'<p>'.esc_html(__('You can only download if coming from a valid link',' church-admin') ).'</p>';
-                }
-            break;
+     
             case 'csv-filter':
                 if(church_admin_level_check('Directory') )
                 {
@@ -3112,16 +3003,7 @@ function church_admin_download()
                         echo'<p>'.esc_html(__('You can only download if coming from a valid link',' church-admin') ).'</p>';
                     }
             break;
-            case 'small-group-xml':
-                    if(wp_verify_nonce( $_REQUEST['small-group-xml'],'small-group-xml') )
-                    {
-
-                        require_once( plugin_dir_path( __FILE__ ).'includes/pdf_creator.php');
-                        church_admin_small_group_xml();
-                    }else{
-                        echo'<p>'.esc_html(__('You can only download if coming from a valid link',' church-admin') ).'</p>';
-                    }
-            break;
+            
             case 'address-xml':
                 $member_type_id=!empty( $_REQUEST['member_type_id'] )?$_REQUEST['member_type_id']:'#';
                 $small_group=!empty( $_REQUEST['small_group'] )?1:0;
@@ -3150,22 +3032,8 @@ function church_admin_download()
                     exit();
                 }
             break;
-            case'smallgroup':
-                    if(wp_verify_nonce( $_REQUEST['_wpnonce'], 'smallgroup') )
-                        {
-                            require_once( plugin_dir_path(__FILE__).'includes/pdf_creator.php' );
-                            church_admin_smallgroup_pdf( $member_type_id, $people_type_id, $loggedin, urldecode( $title) );
-                        }
-                        else{
-                            echo'<p>'.esc_html(__('You can only download if coming from a valid link',' church-admin') ).'</p>';
-                        }
-                    exit();
-            break;
-            case 'smallgroups':
-                require_once( plugin_dir_path( __FILE__ ).'includes/pdf_creator.php');
-                church_admin_smallgroups_pdf( $loggedin , urldecode( $title) );
-                exit();
-            break;
+            
+          
             case 'vcf-person':
                 $okay=FALSE;
                 if(!empty( $_GET['token'] ) )
