@@ -5,7 +5,7 @@ Tags: church, sermons, membership,schedule,  calendar
 Requires at least: 5.0
 Requires PHP: 7.0
 Tested up to: 6.7
-Stable tag: 5.0.10
+Stable tag: 5.0.11
 Elementor tested up to: 3.25.0
 License: GNU General Public License (GPL) version 2 
 
@@ -60,6 +60,8 @@ You can report any security bugs found in the source code of the site-reviews pl
 
 
 == Changelog ==
+= 5.0.11 =
+* Graceful update message shown for premium shortcodes
 = 5.0.10 =
 * Remove giving CSV download which is no longer in free version
 = 5.0.9 =

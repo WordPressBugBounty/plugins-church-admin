@@ -4,11 +4,11 @@
 Plugin Name: Church Admin
 Plugin URI: http://www.churchadminplugin.com/
 Description: Manage church life with address book, schedule, classes, small groups, and advanced communication tools - bulk email and sms. 
-Version: 5.0.10
+Version: 5.0.11
 Tags: sermons, sermons, prayer, membership, SMS, Bible, events, calendar, email, small groups, contact form, giving, administration, management, child protection, safeguarding
 Author: Andy Moyle
 Text Domain: church-admin
-Elementor tested up to: 3.21.4
+Elementor tested up to: 3.26.0
 
 Author URI: http://www.themoyles.co.uk
 License:
@@ -50,7 +50,7 @@ Copyright (C) 2010-2022 Andy Moyle
 
 
 */
-if(!defined('CHURCH_ADMIN_VERSION')){define('CHURCH_ADMIN_VERSION','5.0.10');}
+if(!defined('CHURCH_ADMIN_VERSION')){define('CHURCH_ADMIN_VERSION','5.0.11');}
 
 define('CA_PAYPAL',"https://www.paypal.com/cgi-bin/webscr");
 require_once( plugin_dir_path( __FILE__ ) .'includes/functions.php');
@@ -677,21 +677,73 @@ function church_admin_initialise() {
      ***************************************************************************/
     if(!empty($_GET['licence-change'])&&$_GET['licence-change']=='reset'){
         church_admin_debug('***** LICENCE CHANGE ********');
-        //this will be pinged when a payment ipn received at www.churchadminplugin.com, to force a licence check.
-        update_option('church_admin_licence_checked',1);//low value to force a check
-        delete_option('church_admin_trial');
-        $licence=church_admin_app_licence_check();
-        church_admin_debug('LICENCE VAR '.$licence);
-        echo'<!doctype html><html><head><title>Licence change check</title><style>body { text-align: center; padding:150px; }h1 { font-size: 50px; }body { font: 20px Helvetica, sans-serif; color: #333; }article { display: block; text-align:center; width: 650px; margin: 0 auto; }a { color: #dc8100; text-decoration: none; }a:hover { color: #333; text-decoration: none; }</style></head><body><article><p style="text-align:center"><img src="'.plugins_url('/', __FILE__ ) .'images/church-admin-logo.png"></p><h2>Licence change check</h2><p>';
-        echo'<h3>'.esc_html($licence).'</h3>';
-        echo'<p>Church Admin version: '.CHURCH_ADMIN_VERSION.'</p>';
-        
-        $trial = get_option('church_admin_trial');
-        church_admin_debug('Trial: '.$trial);
-        if(!empty($trial) && time() > ($trial + $one_month)){   
-            echo'<p>Trial period, ending:'.date('d M Y',$trial).'</p>';
+        echo'<!doctype html><html><head><title>Licence change check</title><script src="'.site_url().'/wp-includes/js/jquery/jquery.min.js" id="jquery-core-js"></script><style>body { text-align: center; padding:150px; }h1 { font-size: 50px; }body { font: 20px Helvetica, sans-serif; color: #333; }article { display: block; text-align:center; width: 650px; margin: 0 auto; }a { color: #dc8100; text-decoration: none; }a:hover { color: #333; text-decoration: none; }</style></head><body><article><p style="text-align:center"><img src="'.plugins_url('/', __FILE__ ) .'images/church-admin-logo.png"></p><h2>Licence change check</h2><p>';
+        echo'<p>Site url:'.esc_url(site_url()).'</p>';
+        $licence = get_option('church_admin_new_licence');
+        if(!empty($licence)){
+            echo'<h3>'.esc_html($licence).'</h3>';
+            if($licence=='premium'){
+                echo'<p><a href="'.admin_url().'/admin.php?page=church_admin%2Findex.php">Please head to the admin area and updatee to the new Premium Version</a></p>';
+            }
         }
+        else{
+            echo'<h3>No licence found</h3><p>Please contact <a href="mailto:support@churchadminplugin.com&subject=Licence+issue+'.site_url().'">support@churchadminplugin.com</a> if you think that is wrong.</p><p>Subscribe now...</p><form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+    <input name="cmd" type="hidden" value="_xclick-subscriptions"> 
+    <input name="item_name" type="hidden" value="Church Admin Premium Version Upgrade from v'.esc_attr(CHURCH_ADMIN_VERSION).'"
+    <input type="hidden" name="return" value="'.site_url().'/?licence-change=reset"/>
+    <input type="hidden" name="rm" value=2/>
+    <input name="notify_url" type="hidden" value="https://www.churchadminplugin.com/wp-admin/admin-ajax.php?action=church_admin_premium_ipn"> 
+        <input type="hidden" name="custom" value="'.site_url().'">
+        <input name="business" type="hidden" value="support@churchadminplugin.com"> 
+        <input type="hidden" name="a3" class="premium-price" value="65">
+       <input type="hidden" class="ca-recurring"  name="p3" value="1" /><input type="hidden" class="ca-recurring" name="t3" value="Y" /><input type="hidden" class="ca-recurring" name="src" value="1" /><input type="hidden" name="no_note" value=1>
+       <div class="form-group"><select class="premium-currency_code" name="currency_code"><option value="USD">US Dollar $65 annually</option><option value="GBP">GB Pound Sterling £50 annually</option><option value="EUR">Euro €60 annually</option><option value="AUD">Australian Dollar $100 annually</option><option value="BRL">Brazilian Real 360 annually</option><option value="CAD">Canadian Dollar $90 annually</option><option value="MXN">Mexican Peso 1300 annually</option> <option value="CHF">Swiss Franc 55 annually</option></select></div><input class="button-primary" type="submit" value="Upgrade to Premium"></form></p><script>
+               jQuery( document ).ready(function($) {
+                   console.log( "ready!" );
+              
+                   $(".premium-currency_code").change(sortPrice);
+                   $(".premium-frequency").change(sortPrice);
+                   
+                   function sortPrice(){
+                       var currency_code=$(".premium-currency_code").val();
+                       var frequency=$(".premium-frequency").val();
+                       console.log("Currency "+ currency_code+ "Frequency "+frequency);
+                       var price=99;
+                       
+                       var sign="&pound;";
+                       console.log(currency_code)
+                       switch(currency_code)
+                       {
+                           default:case "GBP":price=50;sign="GBP &pound;50";break;	
+                           case "AUD":price=100;sign="AUD &dollar;100";break;
+                           case "MXN":price=1300;sign="MXN Peso 1300";break;
+                           case "BRL":price=360;sign="BRL Real 360";break;
+                           case "CAD":price=90;sign="CAD &dollar;90";break;
+                           case "USD":price=65;sign="USD &dollar;65";break;
+                           case"EUR":price=60;sign="EU &euro;60";break;
+                           case "CHF":price=55;sign="CHF55";break;
+                           
+                       }
+                       
+                       $(".premium-sign").html(sign);
+                       var formattedPrice =parseFloat(Math.round(price * 100) / 100).toFixed(2);
+                       $(".premium-cost").html(formattedPrice);
+                       $(".premium-price").val(formattedPrice);
+                       $(".premiumfreq").html(freq);
+                       
+                   };
+                   
+               });</script>';
+            
+            
+            
+            
+            }
+        echo'<p>Church Admin Free version: '.esc_html(CHURCH_ADMIN_VERSION).'</p>';
+        
+       
         echo'<p><a href="'.site_url().'">Back to main site</a></p>';
+        echo'<p><a href="'.admin_url().'/admin.php?page=church_admin%2Findex.php">Back to admin area</a></p>';
         echo'</article></body></html>';
         church_admin_debug('***** END LICENCE CHANGE ********');
         exit();
@@ -1946,10 +1998,72 @@ function church_admin_shortcode( $atts, $content = null)
 		$out.= '<p><a href="' . esc_url( wp_nonce_url( $link, 'posts logout') ).'">' . esc_html( $text ). '</a></p>';
 		//output logoutlink
     	}
-
+        $licence = get_option('church_admin_new_licence');
     	//grab content
     	switch( $type)
     	{
+            //new premium only
+            case 'ministry-rota':
+            case 'spiritual-gifts':
+            case 'unit':
+            case 'attendance':
+            case 'volunteer':
+            case 'video':
+            case 'classes':
+            case 'class':
+            case 'facilities':
+            case 'facility-booking':
+            case 'event_booking':
+            case 'event':
+            case 'events':
+            case'event-booking':
+            case 'recent':
+            case 'bible-readings':
+            case 'bible-reading':
+            case 'small-groups-list':
+            case 'my-group':
+            case 'small-group-signup':
+            case 'small-groups':
+            case 'map':
+            case 'ministries':
+            case 'my_rota':
+            case 'my-rota':
+            case 'rota':
+            case 'rolling-average':
+            case 'weekly-attendance':
+            case 'monthly-attendance':
+            case 'rolling-average-attendance':
+            case 'graph':
+            case 'anniversaries':
+            case 'covid-prebooking':
+            case'service-prebooking':
+            case 'service-booking-pdf':
+            case 'covid-prebooking-pdf':
+            case 'how-much':
+            case 'giving':
+            case 'giving-totals':
+            case 'pledge':
+            case 'contact-form':
+            case 'not-available':
+            case 'latest-youtube':
+            case 'toilet-message':
+                    if($licence =='Premium'){
+                            $out.='<p>To continue using this shortcode, please update the plugin to the new Premium version in tehChurch Admin Main menu</p>';
+                            return $out;
+                    }
+                    if(empty($licence)||$licence!='premium'){
+                            $out.='<p>'.esc_html(__('This is a premium feature, please upgrade or activate premium','church-admin')).'</p>';
+                            $out.='<p><a href="'.site_url().'/?licence-change=reset">'.esc_html(__('Check Activation of premium','church-admin')).'</a></p>';
+                            $out.='<p><a href="https://buy.stripe.com/fZedSB9ErbQRcjm14V">'.esc_html(__('Upgrade','church-admin')).'</a></p>';
+                            return $out;
+                    }
+            break;
+
+            //end premium only
+
+
+
+
             case 'mailing-list':
                 require_once( plugin_dir_path( __FILE__ ).'display/mailing-list.php');
                 $out.=church_admin_mailing_list($member_type_id);
@@ -1969,31 +2083,10 @@ function church_admin_shortcode( $atts, $content = null)
             case 'logged-in':
                     if(is_user_logged_in() )return $content;
             break;
-            case 'spiritual-gifts':
-                require_once( plugin_dir_path( __FILE__ ).'display/spiritual-gifts.php');
-				$out.=church_admin_spiritual_gifts( $admin_email);
-            break;
-			case'unit':
-                require_once( plugin_dir_path( __FILE__ ).'display/units.php');
-				$out.=church_admin_display_unit( $unit_id);
-            break;
-			case 'attendance':
-				if(is_user_logged_in()&&church_admin_level_check('Directory') )
-				{
-					require_once( plugin_dir_path( __FILE__ ).'includes/individual_attendance.php');
-					$out.=church_admin_individual_attendance();
-				}
-				else
-				{
-					$out.='<h3>'.esc_html( __('Only logged in users with permission can use this feature','church-admin' ) ).'</h3>';
-					$out.=wp_login_form(array('echo' => false) );
-				}
-			break;
+            
 			
-			case 'volunteer':
-				require_once( plugin_dir_path( __FILE__ ).'display/volunteer.php');
-				$out.=church_admin_display_volunteer();
-			break;
+			
+			
 			case 'sessions': 
                 require_once( plugin_dir_path( __FILE__ ).'includes/sessions.php');
 				$out.=church_admin_sessions(NULL,NULL);
@@ -2114,26 +2207,7 @@ function church_admin_shortcode( $atts, $content = null)
         
         $out.='</div>';
   break;
-      case 'classes':
-				wp_enqueue_script('jquery-ui-datepicker');
-				require_once( plugin_dir_path( __FILE__ ).'display/classes.php');
-        		$out.=church_admin_display_classes( $today,$allow_registration);
-                $out.='<script type="text/javascript">jQuery(function( $)  {
-
-                    $(".ca-class-toggle").click(function()  {
-                            var id=this.id;
-                            console.log(id);
-                            $("."+id).toggle();
-                        });
-
-                    });</script>';
-      break;
-      case 'class':
-				wp_enqueue_script('jquery-ui-datepicker');
-			  	require_once( plugin_dir_path( __FILE__ ).'display/classes.php');
-        		$out.=church_admin_display_class( $class_id,TRUE,$allow_registration);
-               
-      break;
+    
     case 'facilities':
                 require_once( plugin_dir_path( __FILE__ ).'display/calendar.php');
             	$out.=church_admin_display_calendar( $facilities_id);
@@ -2158,12 +2232,7 @@ function church_admin_shortcode( $atts, $content = null)
             	require_once( plugin_dir_path( __FILE__ ).'/display/calendar-list.php'); 
                 $out.=church_admin_calendar_list( $days,$category);
     break;
-    case 'event_booking':
-            case 'event':
-            case 'events':
-           wp_enqueue_script('church-admin-event-booking'); require_once( plugin_dir_path( __FILE__ ).'/display/events.php');
-            $out.=church_admin_event_bookings_output( $event_id);
-      break;  
+ 
       
         case 'recent':
             $access=TRUE;
@@ -2322,27 +2391,7 @@ function church_admin_shortcode( $atts, $content = null)
                 }
             }
         break;
-        case 'small-groups-list':
-				wp_enqueue_script('church_admin_google_maps_api');
-				wp_enqueue_script('church_admin_sg_map_script');
-                
-            	require_once( plugin_dir_path( __FILE__ ).'/display/small-group-list.php');
-            	$out.= church_admin_small_group_list( $map,$zoom,$photo,$loggedin,$title,$pdf,$no_address);
-      break;
-    case 'my-group':
-                require_once( plugin_dir_path( __FILE__ ).'/display/my-group.php');
-                $out.=church_admin_my_group();
-    break;
-        case 'small-group-signup':
-            require_once( plugin_dir_path( __FILE__ ).'/display/small-group-signup.php');
-        	$out.=church_admin_smallgroup_signup( $title,$people_types);
-        break;
-	case 'small-groups':
-					wp_enqueue_script('church_admin_google_maps_api');
-					wp_enqueue_script('church_admin_sg_map_script');
-	        		require_once( plugin_dir_path( __FILE__ ).'/display/small-groups.php' );
-          			$out.= church_admin_frontend_small_groups( $member_type_id,$restricted);
-      break;
+  
     case 'map':
         $out.=church_admin_map_shortcode( $atts, $content);
     break;
@@ -2358,60 +2407,8 @@ function church_admin_shortcode( $atts, $content = null)
                 wp_enqueue_script('church_admin_map_script');
                 $out.=church_admin_register( $atts, $content);
     break;
-      case 'ministries':
-            	require_once( plugin_dir_path( __FILE__ ).'/display/ministries.php');
-            	$out.=church_admin_frontend_ministries( $ministry_id,$member_type_id);
-      break;
+   
      
-      case 'rolling-average':
-      case 'weekly-attendance':
-      case 'monthly-attendance':
-      case 'rolling-average-attendance':
-        case 'graph':
-					wp_enqueue_script('jquery-ui-datepicker');
-					wp_enqueue_script('church_admin_google_graph_api');
-				if ( empty( $width) )$width=900;
-				if ( empty( $height) )$height=500;
-				if(!empty( $_POST['type'] ) )
-				{
-					switch( $_POST['type'] )
-					{
-						case'weekly':$graphtype='weekly';break;
-						case'rolling':$graphtype='rolling';break;
-						default:$graphtype='weekly';break;
-					}
-				}else{$graphtype='weekly';}
-				if(!empty( $_POST['start'] ) )  {
-                    $start = sanitize_text_field(stripslashes($_POST['start']));
-                    //validate
-                    if(!church_admin_checkdate($start))
-                    {
-                        $start=date('Y-m-d',strtotime('-1 year') );
-                    }
-                }
-                else
-                {
-                    $start=date('Y-m-d',strtotime('-1 year') );
-                }
-				if(!empty( $_POST['end'] ) )  {
-                    $end=sanitize_text_field(stripslashes($_POST['end']));
-                    //validate
-                    if(!church_admin_checkdate($end))
-                    {
-                        $end=date('Y-m-d',strtotime('-1 year') );
-                    }
-                }else{
-                    $end=date('Y-m-d');
-                }
-				if(!empty( $_POST['service_id'] ) )  {
-                    $service_id=sanitize_text_field(stripslashes($_POST['service_id']));
-                }else{
-                    $service_id='S/1';
-                }
-
-				require_once( plugin_dir_path( __FILE__ ).'display/graph.php');
-				$out.=church_admin_graph( $graphtype,$service_id,$start,$end,$width,$height,FALSE);
-			break;
             case 'anniversaries':
                 if ( empty( $loggedin)||is_user_logged_in() )
                 {
@@ -2477,75 +2474,17 @@ function church_admin_shortcode( $atts, $content = null)
 						 $out.='<div class="login"><h2>'.esc_html( __('Please login','church-admin') ).'</h2>'.wp_login_form(array('echo'=>FALSE,'redirect'=>get_permalink()) ).'</div>'.'<p><a href="'.esc_url( wp_lostpassword_url(get_permalink() ) ).'" title="Lost Password">'.esc_html( __('Help! I don\'t know my password','church-admin') ).'</a></p>';
 					 }
        		break;
-            case 'covid-prebooking':
-            case'service-prebooking':
-                
-                if ( empty( $loggedin)||is_user_logged_in() )
-                {
-                    wp_enqueue_script('church-admin-form-case-enforcer');
-                    require_once( plugin_dir_path( __FILE__ ).'display/covid-prebooking.php');
-                    $out.=church_admin_covid_attendance( $service_id,$mode,$max_fields,$days,$admin_email,$email_text);
-                }
-                else
-                {
-                    $out.='<div class="login"><h2>'.esc_html( __('Please login','church-admin') ).'</h2>'.wp_login_form(array('echo'=>FALSE,'redirect'=>get_permalink()) ).'</div>'.'<p><a href="'.esc_url( wp_lostpassword_url(get_permalink() ) ).'" title="Lost Password">'.esc_html( __('Help! I don\'t know my password','church-admin') ).'</a></p>';
-					  
-                }
-            break;
+       
             
-            case 'how-much':
-               
-                require_once( plugin_dir_path( __FILE__ ).'display/giving.php');
-                $out.=church_admin_fund_so_far( $fund,$start_date,$target);
-            break;
-            case 'giving':
-               wp_enqueue_script('church-admin-giving-form'); 
-                require_once( plugin_dir_path( __FILE__ ).'display/giving.php');
-                $out.=church_admin_giving_form( $fund,$monthly);
-            break;
-            case 'giving-totals':
-                wp_enqueue_script('church-admin-giving-form'); 
-                require_once( plugin_dir_path( __FILE__ ).'includes/pledges.php');
-                $out .= church_admin_pledge_totals(FALSE);
-                require_once( plugin_dir_path( __FILE__ ).'display/pledge.php');
-                $out .='<p><button id="show-pledge" class="button">'.__('Pledge now','church-admin').'</button>&nbsp; <button id="show-giving" class="button">'.__('Give now','church-admin').'</button></p>';
-                $out.='<script>
-                jQuery(document).ready(function($){
-                    $("#show-pledge").click(function(){
-                        $(".giving-toggle").hide();
-                        $(".pledge-toggle").show();
-                    });
-                    $("#show-giving").click(function(){
-                        $(".pledge-toggle").hide();
-                        $(".giving-toggle").show();
-                    });
-                });</script>';
-                $out.='<div class="pledge-toggle" style="display:none">'.church_admin_pledge_form().'</div>';
-                require_once( plugin_dir_path( __FILE__ ).'display/giving.php');
-                $out.='<div class="giving-toggle" style="display:none">'.church_admin_giving_form( $fund,$monthly).'</div>';
-             break;
-            case 'pledge':
-               
-                require_once( plugin_dir_path( __FILE__ ).'display/pledge.php');
-                $out.=church_admin_pledge_form();
-            break;
-            case 'contact-form':
-                require_once( plugin_dir_path( __FILE__ ).'display/contact.php');
-                $out.=church_admin_contact_public();
-            break;
-            case 'not-available':
-                require_once( plugin_dir_path( __FILE__ ).'display/not-available.php');
-                $out.= church_admin_not_available();
-            break;
+          
+           
+           
             case 'latest-youtube':
             case 'latest_youtube':
                 require_once( plugin_dir_path( __FILE__ ).'display/latest-youtube.php');
                 $out.= church_admin_latest_youtube( $playlist_id,$cache);
             break;
-            case 'toilet-message':
-                require_once( plugin_dir_path( __FILE__ ).'display/kidswork-message.php');
-                $out.= church_admin_toilet_message($ministry_id);
-            break;
+          
 
     	}
 
