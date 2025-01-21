@@ -1167,27 +1167,15 @@ function church_admin_edit_sermon( $file_id)
         {
             $sqlsafe['audio_url']=$form['audio_url'];
             $audioURL=$form['audio_url'];
-            if(str_contains( $audioURL,'google.com') )
-            {
-                //church_admin_debug('Audio url from Google' .$audioURL);
-                //Google download direct link is of a different form to the public share link, this snippet converts it (not issue if file>100MB)
-                
-                $url=str_replace('file/d/','uc?id=',$audioURL);
-                $url=str_replace('/view?usp=drive_link','&export=open',$url);
-                $url=str_replace('/view?usp=sharing','&export=open',$url);
-                $url=str_replace('/view?usp=share_link','&export=open',$url);
-                $sqlsafe['audio_url']=$url;        
-                //church_admin_debug('Audio url changed to ' .$sqlsafe['audio_url'] );
-                $mimeType=church_admin_getRemoteMimeType( $sqlsafe['audio_url'] );
-                //church_admin_debug($mimeType);
-                if( $mimeType!='application/binary')$errors['audio_url']=__('External file is not an mp3','church-admin');
-                
-            }
-            else
-            {
-                $mimeType=church_admin_getRemoteMimeType( $sqlsafe['audio_url'] );
-                if( $mimeType!='audio/mpeg')$errors['audio_url']=__('External file is not an mp3','church-admin');
-            }
+            church_admin_debug('URL: '.$sqlsafe['audio_url']);
+           
+            $mimeType=church_admin_getRemoteMimeType( $sqlsafe['audio_url'] );
+            
+            $dot_and_ext = substr($sqlsafe['audio_url'] ,-4);
+            church_admin_debug($dot_and_ext);
+
+            if( $mimeType!='audio/mpeg' && $dot_and_ext!='.mp3' ) {$errors['audio_url']=__('External file is not an mp3','church-admin');}
+            
             $length=!empty($form['external_duration'])?$form['external_duration']: NULL;
 
             $file_name=NULL;
@@ -1496,7 +1484,7 @@ function church_admin_sermon_form( $current_data,$errors)
 
     //external file
     echo'<p style="color:red">'.__('WARNING - Google drive hosted files will no longer play since 10th Jan 2024. Google have changed their settings','church-admin').'</p>';
-    echo'<div class="church-admin-form-group"><label>'.esc_html( __('External Audio mp3/M4a URL','church-admin' ) ).'</label><input class="church-admin-form-control" type="text" name="audio_url" id="audio_url"';
+    echo'<div class="church-admin-form-group"><label>'.esc_html( __('External Audio mp3 URL','church-admin' ) ).'</label><input class="church-admin-form-control" type="text" name="audio_url" id="audio_url"';
     if(!empty( $errors['audio_url'] ) ) echo 'style="border:1px red solid"';
     if(!empty( $current_data->external_file) )echo' value="'.esc_url( $current_data->external_file).'" ';
     echo'/>';

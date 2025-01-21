@@ -1622,7 +1622,48 @@ function church_admin_note_delete_callback() {
 function church_admin_dismissable_notices() {
     church_admin_debug('*** church_admin_dismissable_notices ****');
     church_admin_debug($_GET);
-    
+    global $wpdb;
+
+    $small_churches_offer_dismissed=get_option('dismissed-small-churches-offer-dismissed');
+    if ( empty( $small_churches_offer_dismissed) && !empty( $_GET['page'] )&& ( $_GET['page']=='church_admin/index.php') ) { 
+        $no_people=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people');
+        if(!empty($no_people) && $no_people<=50)
+        {
+            echo'<div class="notice notice-danger is-dismissible ca-notice-dismiss" data-notice="prefix_deprecated"><h2>Small Churches Special Offer</h2>';
+        
+        
+            echo'<p>We have  special offer for small churches under 50 people to upgrade to Premium for the very special one off payment of $30</p><p><a class="button-primary" href="https://buy.stripe.com/bIYbKt2bZ7AB6Z24ho">Upgrade now</a></p> </div>';
+            echo'<script>jQuery(document).ready(function( $)  {
+            $("body").on("click",".ca-notice-dismiss",function()  {
+                
+                var data ={
+                    "action": "church_admin",
+                    "method":"dismissed-notice-handler",
+                    "nonce":"'.wp_create_nonce('dismissed-notice-handler').'",
+                    "type": "small-churches-offer-dismissed"
+                  };
+                  
+                $.ajax( ajaxurl,
+                {
+                  "type": "POST",
+                  "data": data ,
+                  success:function()  {console.log("Ajax dismiss done");}
+                } );
+
+            });
+
+        });</script>';
+
+
+
+        }
+        
+        
+   
+        
+    }
+
+
 
     //free only in repository
     $free_dismissed=get_option('dismissed-church-admin-free-version');
@@ -5888,53 +5929,22 @@ function church_admin_manual_advert()
    echo'<p> <a class="button-primary" href="'.esc_url(wp_nonce_url('admin.php?page=church_admin/index.php&action=premium-upgrade','premium-upgrade')).'">Premium plugin install</a></p>';
 
    echo '<h3>'.esc_html(__("If you don't have a standard/premium subscription. Please subscribe...",'church-admin')).'</h3>';
-   echo '<p><form action="'.CA_PAYPAL.'" method="post">
-    <input name="cmd" type="hidden" value="_xclick-subscriptions"> 
-    <input name="item_name" type="hidden" value="Church Admin Premium Version from v'.CHURCH_ADMIN_VERSION.'"
-    <input type="hidden" name="return" value="'.site_url().'/?licence-change=reset"/>
-    <input type="hidden" name="rm" value=2/>
-    <input name="notify_url" type="hidden" value="https://www.churchadminplugin.com/wp-admin/admin-ajax.php?action=church_admin_ipn"> 
-        <input type="hidden" name="custom" value="'.site_url().'">
-        <input name="business" type="hidden" value="support@churchadminplugin.com"> 
-        <input type="hidden" name="a3" class="premium-price" value="65">
-       <input type="hidden" class="ca-recurring"  name="p3" value="1" /><input type="hidden" class="ca-recurring" name="t3" value="Y" /><input type="hidden" class="ca-recurring" name="src" value="1" /><input type="hidden" name="no_note" value=1>
-       <div class="form-group"><select class="premium-currency_code" name="currency_code"><option value="USD">US Dollar $65 annually</option><option value="GBP">GB Pound Sterling £50 annually</option><option value="EUR">Euro €60 annually</option><option value="AUD">Australian Dollar $100 annually</option><option value="BRL">Brazilian Real 360 annually</option><option value="CAD">Canadian Dollar $90 annually</option><option value="MXN">Mexican Peso 1300 annually</option> <option value="CHF">Swiss Franc 55 annually</option></select></div><input class="button-primary" type="submit" value="Upgrade to Premium"></form></p><script>
-               jQuery( document ).ready(function($) {
-                   console.log( "ready!" );
-              
-                   $(".premium-currency_code").change(sortPrice);
-                   $(".premium-frequency").change(sortPrice);
-                   
-                   function sortPrice(){
-                       var currency_code=$(".premium-currency_code").val();
-                       var frequency=$(".premium-frequency").val();
-                       console.log("Currency "+ currency_code+ "Frequency "+frequency);
-                       var price=99;
-                       
-                       var sign="&pound;";
-                       console.log(currency_code)
-                       switch(currency_code)
-                       {
-                           default:case "GBP":price=50;sign="GBP &pound;50";break;	
-                           case "AUD":price=100;sign="AUD &dollar;100";break;
-                           case "MXN":price=1300;sign="MXN Peso 1300";break;
-                           case "BRL":price=360;sign="BRL Real 360";break;
-                           case "CAD":price=90;sign="CAD &dollar;90";break;
-                           case "USD":price=65;sign="USD &dollar;65";break;
-                           case"EUR":price=60;sign="EU &euro;60";break;
-                           case "CHF":price=55;sign="CHF55";break;
-                           
-                       }
-                       
-                       $(".premium-sign").html(sign);
-                       var formattedPrice =parseFloat(Math.round(price * 100) / 100).toFixed(2);
-                       $(".premium-cost").html(formattedPrice);
-                       $(".premium-price").val(formattedPrice);
-                       $(".premiumfreq").html(freq);
-                       
-                   };
-                   
-               });</script>';
+   echo '<p class="church-admin-module-select">Choose upgrade subscription, prices will convert to your currency<select class="ca_upgrade_select">
+   <option>Choose...</option><option value="https://buy.stripe.com/9AQ7ud5obdYZ836cNP">Monthly Subscription $9.99</option><option value="https://buy.stripe.com/28o6q9dUH3kl8365lp">Quarterly subscription $29.07 (save 3% a quarter)</option><option value="https://buy.stripe.com/28o8yhdUH6wx97a29e">Annual subscription $99.99 (equivalent to 2 months free per year)</option><option value="https://buy.stripe.com/bIY4i1dUH6wxdnqg05">Lifetime licence, one off payment $175</option><option value="https://buy.stripe.com/bIYbKt2bZ7AB6Z24ho">Special price for small congregations under 50 people, one off payment $30</option></select><script>
+           jQuery(document).ready(function($){ 
+           $(function(){
+           
+           $(".ca_upgrade_select").on("change", function () {
+                   var url =  $(this).val(); // get selected value
+                   console.log(url);
+                   if (url) { // require a URL
+                       window.location = url; // redirect
+                   }
+                   return false;
+               });
+           });
+       });
+       </script>';
     
    
                
@@ -6562,15 +6572,14 @@ function church_admin_member_type_option( $currentID)
 
 
 function church_admin_getRemoteMimeType( $url) {
-    //church_admin_debug('Mime type check for '.$url);
-    $ch = curl_init( $url);
-    curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true);
-    curl_exec( $ch);
+    //better way to do it but doesn't work with all servers. Grrrr
+    $response  = wp_remote_get( $url );
 
-    # get the content type
-    $mimeType=curl_getinfo( $ch, CURLINFO_CONTENT_TYPE);
-    //church_admin_debug('Mime type '.$mimeType);
+	$mimeType =  wp_remote_retrieve_header( $response, 'content-type' );
+    church_admin_debug('Mime type '.$mimeType);
     return $mimeType;
+   
+   
 }
 
 

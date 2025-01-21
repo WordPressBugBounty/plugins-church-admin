@@ -4,7 +4,7 @@
 Plugin Name: Church Admin
 Plugin URI: http://www.churchadminplugin.com/
 Description: Manage church life with address book, schedule, classes, small groups, and advanced communication tools - bulk email and sms. 
-Version: 5.0.11
+Version: 5.0.13
 Tags: sermons, sermons, prayer, membership, SMS, Bible, events, calendar, email, small groups, contact form, giving, administration, management, child protection, safeguarding
 Author: Andy Moyle
 Text Domain: church-admin
@@ -50,7 +50,7 @@ Copyright (C) 2010-2022 Andy Moyle
 
 
 */
-if(!defined('CHURCH_ADMIN_VERSION')){define('CHURCH_ADMIN_VERSION','5.0.11');}
+if(!defined('CHURCH_ADMIN_VERSION')){define('CHURCH_ADMIN_VERSION','5.0.13');}
 
 define('CA_PAYPAL',"https://www.paypal.com/cgi-bin/webscr");
 require_once( plugin_dir_path( __FILE__ ) .'includes/functions.php');
@@ -687,56 +687,23 @@ function church_admin_initialise() {
             }
         }
         else{
-            echo'<h3>No licence found</h3><p>Please contact <a href="mailto:support@churchadminplugin.com&subject=Licence+issue+'.site_url().'">support@churchadminplugin.com</a> if you think that is wrong.</p><p>Subscribe now...</p><form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-    <input name="cmd" type="hidden" value="_xclick-subscriptions"> 
-    <input name="item_name" type="hidden" value="Church Admin Premium Version Upgrade from v'.esc_attr(CHURCH_ADMIN_VERSION).'"
-    <input type="hidden" name="return" value="'.site_url().'/?licence-change=reset"/>
-    <input type="hidden" name="rm" value=2/>
-    <input name="notify_url" type="hidden" value="https://www.churchadminplugin.com/wp-admin/admin-ajax.php?action=church_admin_premium_ipn"> 
-        <input type="hidden" name="custom" value="'.site_url().'">
-        <input name="business" type="hidden" value="support@churchadminplugin.com"> 
-        <input type="hidden" name="a3" class="premium-price" value="65">
-       <input type="hidden" class="ca-recurring"  name="p3" value="1" /><input type="hidden" class="ca-recurring" name="t3" value="Y" /><input type="hidden" class="ca-recurring" name="src" value="1" /><input type="hidden" name="no_note" value=1>
-       <div class="form-group"><select class="premium-currency_code" name="currency_code"><option value="USD">US Dollar $65 annually</option><option value="GBP">GB Pound Sterling £50 annually</option><option value="EUR">Euro €60 annually</option><option value="AUD">Australian Dollar $100 annually</option><option value="BRL">Brazilian Real 360 annually</option><option value="CAD">Canadian Dollar $90 annually</option><option value="MXN">Mexican Peso 1300 annually</option> <option value="CHF">Swiss Franc 55 annually</option></select></div><input class="button-primary" type="submit" value="Upgrade to Premium"></form></p><script>
-               jQuery( document ).ready(function($) {
-                   console.log( "ready!" );
-              
-                   $(".premium-currency_code").change(sortPrice);
-                   $(".premium-frequency").change(sortPrice);
-                   
-                   function sortPrice(){
-                       var currency_code=$(".premium-currency_code").val();
-                       var frequency=$(".premium-frequency").val();
-                       console.log("Currency "+ currency_code+ "Frequency "+frequency);
-                       var price=99;
-                       
-                       var sign="&pound;";
-                       console.log(currency_code)
-                       switch(currency_code)
-                       {
-                           default:case "GBP":price=50;sign="GBP &pound;50";break;	
-                           case "AUD":price=100;sign="AUD &dollar;100";break;
-                           case "MXN":price=1300;sign="MXN Peso 1300";break;
-                           case "BRL":price=360;sign="BRL Real 360";break;
-                           case "CAD":price=90;sign="CAD &dollar;90";break;
-                           case "USD":price=65;sign="USD &dollar;65";break;
-                           case"EUR":price=60;sign="EU &euro;60";break;
-                           case "CHF":price=55;sign="CHF55";break;
-                           
-                       }
-                       
-                       $(".premium-sign").html(sign);
-                       var formattedPrice =parseFloat(Math.round(price * 100) / 100).toFixed(2);
-                       $(".premium-cost").html(formattedPrice);
-                       $(".premium-price").val(formattedPrice);
-                       $(".premiumfreq").html(freq);
-                       
-                   };
-                   
-               });</script>';
-            
-            
-            
+            echo'<h3>No licence found</h3><p>Please contact <a href="mailto:support@churchadminplugin.com&subject=Licence+issue+'.site_url().'">support@churchadminplugin.com</a> if you think that is wrong.</p><p>Subscribe now...</p>';
+            echo '<p class="church-admin-module-select">Choose upgrade subscription, prices will convert to your currency<select class="ca_upgrade_select">
+<option>Choose...</option><option value="https://buy.stripe.com/9AQ7ud5obdYZ836cNP">Monthly Subscription $9.99</option><option value="https://buy.stripe.com/28o6q9dUH3kl8365lp">Quarterly subscription $29.07 (save 3% a quarter)</option><option value="https://buy.stripe.com/28o8yhdUH6wx97a29e">Annual subscription $99.99 (equivalent to 2 months free per year)</option><option value="https://buy.stripe.com/bIY4i1dUH6wxdnqg05">Lifetime licence, one off payment $175</option><option value="https://buy.stripe.com/bIYbKt2bZ7AB6Z24ho">Special price for small congregations under 50 people, one off payment $30</option></select><script>
+        jQuery(document).ready(function($){ 
+        $(function(){
+        
+        $(".ca_upgrade_select").on("change", function () {
+                var url =  $(this).val(); // get selected value
+                console.log(url);
+                if (url) { // require a URL
+                    window.location = url; // redirect
+                }
+                return false;
+            });
+        });
+    });
+    </script>';
             
             }
         echo'<p>Church Admin Free version: '.esc_html(CHURCH_ADMIN_VERSION).'</p>';
@@ -4304,6 +4271,7 @@ function church_admin_ajax_handler()
                 //church_admin_debug('Dismiss notice');
                 switch( $_REQUEST['type'] )
                 {
+                    case 'small-churches-offer-dismissed':update_option('dismissed-small-churches-offer-dismissed',TRUE);break;
                     case 'church-admin-free-version': update_option('dismissed-church-admin-free-version',TRUE);break;
                     case 'church-admin-roles-permissions': update_option('dismissed-church-admin-roles-permissions',TRUE);break;
                     case 'dismissed-church-admin-please-review':update_option('dismissed-church-admin-please-review',TRUE);break;
