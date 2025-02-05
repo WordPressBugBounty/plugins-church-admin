@@ -1663,76 +1663,6 @@ function church_admin_dismissable_notices() {
         
     }
 
-
-
-    //free only in repository
-    $free_dismissed=get_option('dismissed-church-admin-free-version');
-    if ( empty( $free_dismissed) && !empty( $_GET['page'] )&& ( $_GET['page']=='church_admin/index.php') ) { 
-        church_admin_debug('NOTICE');
-   
-        echo'<div class="notice notice-danger is-dismissible ca-notice-dismiss" data-notice="prefix_deprecated"><h2>Church Admin Plugin News from v5.0.0</h2>';
-        
-        
-        echo'<p>In line with changes to the WordPress plugins repository rules, the main plugin contains the free modules only.</p><p>To upgrade to the Premium version with full feature set, please subscribe with this <a href="https://buy.stripe.com/fZedSB9ErbQRcjm14V">link</a>.</p><p>If you have already upgraded, please install the upgrade...</p><p> <a class="button-primary" href="'.esc_url(wp_nonce_url('admin.php?page=church_admin/index.php&action=premium-upgrade','premium-upgrade')).'">Premium plugin install</a></p> </div>';
-        echo'<script>jQuery(document).ready(function( $)  {
-            $("body").on("click",".ca-notice-dismiss",function()  {
-                
-                var data ={
-                    "action": "church_admin",
-                    "method":"dismissed-notice-handler",
-                    "nonce":"'.wp_create_nonce('dismissed-notice-handler').'",
-                    "type": "church-admin-free-version"
-                  };
-                  
-                $.ajax( ajaxurl,
-                {
-                  "type": "POST",
-                  "data": data ,
-                  success:function()  {console.log("Ajax dismiss done");}
-                } );
-
-            });
-
-        });</script>';
-    }
-
-    /********************************
-    * ROLES and Permissions v4.5.0
-    ********************************/
-    $roles_dismissed=get_option('dismissed-church-admin-roles-permissions');
-    
-    if ( empty( $roles_dismissed) && !empty( $_GET['page'] )&& ( $_GET['page']=='church_admin/index.php') ) { 
-        church_admin_debug('NOTICE');
-        // Added the class "notice-my-class" so jQuery pick it up and pass via AJAX,
-        // and added "data-notice" attribute in order to track multiple / different notices
-        // multiple dismissible notice states 
-        echo '<div class="notice notice-info is-dismissible ca-notice-dismiss" data-notice="prefix_deprecated">
-            <h2 style="color:red">'.esc_html( __( 'Church Admin - Roles and Permissions have changed from v4.5.0', 'church-admin' )) .'</h2>
-            <p>'.esc_html( __('Please check roles/permissions for non WordPress Administrator accounts using Church Admin','church-admin' ) ).'</p>
-            <p><a class="button-primary" target="_blank" href="'.wp_nonce_url('admin.php?page=church_admin%2Findex.php&action=roles','roles').'">'.esc_html( __('Roles','church-admin' ) ).'</a></p>
-            <p><a  class="button-primary"  target="_blank" href="'.wp_nonce_url('admin.php?page=church_admin%2Findex.php&action=permissions','permissions').'">'.esc_html( __('Permissions','church-admin' ) ).'</a></p>
-            </div>';
-        echo'<script>jQuery(document).ready(function( $)  {
-            $("body").on("click",".ca-notice-dismiss",function()  {
-                
-                var data ={
-                    "action": "church_admin",
-                    "method":"dismissed-notice-handler",
-                    "nonce":"'.wp_create_nonce('dismissed-notice-handler').'",
-                    "type": "church-admin-roles-permissions"
-                  };
-                  
-                $.ajax( ajaxurl,
-                {
-                  "type": "POST",
-                  "data": data ,
-                  success:function()  {console.log("Ajax dismiss done");}
-                } );
-
-            });
-
-        });</script>';
-    }
 }
 
 add_action( 'admin_notices', 'church_admin_dismissable_notices' );
@@ -5911,7 +5841,7 @@ function church_admin_manual_advert()
 {
 
    
-   
+   global $wpdb;
     
     
     
@@ -5948,6 +5878,13 @@ function church_admin_manual_advert()
     
    
                
+    
+    $people = $wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_people');
+    if(!empty($people) && $people<=50){
+
+        echo '<p style="color:red"><strong>'.esc_html(__('For congregations of less than 50 people we have a special premium upgrade for a one off payment of USD $30 (other currencies available)','church-admin')).'</strong></p>';
+        echo'<p><a class="button-primary" href="https://buy.stripe.com/bIYbKt2bZ7AB6Z24ho">'.esc_html(__('Buy now','church-admin')).'</a></p>';
+    }
     echo'</div></div>';
 }
 /************************
