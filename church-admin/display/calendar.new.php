@@ -111,7 +111,7 @@ function church_admin_calendar_container($cat_id,$fac_ids)
     <text x="25%" y="50%">'.esc_html( $wp_locale->get_weekday_abbrev( esc_html( $wp_locale->get_weekday( 6) ) ) ).'</text>
     </svg></span></div>'."\r\n";
     $day=$events=1;
-    for ( $week=1; $week<=5; $week++)
+    for ( $week=1; $week<=6; $week++)
     {
         $out.='<div class="ca-week">';
         for ( $d=1; $d<=7; $d++)
@@ -212,7 +212,7 @@ function church_admin_render_month( $month,$year,$day,$cat_id,$fac_ids)
     //output array of dates, note that on the calendar the first day box is day0
     $dates=array();
     $dayNo=0;
-    for ( $calendarDays=0; $calendarDays<=35; $calendarDays++)
+    for ( $calendarDays=0; $calendarDays<=42; $calendarDays++)
     {
         if( $calendarDays<$startday)  {$dates[$calendarDays]=NULL;}
         elseif( $dayNo<=$numDaysInMonth)

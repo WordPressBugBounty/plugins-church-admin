@@ -4,7 +4,7 @@
 Plugin Name: Church Admin
 Plugin URI: http://www.churchadminplugin.com/
 Description: Manage church life with address book, schedule, classes, small groups, and advanced communication tools - bulk email and sms. 
-Version: 5.0.13
+Version: 5.0.14
 Tags: sermons, sermons, prayer, membership, SMS, Bible, events, calendar, email, small groups, contact form, giving, administration, management, child protection, safeguarding
 Author: Andy Moyle
 Text Domain: church-admin
@@ -50,7 +50,7 @@ Copyright (C) 2010-2022 Andy Moyle
 
 
 */
-if(!defined('CHURCH_ADMIN_VERSION')){define('CHURCH_ADMIN_VERSION','5.0.13');}
+if(!defined('CHURCH_ADMIN_VERSION')){define('CHURCH_ADMIN_VERSION','5.0.14');}
 
 define('CA_PAYPAL',"https://www.paypal.com/cgi-bin/webscr");
 require_once( plugin_dir_path( __FILE__ ) .'includes/functions.php');
@@ -1094,7 +1094,9 @@ function church_admin_initialise() {
 
 
 
-if(function_exists('register_block_type') )require_once( plugin_dir_path( __FILE__ ) .'gutenberg/php-blocks.php');
+if(function_exists('register_block_type') ){
+    require_once( plugin_dir_path( __FILE__ ) .'gutenberg/php-blocks.php');
+}
 add_action( 'delete_user', 'church_admin_delete_user' );//make sure user account disconnected from directory
 
 

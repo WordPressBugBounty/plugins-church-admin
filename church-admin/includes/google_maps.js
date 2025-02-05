@@ -1,4 +1,6 @@
 //used by shortcode and block church_admin_map
+
+
 function load(lat,lng,xml_url,zoom,translation) {
 	console.log('google_maps.js');
 		console.log("Centre lat: "+lat);
@@ -85,3 +87,4 @@ function load(lat,lng,xml_url,zoom,translation) {
 		}
 	});
 }
+

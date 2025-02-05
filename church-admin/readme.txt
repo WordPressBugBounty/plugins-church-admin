@@ -5,7 +5,7 @@ Tags: church, sermons, membership,schedule,  calendar
 Requires at least: 5.0
 Requires PHP: 7.0
 Tested up to: 6.7
-Stable tag: 5.0.13
+Stable tag: 5.0.14
 Elementor tested up to: 3.25.0
 License: GNU General Public License (GPL) version 2 
 
@@ -60,6 +60,9 @@ You can report any security bugs found in the source code of the site-reviews pl
 
 
 == Changelog ==
+= 5.0.14 =
+* Sanitize output for church_admin member map Glutenberg block
+* New style calendar fix for 6 week months like March 2025
 = 5.0.13 =
 * Fix some external mp3 files rejected when adding media as not mp3s
 = 5.0.12 = 

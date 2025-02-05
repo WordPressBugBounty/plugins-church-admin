@@ -20,7 +20,7 @@ jQuery(document).ready(function( $) {
         ***************************/
         var dates=data.dates;
         
-        for (i = 1; i <=35; i++) { 
+        for (i = 1; i <=42; i++) { 
             
             if(dates[i] )
             {
