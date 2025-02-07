@@ -4,7 +4,7 @@
 Plugin Name: Church Admin
 Plugin URI: http://www.churchadminplugin.com/
 Description: Manage church life with address book, schedule, classes, small groups, and advanced communication tools - bulk email and sms. 
-Version: 5.0.15
+Version: 5.0.16
 Tags: sermons, sermons, prayer, membership, SMS, Bible, events, calendar, email, small groups, contact form, giving, administration, management, child protection, safeguarding
 Author: Andy Moyle
 Text Domain: church-admin
@@ -50,7 +50,7 @@ Copyright (C) 2010-2022 Andy Moyle
 
 
 */
-if(!defined('CHURCH_ADMIN_VERSION')){define('CHURCH_ADMIN_VERSION','5.0.15');}
+if(!defined('CHURCH_ADMIN_VERSION')){define('CHURCH_ADMIN_VERSION','5.0.16');}
 
 define('CA_PAYPAL',"https://www.paypal.com/cgi-bin/webscr");
 require_once( plugin_dir_path( __FILE__ ) .'includes/functions.php');
@@ -1347,8 +1347,8 @@ function church_admin_register_frontend_scripts() {
     wp_register_script('church-admin-form-case-enforcer',plugins_url( '/', __FILE__ ) . 'includes/jQuery.caseEnforcer.min.js',array( 'jquery' ),FALSE, TRUE);
     
    
-	wp_register_script('church-admin-calendar-script',plugins_url( '/', __FILE__ ) . 'includes/calendar.js',array( 'jquery' ),FALSE, TRUE);
-	wp_register_script('church-admin-calendar',plugins_url( '/', __FILE__ ) . 'includes/jQueryCalendar.js',array( 'jquery' ),FALSE, TRUE);
+	wp_register_script('church-admin-calendar-script',plugins_url( '/', __FILE__ ) . 'includes/calendar.js',array( 'jquery' ),filemtime(plugin_dir_path(__FILE__ ).'includes/calendar.js'),TRUE);
+	wp_register_script('church-admin-calendar',plugins_url( '/', __FILE__ ) . 'includes/jQueryCalendar.js',array( 'jquery' ),filemtime(plugin_dir_path(__FILE__ ).'includes/jQueryCalendar.js'),TRUE);
 	
     /****************
      * Podcast
