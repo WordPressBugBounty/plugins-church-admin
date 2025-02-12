@@ -30,30 +30,21 @@ function church_admin_block_assets()
 	if(has_block('church-admin/address-list',$post)
 	||has_block('church-admin/basic-register',$post)
 	||has_block('church-admin/attendance',$post)
-	||has_block('church-admin/birthdays',$post)
+
 	||has_block('church-admin/calendar',$post)
 	||has_block('church-admin/custom-fields',$post)
 	||has_block('church-admin/calendar-list',$post)
-	||has_block('church-admin/event_booking',$post)
+	
 	||has_block('church-admin/register',$post)
 	||has_block('church-admin/giving',$post)
 	||has_block('church-admin/graph',$post)
 	||has_block('church-admin/member-map',$post)
-	||has_block('church-admin/ministries',$post)
-	||has_block('church-admin/my-rota',$post)
-	||has_block('church-admin/rota',$post)
-	||has_block('church-admin/pledges',$post)
+
 	||has_block( 'church-admin/recent',$post)
 	||has_block('church-admin/sermon-podcast',$post)
 	||has_block('church-admin/service-booking',$post)
 	||has_block('church-admin/sermons',$post)
 	||has_block( 'church-admin/sermon-series',$post)
-	||has_block('church-admin/serving',$post)
-	||has_block('church-admin/sessions',$post)
-	||has_block('church-admin/small-groups-list',$post)
-	||has_block('church-admin/small-group-members',$post)
-	||has_block('church-admin/small-group-signup',$post)
-	||has_block( 'church-admin/volunteer',$post)
 	||has_block( 'church-admin/video-embed',$post)
 	)
 	{
@@ -114,16 +105,7 @@ function church_admin_block_assets()
 			}	
 			
 		}
-		if(has_block('church-admin/small-groups-list',$post) )
-		{
-
-			wp_enqueue_script('church_admin_sg_map_script', plugins_url('includes/smallgroup_maps.js',dirname(__FILE__) ), array( 'jquery' ) ,filemtime(plugin_dir_path(dirname(__FILE__) ).'includes/smallgroup_maps.js'));
-			//now enqueue google map api with the key & callback function
-			$src = 'https://maps.googleapis.com/maps/api/js';
-			$key='?key='.get_option('church_admin_google_api_key');
-			
-			wp_register_script( 'church_admin_google_maps_api',$src.$key, array() ,FALSE);
-		}
+		
 		if(has_block('church-admin/member-map',$post) )
 		{	$api_key=get_option('church_admin_google_api_key');
 			if(!empty($api_key))
@@ -146,16 +128,7 @@ function church_admin_block_assets()
 			
 			wp_enqueue_script('church_admin_podcast_audio_use',plugins_url('includes/audio.use.js',dirname(__FILE__) ), array( 'jquery' ),CHURCH_ADMIN_VERSION ,FALSE);
 		}
-		if(has_block('church-admin/giving',$post) )
-		{
-			
-			wp_enqueue_script('church-admin-giving-form',plugins_url( '/', dirname(__FILE__ ) ) . 'includes/giving.js',array( 'jquery' ),filemtime(plugin_dir_path(dirname(__FILE__) ).'includes/giving.js'), TRUE);
-		}
-		if(has_block('church-admin/event_booking',$post) )
-		{
-			church_admin_debug("Line 119");
-			wp_register_script('church-admin-event-booking',plugins_url( '/', dirname(__FILE__) ) . 'includes/event-booking.js',array( 'jquery' ),FALSE, TRUE);
-		}
+		
 	}
     
 }
@@ -277,43 +250,7 @@ function church_admin_block_init() {
 		'render_callback' => 'church_admin_block_address_list',
 	) );
 	
-	/***********************************************************************************************
-	*
-	* Birthdays
-	*
-	***********************************************************************************************/
-	register_block_type( 'church-admin/birthdays', array(
-		'title'=>esc_html( __('Birthdays','church-admin' ) ),
-		'description'=>esc_html( __('Displays birthdays according to set parameters','church-admin' ) ),
-		'attributes'      => array(
-			'member_type_id' => array('type' => 'string','default'=>esc_html( __('Member, Mailing List','church-admin') )),
-			'people_type_id' => array('type' => 'string','default'=>esc_html( __('Adult,Child,Teenager','church-admin') )),
-			'days' => array('type' => 'string','default'=>31),
-            'show_age'=>array('type'=>'boolean','default'=>0),
-			'show_email'=>array('type'=>'boolean','default'=>0),
-			'show_phone'=>array('type'=>'boolean','default'=>0),
-			'colorscheme'=>array('type'=>'string','default'=>''),
-			'loggedin'=>array('type'=>'boolean','default'=>1),
-		),
-		'editor_script'   => 'church-admin-php-blocks', // The script name we gave in the wp_register_script() call.
-		'render_callback' => 'church_admin_block_birthdays',
-	) );
-	register_block_type( 'church-admin/anniversaries', array(
-		'title'=>esc_html( __('Anniversaries','church-admin' ) ),
-		'description'=>esc_html( __('Displays wedding anniversaries according to set parameters','church-admin' ) ),
-		'attributes'      => array(
-			'member_type_id' => array('type' => 'string','default'=>esc_html( __('Member, Mailing List','church-admin') )),
-			'people_type_id' => array('type' => 'string','default'=>esc_html( __('Adult,Child,Teenager','church-admin') )),
-			'days' => array('type' => 'string','default'=>31),
-            'show_age'=>array('type'=>'boolean','default'=>0),
-			'show_email'=>array('type'=>'boolean','default'=>0),
-			'show_phone'=>array('type'=>'boolean','default'=>0),
-			'colorscheme'=>array('type'=>'string','default'=>''),
-			'loggedin'=>array('type'=>'boolean','default'=>1),
-		),
-		'editor_script'   => 'church-admin-php-blocks', // The script name we gave in the wp_register_script() call.
-		'render_callback' => 'church_admin_block_anniversaries',
-	) );
+	
 	/***********************************************************************************************
 	*
 	* Calendar
@@ -437,23 +374,7 @@ function church_admin_block_init() {
 			'editor_script'   => 'church-admin-php-blocks', // The script name we gave in the wp_register_script() call.
 			'render_callback' => 'church_admin_block_member_map',
 	) );
-	/***********************************************************************************************
-	*
-	* Ministries
-	*
-	***********************************************************************************************/
-	register_block_type( 'church-admin/ministries', array(
-		'title'=>esc_html( __('Ministries','church-admin' ) ),
-		'description'=>esc_html( __('Displays ministries','church-admin' ) ),
-		'attributes'      => array(
-			'member_type_id' => array('type' => 'string','default'=>esc_html( __('Member','church-admin') )),
-			'ministry_id' => array('type' => 'string','default'=>'#'),
-			'colorscheme'=>array('type'=>'string','default'=>'')
-		),
-		'editor_script'   => 'church-admin-php-blocks', // The script name we gave in the wp_register_script() call.
-		'render_callback' => 'church_admin_block_ministries',
-	) );
-	
+
 	
 	/***********************************************************************************************
 	*
@@ -528,28 +449,8 @@ function church_admin_block_init() {
 
 	
 
-/***********************************************************************************************
-	*
-	* Contact form
-	*
-	***********************************************************************************************/
-	register_block_type( 'church-admin/contact-form', array(
-		'title'=>esc_html( __('Contact form','church-admin' ) ),
-		'description'=>esc_html( __('Displays the contact form','church-admin' ) ),
-		'keywords'=>array(
-		__( 'Church Admin','church-admin' ),
-		__( 'Contact','church-admin' ),
-		
-	),
-		'editor_script'   => 'church-admin-php-blocks', // The script name we gave in the wp_register_script() call.
-		'render_callback' => 'church_admin_block_contact',
-) );
 
-
-
-
-
-
+	
    
    /***********************************************************************************************
 	*
@@ -1010,50 +911,7 @@ function church_admin_block_address_list( $attributes ) {
 	$out.='</div></div><!--end shortcode output-->';
     return $out;
 }
-function church_admin_block_rota( $attributes ) {
-	require_once(plugin_dir_path(dirname(__FILE__) ) .'display/rota.php');
 
-	$out='<div class="alignwide church-admin-shortcode-output ';
-	if(!empty( $attributes['colorscheme'] ) )  {
-
-		switch( $attributes['colorscheme'] )
-		{
-			case 'white':
-				$out.='ca-background ';
-			break;
-			case 'bluegrey':
-			default: 
-				$out.=' ca-dark-mode-blue-grey ';
-			break;
-			case 'warmgrey':
-			$out.=' ca-dark-mode-warm-grey ';
-			break;
-			case 'coolgrey':
-				$out.=' ca-dark-mode-cool-grey ';
-			break;
-		}
-	}
-    elseif(!empty( $attributes['background'] ) )$out.=' ca-background ';
-	$out.='">';
-    if(defined('CA_DEBUG') )church_admin_debug( $attributes);
-	if(is_user_logged_in()||empty( $attributes['logged_in'] ) )
-	{
-       
-        if(!empty( $_REQUEST['rota_date'] ) )  {
-			$date=sanitize_text_field(stripslashes($_REQUEST['rota_date']));
-		}else{
-			$date=wp_date('Y-m-d');
-		}
-		if(!church_admin_checkdate($date)){$date = wp_date('Y-m-d');}
-        $out.=church_admin_front_end_rota( $attributes['service_id'],$attributes['weeks'],TRUE,$date,$attributes['title'],$attributes['initials'],$attributes['links'],$attributes['name_style'] );
-	}
-	else //login required
-	{
-		$out.='<div class="login"><h2>'.esc_html( __('Please login','church-admin' ) ).'</h2>'.wp_login_form(array('echo'=>FALSE) ).'</div>'.'<p><a href="'.wp_lostpassword_url(get_permalink() ).'" title="Lost Password">'.esc_html( __('Help! I don\'t know my password','church-admin' ) ).'</a></p>';
-	}
-	$out.='</div>';
-	return $out;
-}
 
 function church_admin_block_recent( $attributes ) {
 	$out='<div class="alignwide church-admin-shortcode-output ';
@@ -1092,154 +950,8 @@ function church_admin_block_recent( $attributes ) {
 	return $out;
 }
 
-function church_admin_block_spiritual_gifts( $attributes ) {
-	$out='<div class="alignwide church-admin-shortcode-output ';
-	if(!empty( $attributes['colorscheme'] ) )  {
 
-		switch( $attributes['colorscheme'] )
-		{
-			case 'white':
-				$out.='ca-background ';
-			break;
-			case 'bluegrey':
-			default: 
-				$out.=' ca-dark-mode-blue-grey ';
-			break;
-			case 'warmgrey':
-				$out.=' ca-dark-mode-warm-grey ';
-			break;
-			case 'coolgrey':
-				$out.=' ca-dark-mode-cool-grey ';
-			break;
-		}
-	}
-    elseif(!empty( $attributes['background'] ) )$out.=' ca-background ';
-	$out.='">';
-	if(is_user_logged_in() )
-	{
-		require_once(plugin_dir_path(dirname(__FILE__) ).'display/spiritual-gifts.php');
-		if ( empty( $attributes['admin_email'] ) )$attributes['admin_email']='';
-		$out.=church_admin_spiritual_gifts( $attributes['admin_email'] );
-	}
-	else //login required
-	{
-		$out.='<div class="login"><h2>'.esc_html( __('Please login to fill out our spiritual gifts questionnaire','church-admin' ) ).'</h2>'.wp_login_form(array('echo'=>FALSE) ).'</div>'.'<p><a href="'.wp_lostpassword_url(get_permalink() ).'" title="Lost Password">'.esc_html( __('Help! I don\'t know my password','church-admin' ) ).'</a></p>';
-	}
-	$out.='</div>';
-	return $out;
-}
 
-function church_admin_block_contact( $attributes)
-{
-	$out='<div class="alignwide church-admin-shortcode-output ';
-	if(!empty( $attributes['colorscheme'] ) )  {
-
-		switch( $attributes['colorscheme'] )
-		{
-			case 'white':
-				$out.='ca-background ';
-			break;
-			case 'bluegrey':
-			default: 
-				$out.=' ca-dark-mode-blue-grey ';
-			break;
-			case 'warmgrey':
-	$out.=' ca-dark-mode-warm-grey ';
-	break;
-	case 'coolgrey':
-		$out.=' ca-dark-mode-cool-grey ';
-	break;
-			}
-		}
-		elseif(!empty( $attributes['background'] ) )$out.=' ca-background ';
-	$out.='">';	
-		require_once(plugin_dir_path(dirname(__FILE__) ).'display/contact.php');
-		$out.=church_admin_contact_public();
-		$out.='</div>';
-		return $out;
-}
-function church_admin_block_birthdays( $attributes)
-{
-	$member_type_id=1;
-
-    $member_type_id=implode(",",church_admin_get_member_type_ids( $attributes['member_type_id'] ) );
-	$people_type_id=implode(",",church_admin_get_people_type_ids( $attributes['people_type_id'] ) );
-	$out='';
-    $out='<div class="alignwide church-admin-shortcode-output ';
-	if(!empty( $attributes['colorscheme'] ) )  {
-
-		switch( $attributes['colorscheme'] )
-		{
-			case 'white':
-				$out.='ca-background ';
-			break;
-			case 'bluegrey':
-			default: 
-				$out.=' ca-dark-mode-blue-grey ';
-			break;
-			case 'warmgrey':
-				$out.=' ca-dark-mode-warm-grey ';
-			break;
-			case 'coolgrey':
-				$out.=' ca-dark-mode-cool-grey ';
-			break;
-		}
-	}
-    elseif(!empty( $attributes['background'] ) )$out.=' ca-background ';
-	$out.='">';
-	if ( empty( $attributes['loggedin'] )||is_user_logged_in() )
-    {
-        require_once(plugin_dir_path(dirname(__FILE__) ).'includes/birthdays.php');
-        $out.=church_admin_frontend_birthdays( (int)$member_type_id,(int)$people_type_id, (int)$attributes['days'],(int)$attributes['show_age'],(int)$attributes['show_email'],(int)$attributes['show_phone'] );
-    }
-	else //login required
-	{
-		$out.='<div class="login"><h2>'.esc_html( __('Please login','church-admin' ) ).'</h2>'.wp_login_form(array('echo'=>FALSE) ).'</div>'.'<p><a href="'.wp_lostpassword_url(get_permalink() ).'" title="Lost Password">'.esc_html( __('Help! I don\'t know my password','church-admin' ) ).'</a></p>';
-	}
-	$out.='</div>';
-	return $out;
-}
-function church_admin_block_anniversaries( $attributes)
-{
-	$member_type_id=1;
-
-    $member_type_id=implode(",",church_admin_get_member_type_ids( $attributes['member_type_id'] ) );
-	$people_type_id=implode(",",church_admin_get_people_type_ids( $attributes['people_type_id'] ) );
-	$out='';
-    $out='<div class="alignwide church-admin-shortcode-output ';
-	if(!empty( $attributes['colorscheme'] ) )  {
-
-		switch( $attributes['colorscheme'] )
-		{
-			case 'white':
-				$out.='ca-background ';
-			break;
-			case 'bluegrey':
-			default: 
-				$out.=' ca-dark-mode-blue-grey ';
-			break;
-			case 'warmgrey':
-				$out.=' ca-dark-mode-warm-grey ';
-			break;
-			case 'coolgrey':
-				$out.=' ca-dark-mode-cool-grey ';
-			break;
-		}
-	}
-    elseif(!empty( $attributes['background'] ) )$out.=' ca-background ';
-	$out.='">';
-	if ( empty( $attributes['loggedin'] )||is_user_logged_in() )
-    {
-        require_once(plugin_dir_path(dirname(__FILE__) ).'includes/birthdays.php');
-        $out.=church_admin_frontend_anniversaries( (int)$member_type_id,(int)$people_type_id, (int)$attributes['days'],(int)$attributes['show_age'],(int)$attributes['show_email'],(int)$attributes['show_phone'] );
-    }
-	else //login required
-	{
-		$out.='<div class="login"><h2>'.esc_html( __('Please login','church-admin' ) ).'</h2>'.wp_login_form(array('echo'=>FALSE) ).'</div>'.'<p><a href="'.wp_lostpassword_url(get_permalink() ).'" title="Lost Password">'.esc_html( __('Help! I don\'t know my password','church-admin' ) ).'</a></p>';
-	}
-	$out.='</div>';
-	return $out;
-}
 
 
 function church_admin_block_series( $attributes)
@@ -1323,72 +1035,3 @@ function church_admin_block_member_map( $attributes)
     return $out;
 }
 
-function church_admin_block_giving( $attributes)
-{
-    require_once(plugin_dir_path(dirname(__FILE__) ).'display/giving.php');
-    $premium=get_option('church_admin_payment_gateway');
-	$out='<div class="alignwide church-admin-shortcode-output ';
-	if(!empty( $attributes['colorscheme'] ) )  {
-
-		switch( $attributes['colorscheme'] )
-		{
-			case 'white':
-				$out.='ca-background ';
-			break;
-			case 'bluegrey':
-			default: 
-				$out.=' ca-dark-mode-blue-grey ';
-			break;
-			case 'warmgrey':
-	$out.=' ca-dark-mode-warm-grey ';
-	break;
-	case 'coolgrey':
-		$out.=' ca-dark-mode-cool-grey ';
-	break;
-		}
-	}
-    elseif(!empty( $attributes['background'] ) )$out.=' ca-background ';
-	$out.='">';
-	$out.='<div class="church-admin-giving">';
-    if(!empty( $premium) )
-    {
-        if ( empty( $attributes) )$attributes=array('fund'=>"");
-        $out.=church_admin_giving_form( $attributes['fund'] );
-    }
-    else
-    {
-        $out.='<h2>Oh dear!</h2>'.esc_html( __('The giving form is only active for app subscribers and when PayPal settings on the giving page have been filled in','church-admin' ) ).'</p>';
-    }
-	$out.='</div></div>';
-    return $out;
-}
-function church_admin_block_pledge( $attributes)
-{
-    require_once(plugin_dir_path(dirname(__FILE__) ).'display/pledge.php');
-    
-    $out='<div class="alignwide church-admin-shortcode-output ';
-	if(!empty( $attributes['colorscheme'] ) )  {
-
-		switch( $attributes['colorscheme'] )
-		{
-			case 'white':
-				$out.='ca-background ';
-			break;
-			case 'bluegrey':
-			default: 
-				$out.=' ca-dark-mode-blue-grey ';
-			break;
-			case 'warmgrey':
-	$out.=' ca-dark-mode-warm-grey ';
-	break;
-	case 'coolgrey':
-		$out.=' ca-dark-mode-cool-grey ';
-	break;
-		}
-	}
-    elseif(!empty( $attributes['background'] ) )$out.=' ca-background ';
-	$out.='">';
-    $out.=church_admin_pledge_form();
-	$out.='</div>';
-	return $out;
-}

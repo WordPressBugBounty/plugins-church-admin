@@ -5,7 +5,7 @@ Tags: church, sermons, membership,schedule,  calendar
 Requires at least: 5.0
 Requires PHP: 7.0
 Tested up to: 6.7
-Stable tag: 5.0.16
+Stable tag: 5.0.17
 Elementor tested up to: 3.25.0
 License: GNU General Public License (GPL) version 2 
 
@@ -60,6 +60,9 @@ You can report any security bugs found in the source code of the site-reviews pl
 
 
 == Changelog ==
+= 5.0.17 = 
+* Fix for CSV download of address list
+* Updated premium shortcodes to show upgrade required message
 = 5.0.16 =
 * Calendar script file versioned so it doesn't cache with old buggy version
 = 5.0.15 =

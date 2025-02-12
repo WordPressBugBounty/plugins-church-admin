@@ -4,11 +4,11 @@
 Plugin Name: Church Admin
 Plugin URI: http://www.churchadminplugin.com/
 Description: Manage church life with address book, schedule, classes, small groups, and advanced communication tools - bulk email and sms. 
-Version: 5.0.16
+Version: 5.0.17
 Tags: sermons, sermons, prayer, membership, SMS, Bible, events, calendar, email, small groups, contact form, giving, administration, management, child protection, safeguarding
 Author: Andy Moyle
 Text Domain: church-admin
-Elementor tested up to: 3.26.0
+Elementor tested up to: 3.27
 
 Author URI: http://www.themoyles.co.uk
 License:
@@ -1972,6 +1972,8 @@ function church_admin_shortcode( $atts, $content = null)
     	switch( $type)
     	{
             //new premium only
+            case 'sessions':
+            case 'birthdays':
             case 'ministry-rota':
             case 'spiritual-gifts':
             case 'unit':
@@ -2016,8 +2018,9 @@ function church_admin_shortcode( $atts, $content = null)
             case 'not-available':
             case 'latest-youtube':
             case 'toilet-message':
+            case'recent':
                     if($licence =='Premium'){
-                            $out.='<p>To continue using this shortcode, please update the plugin to the new Premium version in tehChurch Admin Main menu</p>';
+                            $out.='<p>To continue using this shortcode, please update the plugin to the new Premium version in the Church Admin Main menu</p>';
                             return $out;
                     }
                     if(empty($licence)||$licence!='premium'){
@@ -2056,10 +2059,6 @@ function church_admin_shortcode( $atts, $content = null)
 			
 			
 			
-			case 'sessions': 
-                require_once( plugin_dir_path( __FILE__ ).'includes/sessions.php');
-				$out.=church_admin_sessions(NULL,NULL);
-			break;
             case 'video':
                 if(!empty( $url) )
                 {
@@ -2181,11 +2180,7 @@ function church_admin_shortcode( $atts, $content = null)
                 require_once( plugin_dir_path( __FILE__ ).'display/calendar.php');
             	$out.=church_admin_display_calendar( $facilities_id);
     break;
-    case 'facility-booking':
-        //require_once( plugin_dir_path( __FILE__ ).'display/facility-bookings.php');
-       
-        //$out.=church_admin_facility_booking( $facilities_id);
-    break;
+   
     case 'names':
 				if ( empty( $loggedin)||is_user_logged_in() )
 				{
@@ -2203,27 +2198,7 @@ function church_admin_shortcode( $atts, $content = null)
     break;
  
       
-        case 'recent':
-            $access=TRUE;
-      		if(is_user_logged_in() )
-      		{
-      			
-      			$current_user=wp_get_current_user();
-      			$people_id=$wpdb->get_var('SELECT people_id FROM '.$wpdb->prefix.'church_admin_people WHERE user_id="'.(int)$current_user->ID.'"');
-      			$restrictedList=get_option('church-admin-restricted-access');
-      			if(is_array( $restrictedList)&&in_array( $people_id,$restrictedList) )$access=FALSE;
-      		}    
-			if ( empty( $loggedin)||is_user_logged_in() && $access)
-			{
-				require_once( plugin_dir_path( __FILE__ ).'includes/recent.php');
-				$out.=church_admin_recent_display( $weeks,$member_type_id);
-			}
-			else //login required
-			{
-				if(!$access && is_user_logged_in()  )$out.='<div class="notice notice-warning inline">'.esc_html( __("You haven't been granted access to this infromation",'church-admin' ) ) .'</div>';
-                $out.='<div class="login"><h2>'.esc_html( __('Please login','church-admin' ) ).'</h2>'.wp_login_form(array('echo'=>FALSE,'redirect'=>get_permalink()) ).'</div>'.'<p><a href="'.esc_url( wp_lostpassword_url( get_permalink() ) ).'" title="Lost Password">'.esc_html(__('Help! I don\'t know my password','church-admin')).'</a></p>';
-			}
-			break;
+        
             case 'phone-list':
                 $access=TRUE;
                 if(is_user_logged_in() )
@@ -2378,30 +2353,7 @@ function church_admin_shortcode( $atts, $content = null)
     break;
    
      
-            case 'anniversaries':
-                if ( empty( $loggedin)||is_user_logged_in() )
-                {
-                    require_once( plugin_dir_path( __FILE__ ).'includes/birthdays.php');
-                    $out.=church_admin_frontend_anniversaries( $member_type_id,$people_type_id, $days,$show_age,$show_email,$show_phone);
-                }
-                else //login required
-                {
-                    $out.='<div class="login"><h2>'.esc_html( __('Please login','church-admin' ) ).'</h2>'.wp_login_form(array('echo'=>FALSE,'redirect'=>get_permalink()) ).'</div>'.'<p><a href="'.esc_url( wp_lostpassword_url(get_permalink() ) ).'" title="Lost Password">'.esc_html( __('Help! I don\'t know my password','church-admin') ).'</a></p>';
-                }
-    
-                break;
-			case 'birthdays':
-			if ( empty( $loggedin)||is_user_logged_in() )
-			{
-				require_once( plugin_dir_path( __FILE__ ).'includes/birthdays.php');
-                $out.=church_admin_frontend_birthdays( $member_type_id,$people_type_id, $days,$show_age,$show_email,$show_phone);
-			}
-			else //login required
-			{
-				$out.='<div class="login"><h2>'.esc_html( __('Please login','church-admin' ) ).'</h2>'.wp_login_form(array('echo'=>FALSE,'redirect'=>get_permalink()) ).'</div>'.'<p><a href="'.esc_url( wp_lostpassword_url(get_permalink() ) ).'" title="Lost Password">'.esc_html( __('Help! I don\'t know my password','church-admin') ).'</a></p>';
-			}
-
-			break;
+           
 			case 'restricted':
 				//restricts content to certain member_type_ids
 				if(!is_user_logged_in() )
@@ -2420,16 +2372,7 @@ function church_admin_shortcode( $atts, $content = null)
                     $out.=esc_html( __('You are not permitted to view this content','church-admin') );
                 }
 			break;
-			case 'follow-up':
-				if(is_user_logged_in()&& church_admin_level_check('Directory') )
-				{
-					require_once( plugin_dir_path( __FILE__ ).'includes/people_activity.php');
-					return church_admin_recent_people_activity();
-				}
-				else{
-                    $out.=esc_html( __( 'You are not permitted to view this content', 'church-admin' ) );
-                }
-			break;
+		
 			default:
 				if ( empty( $loggedin)||is_user_logged_in() )
 				{

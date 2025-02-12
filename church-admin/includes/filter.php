@@ -689,16 +689,17 @@ function church_admin_filter_email()
 
 function church_admin_build_filter_sql( $input,$type=NULL)
 	{
+		global $wpdb,$church_admin_spiritual_gifts;
 		//church_admin_debug($_POST);
 
 		if(!empty($_POST['send-to-all'])&& $_POST['send-to-all']=='yes'){
 			church_admin_debug('Send to all');
-			$sql='SELECT a.*,b.* FROM '.$wpdb->prefix.'church_admin_people a,'.$wpdb->prefix.'church_admin_household b WHERE a.household_id = b.household_id';
+			$sql='SELECT a.*,b.* FROM '.$wpdb->prefix.'church_admin_people a, '.$wpdb->prefix.'church_admin_household b WHERE a.household_id = b.household_id';
 			return $sql; 
 		}
 
 
-		global $wpdb,$church_admin_spiritual_gifts;
+		
         $show_me=$bible_readings=$age_related=$email_send=$spiritual_gifts=$phoneCalls=$addresses=$classes=$active=$custom=$months=$years=$marital=$genders=$people_types=$email=$sites=$smallgroups=$ministries=$parents=$mobile=$photo_permission=array();
         $show_meSQL=$bible_readingsSQL=$age_relatedSQL=$email_sendSQL=$spiritual_giftsSQL=$phoneCallsSQL=$addressesSQL=$emailSQL=$mobileSQL=$classesSQL=$maritalSQL=$genderSQL=$memberSQL=$peopleSQL=$smallgroupsSQL=$ministriesSQL=$filteredby=$photo_permissionSQL=array();
 		$church_admin_marital_status=get_option('church_admin_marital_status');

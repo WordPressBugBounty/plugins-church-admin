@@ -35,22 +35,10 @@ function church_admin_shortcode_generator()
                                'options'=>array('loggedin','member_type_id','people_type_id','photos','pdf_link','kids','updateable','vcf','map' ),
                                'type'=>'no-content'
                         ),
-        'anniversaries'=>array('title'=>esc_html( __(' Anniversaries','church-admin' ) ),
-                'description'=>esc_html( __('Show anniversaries for different categories, with option to show age and how many days ahead to show.','church-admin' ) ),
-                'options'=>array('loggedin','member_type_id','people_type_id','days','show_age','show_phone','show_email'),
-                'type'=>'no-content'
-        ),
-        'attendance' =>array('title'=>esc_html( __('Attendance','church-admin' ) ),
-                'description'=>esc_html( __('Form to log attendance','church-admin' ) ),
-                'options'=>NULL,
-                'type'=>'no-content'
-        ),
         
-        'birthdays'=>array('title'=>esc_html( __(' Birthdays','church-admin' ) ),
-                'description'=>esc_html( __('Show birthdays for different categories, with option to show age and how many days ahead to show.','church-admin' ) ),
-                'options'=>array('loggedin','member_type_id','people_type_id','days','show_age','show_phone','show_email'),
-                'type'=>'no-content'
-        ),
+       
+        
+        
         'calendar' =>array('title'=>esc_html( __('Calendar','church-admin' ) ),
                     'description'=>esc_html( __('Displays the calendar','church-admin' ) ),
                     'options'=>array('calendar-pdf','facilities_id','cat_id','style'),
@@ -67,18 +55,10 @@ function church_admin_shortcode_generator()
                 'type'=>'no-content'
         ),
         
-        'contact-form' =>array('title'=>esc_html( __('Contact form','church-admin' ) ),
-                'description'=>esc_html( __('Displays the contact form','church-admin' ) ),
-                'options'=>array(),
-                'type'=>'no-content'
-        ),
+       
         
         
-        'hello' =>array('title'=>esc_html( __('Hello user','church-admin' ) ),
-                'description'=>esc_html( __('Displays a welcome to a logged in user','church-admin' ) ),
-                'options'=>null,
-                'type'=>'no-content'
-        ),
+        
         'latest-sermon' =>array('title'=>esc_html( __('Latest Sermon','church-admin' ) ),
                 'description'=>esc_html( __('Displays the newest sermon','church-admin' ) ),
                 'options'=>null,
@@ -119,11 +99,7 @@ function church_admin_shortcode_generator()
                 'options'=>array('people_type_id','member_type_id'),
                 'type'=>'no-content'
         ),
-        'pledges' =>array('title'=>esc_html( __('Pledge form','church-admin' ) ),
-            'description'=>esc_html( __('Shows pledge form (Premium only)','church-admin' ) ),
-            'options'=>array(),
-            'type'=>'no-content'
-        ),
+     
         
         'recent' =>array('title'=>esc_html( __('Recent people activity','church-admin' ) ),
                 'description'=>esc_html( __('People edits','church-admin' ) ),
@@ -153,11 +129,7 @@ function church_admin_shortcode_generator()
                 'options'=>array('exclude'),
                 'type'=>'no-content'
         ),
-        'sessions' =>array('title'=>esc_html( __('Sessions','church-admin' ) ),
-                'description'=>esc_html( __('Tracking small group activity','church-admin' ) ),
-                'options'=>NULL,
-                'type'=>'no-content'
-        ),
+    
         'single-sermon' =>array('title'=>esc_html( __('Single Sermon','church-admin' ) ),
                 'description'=>esc_html( __('Display single sermon','church-admin' ) ),
                 'options'=>array('file_id'),
@@ -172,12 +144,7 @@ function church_admin_shortcode_generator()
                         'options'=>array('video_url'),
                         'type'=>'no-content'
                 ),
-        'volunteer' =>array('title'=>esc_html( __('Volunteer','church-admin' ) ),
-                        'description'=>esc_html( __('Form to apply to serve in a ministry','church-admin' ) ),
-                        'options'=>NULL,
-                        'type'=>'no-content'
-                ),
-        
+   
         
         
         
