@@ -552,15 +552,7 @@ function church_admin_new_sermons_display($how_many=9,$nowhite=false,$playnoshow
         // Pagination
         $out.= $paging;
         //Pagination
-        $out.='<script>
-                        jQuery(document).ready(function($){
-                       
-                            $(".copy-me").click(function(){
-                                console.log("copy me");
-                                navigator.clipboard.writeText($(this).data(\'url\'));
-                                alert("'.esc_html(__('Link copied to clipboard','church-admin')).'");
-                            })
-                        });</script>'."\r\n";
+        
     }
     else
     {

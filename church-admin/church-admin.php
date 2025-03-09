@@ -4,7 +4,7 @@
 Plugin Name: Church Admin
 Plugin URI: http://www.churchadminplugin.com/
 Description: Manage church life with address book, schedule, classes, small groups, and advanced communication tools - bulk email and sms. 
-Version: 5.0.17
+Version: 5.0.23
 Tags: sermons, sermons, prayer, membership, SMS, Bible, events, calendar, email, small groups, contact form, giving, administration, management, child protection, safeguarding
 Author: Andy Moyle
 Text Domain: church-admin
@@ -50,7 +50,7 @@ Copyright (C) 2010-2022 Andy Moyle
 
 
 */
-if(!defined('CHURCH_ADMIN_VERSION')){define('CHURCH_ADMIN_VERSION','5.0.16');}
+if(!defined('CHURCH_ADMIN_VERSION')){define('CHURCH_ADMIN_VERSION','5.0.23');}
 
 define('CA_PAYPAL',"https://www.paypal.com/cgi-bin/webscr");
 require_once( plugin_dir_path( __FILE__ ) .'includes/functions.php');
@@ -1354,7 +1354,7 @@ function church_admin_register_frontend_scripts() {
      * Podcast
      ***************/
     wp_register_script('ca_podcast_audio_use',plugins_url('/', __FILE__ ) . 'includes/audio.use.js' , array( 'jquery' ) ,filemtime(plugin_dir_path(__FILE__ ).'includes/audio.use.js'), TRUE);
-	wp_register_script( 'jquery-ui-datepicker','','',NULL );
+	wp_register_script( 'jquery-ui-datepicker',array( 'jquery' ),'',NULL );
 	wp_register_script('church_admin_form_clone',plugins_url('/', __FILE__ ) . 'includes/jquery-formfields.js', array( 'jquery' ) ,FALSE, TRUE);
 	//fix issue caused by some "premium" themes, which call google maps w/o key on every admin page. D'uh!
  	wp_dequeue_script('avia-google-maps-api');
@@ -2077,7 +2077,8 @@ function church_admin_shortcode( $atts, $content = null)
                 }
             break;
 			case 'podcast':
-                wp_enqueue_script('church-admin-datepicker');
+                wp_enqueue_script('ca_podcast_audio_use');
+                wp_enqueue_script('jquery-ui-datepicker');
                 church_admin_podcast_script();
 				require_once( plugin_dir_path( __FILE__ ).'display/sermon-podcast.php');
 	            
@@ -2086,6 +2087,7 @@ function church_admin_shortcode( $atts, $content = null)
 			break;
             
             case 'sermons':
+                wp_enqueue_script('ca_podcast_audio_use');
                 wp_enqueue_script('church-admin-datepicker');
                 require_once( plugin_dir_path( __FILE__ ).'display/new-sermon-podcast.php');
                 //validate variables
@@ -4582,11 +4584,7 @@ function church_admin_ajax_handler()
 			break;
             case 'dropdown'://checked
                 check_ajax_referer( 'sermon-display', 'nonce' );
-                if(defined('CA_DEBUG') )
-                {
-                    //church_admin_debug('FUNCTION church_admin_podcast_files_list');
-                    //church_admin_debugprint_r( $_REQUEST,TRUE) );
-                }
+               
 				require_once(plugin_dir_path( __FILE__) .'/display/sermon-podcast.php');
                 $response=array();
                 if(defined('CA_DEBUG') )  {
@@ -4597,9 +4595,25 @@ function church_admin_ajax_handler()
                 $page=!empty($_REQUEST['page']) ? sanitize_text_field( stripslashes( $_REQUEST['page'] ) ):null;
                 $limit=!empty($_REQUEST['limit']) ? sanitize_text_field( stripslashes( $_REQUEST['limit'] ) ):null;
                 $speaker=!empty($_REQUEST['speaker']) ? sanitize_text_field( stripslashes( $_REQUEST['speaker'] ) ):null;
-                $order =!empty($_REQUEST['order']) ? sanitize_text_field( stripslashes( $_REQUEST['order'] ) ):null;
+                $ajax_order =!empty($_REQUEST['order']) ? sanitize_text_field( stripslashes( $_REQUEST['order'] ) ):null;
                 
-                $file_list=church_admin_podcast_files_list((int)$series_id,(int)$page,(int)$limit,esc_html( $speaker ),NULL,esc_html( $order ) );
+                //validate
+                $order='DESC';
+                switch($ajax_order){
+                    default:
+                    case 'DESC':
+                        $order='DESC';
+                    break;
+                    case 'ASC':
+                        $order='ASC';
+                    break;
+                }
+                if(!empty($series_id) && !church_admin_int_check($series_id)){exit();}
+                if(!empty($page) && !church_admin_int_check($page)){exit();}
+                if(!empty($limit) && !church_admin_int_check($limit)){exit();}
+
+
+                $file_list=church_admin_podcast_files_list((int)$series_id,(int)$page,(int)$limit, $speaker,NULL, $order  );
                 $series_detail=''; 
                 if(!empty( $_REQUEST['series_id'] ) )$series_detail=church_admin_podcast_series_detail((int)$series_id,NULL);
                 
@@ -4612,7 +4626,9 @@ function church_admin_ajax_handler()
                 {
                     $SQL[]=' AND speaker LIKE "%'.esc_sql( $speaker).'%"';
                 }
-                $first_sermon_id=$wpdb->get_var('SELECT file_id FROM '.$wpdb->prefix.'church_admin_sermon_files WHERE 2=2 '.implode(" ",$SQL).' ORDER BY pub_date '.esc_sql( $order ).' LIMIT 1');
+
+                //$order is safe withour escaping as can only be DESC or ASC
+                $first_sermon_id=$wpdb->get_var('SELECT file_id FROM '.$wpdb->prefix.'church_admin_sermon_files WHERE 2=2 '.implode(" ",$SQL).' ORDER BY pub_date '.$order.' LIMIT 1');
                 $first_sermon=church_admin_podcast_file_detail( $first_sermon_id,$exclude=NULL);
                 
                 $outputArray=array('series_detail'=>$series_detail,'file_list'=>$file_list,'first_sermon'=>$first_sermon,'file_id'=>$first_sermon_id);

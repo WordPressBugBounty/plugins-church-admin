@@ -5,7 +5,7 @@ Tags: church, sermons, membership,schedule,  calendar
 Requires at least: 5.0
 Requires PHP: 7.0
 Tested up to: 6.7
-Stable tag: 5.0.17
+Stable tag: 5.0.23
 Elementor tested up to: 3.25.0
 License: GNU General Public License (GPL) version 2 
 
@@ -60,6 +60,17 @@ You can report any security bugs found in the source code of the site-reviews pl
 
 
 == Changelog ==
+= 5.0.23 =
+* Fix podcast shortcode
+= 5.0.22 =
+* Fix media callback on main menue page
+* Fix Sermons Gutenberg block
+= 5.0.20 =
+* Add edit link to old style calendar display for admins.
+= 5.0.19 =
+* Fix vulnerability in Podcast shortcode
+= 5.0.18=
+* Remove broken edit link from old style calendar events.
 = 5.0.17 = 
 * Fix for CSV download of address list
 * Updated premium shortcodes to show upgrade required message

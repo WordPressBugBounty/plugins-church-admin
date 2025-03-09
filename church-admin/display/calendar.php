@@ -268,21 +268,18 @@ for( $counter = 1; $counter <= $numdaysinmonth; $counter ++ )
     		{
 				$popup.=esc_html(mysql2date(get_option('time_format'),$row->start_time)." - ".mysql2date(get_option('time_format'),$row->end_time))."<br>".esc_html($row->category)." Event <br>";
 			}
-			if( $row->recurring=='s')  {$type='church_admin_single_event_edit'; $nonce='single_event_edit';}else{$type='church_admin_series_event_edit'; $nonce='series_event_edit';}
+			if( $row->recurring=='s')  {$type='single-event-edit'; $nonce='single-event-edit';}else{$type='future-series-edit'; $nonce='future-series-edit';}
 			  if(!empty( $row->link) )
             {
                 if(!empty( $row->link_title) )  {$title= $row->link_title;}else{$title= __('More information...','church-admin') ;}
                 $popup.='<a href="'.esc_url( $row->link).'">'.esc_html($title).'</a>';
             }
             
-           
-
-
-
-
             $popup.='<p><a  rel="nofollow" class="vcf-link" href="'.esc_url(site_url().'?ca_download=ical&date_id='.(int)$row->date_id).'"><span class="ca-dashicons dashicons dashicons-download"></span></a></p>';   
-            if(church_admin_level_check('Calendar') )$popup.='<a title="'.esc_attr(__('Edit Entry','church-admin' ) ).'" href="'.esc_url( wp_nonce_url(admin_url().'?page=church_admin/index.php&amp;action='.esc_attr( $type ).'&amp;event_id='.(int)$row->event_id.'&amp;date_id='.(int)$row->date_id,$nonce) ).'"><span class="ca-dashicons dashicons dashicons-edit"></span>'.esc_html( __('Edit','church-admin') ).'</a>';
-              		
+            if(church_admin_level_check('Calendar') ){
+                $popup.='<a title="'.esc_attr(__('Edit Entry','church-admin' ) ).'" href="'.esc_url( wp_nonce_url(admin_url().'admin.php?page=church_admin/index.php&amp;action='.esc_attr( $type ).'&amp;event_id='.(int)$row->event_id.'&amp;date_id='.(int)$row->date_id,$nonce) ).'"><span class="ca-dashicons dashicons dashicons-edit"></span>'.esc_html( __('Edit','church-admin') ).'</a>';
+            }
+             		
             $day[$row->event_id]= '<div class="church_admin_cal_item" id="ca'.(int)$row->date_id.'" style="background-color:'.esc_attr($row->bgcolor).';border-left:3px solid '.$border.';padding:5px;color:'.esc_attr($row->text_color).'" >'.esc_html(mysql2date(get_option('time_format'),$row->start_time)).' '.esc_html( $row->title).'... <div id="div'.intval( $row->date_id).'" class="church_admin_tooltip"  style="background-color:'.esc_attr($row->bgcolor).';border-left:3px solid '.esc_html($border).';padding:5px;;color:'.esc_attr($row->text_color).'" >'.wp_kses_post($popup).'</div></div>';
         
         }

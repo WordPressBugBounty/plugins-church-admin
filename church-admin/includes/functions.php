@@ -4061,8 +4061,8 @@ function church_admin_actions()
             *
             **************************************/
             case 'test_email':
-                case 'test-email':
-                case 'testemail':
+            case 'test-email':
+            case 'testemail':
                     check_admin_referer('test-email');
                     
                     if(!church_admin_level_check('Bulk_Email') )

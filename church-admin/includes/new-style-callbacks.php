@@ -1,19 +1,20 @@
 <?PHP
-/**
-     *
-     * Automations callback
-     *
-     * @author  Andy Moyle
-     * @param    null
-     * @return
-     * @version  0.1
-     *
-     */
 
 
    
 
-
+function church_admin_media_callback()
+     {
+         require_once(plugin_dir_path(dirname(__FILE__) ).'includes/sermon-podcast.php');
+         $sermonPageID=get_option('church-admin-sermon-page');
+         if ( empty( $sermonPageID) )
+         {
+             echo'<p><a href="'.wp_nonce_url('admin.php?page=premium_church_admin&action=set-sermon-page','set-sermon-page').'">'.esc_html( __('Please set where your sermon page is, to activate share links.','church-admin' ) ).'</a></p>';
+         }
+    
+     
+         ca_podcast_list_files();
+     }
 
 
 

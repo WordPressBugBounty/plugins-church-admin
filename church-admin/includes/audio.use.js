@@ -213,8 +213,9 @@ jQuery(document).ready(function( $ ) {
                     if(!played)
                     {
                         window.localStorage.setItem('played'+fileID,"1");
-                    
-                        jQuery.post(ajaxurl, { 'action': 'church_admin','method':'mp3_plays','security':mp3nonce,'file_id':fileID },
+                        var args = { 'action': 'church_admin','method':'mp3_plays','security':mp3nonce,'file_id':fileID };
+                        console.log(args)
+                        jQuery.post(ajaxurl, args,
                             function(response)  {
                                 console.log("plays updated" + response)
 

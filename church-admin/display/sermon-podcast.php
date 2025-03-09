@@ -77,20 +77,27 @@ function church_admin_podcast_display( $series_id=NULL,$file_id=NULL,$exclude=ar
     *   Output
     *
     *********************************************************/
-    $out.='<div class="ca-podcast clearfix" id="ca-sermons">';
-    $out.='<div class="ca-podcast-left-column">
-                <div class="ca-series-current">'.church_admin_podcast_series_detail( $series_id,$exclude,$limit).'</div>
-                <div class="ca-podcast-current">'.church_admin_podcast_file_detail( $file_id,$exclude,$nowhite).'</div>
-               
-                </div><!--.ca-podcast-list-->
-            <div class="ca-podcast-list">
-                <div class="ca-menu-area">'.church_admin_podcast_menu( $page,$limit,$series_id).'</div>
-                <div class="ca-media-file-list">'.church_admin_podcast_files_list( $series_id,$page,$limit,$speaker,$search,$order,$series_sql).'</div>
-            </div><!--.ca-podcast-list-->'; 
+    $out.='<div class="ca-podcast clearfix" id="ca-sermons">'."\r\n";
+    $out.='<div class="ca-podcast-left-column">'."\r\n";
+    $out.='<div class="ca-series-current">'."\r\n";
+    $out.=church_admin_podcast_series_detail( $series_id,$exclude,$limit)."\r\n";
+    $out.='</div>'."\r\n";
+    $out.='<div class="ca-podcast-current">'."\r\n";
+    $out.=church_admin_podcast_file_detail( $file_id,$exclude,$nowhite)."\r\n";
+    $out.='</div>'."\r\n";
+    $out.='</div><!--.ca-podcast-list-->'."\r\n";
+    $out.='<div class="ca-podcast-list">'."\r\n";
+    $out.='<div class="ca-menu-area">'."\r\n";
+    $out.=church_admin_podcast_menu( $page,$limit,$series_id)."\r\n";
+    $out.='</div>'."\r\n";
+    $out.='<div class="ca-media-file-list">'."\r\n";
+    $out.=church_admin_podcast_files_list( $series_id,$page,$limit,$speaker,$search,$order,$series_sql)."\r\n";
+    $out.='</div>'."\r\n";
+    $out.='</div><!--.ca-podcast-list-->'."\r\n"; 
     
-    $out.='</div><!--#ca-sermons-->';
-    $out.='<script>var mp3nonce="'.esc_attr(wp_create_nonce("church_admin_mp3_play")).'"</script>';
-    $out.='</div>';
+    $out.='</div><!--#ca-sermons-->'."\r\n";
+    $out.='<script>var mp3nonce="'.esc_attr(wp_create_nonce("church_admin_mp3_play")).'"</script>'."\r\n";
+    $out.='</div>'."\r\n";
     return $out;
 }
 
@@ -104,17 +111,24 @@ function church_admin_podcast_files_list( $series_id=null,$page=1,$limit=5,$spea
         church_admin_debug(print_r(get_defined_vars(),TRUE) );
     }
     global $wpdb;
-    if(!empty( $order) )
+    $order = !empty($order) ? $order : 'DESC';
+    switch( $order)
     {
-        switch( $order)
-        {
-            case'ASC':$order='ASC';break;    
-            default:case'DESC':$order='DESC';break;   
-        }
-    }else $order='DESC';
+        case'ASC':
+            $order='ASC';
+            break;    
+        default:
+        case'DESC':
+            $order='DESC';
+        break;   
+    }
+    
     $out='';
     if(!is_user_logged_in() )  {$private=' AND private="0" ';}else{$private='';}
-    $template='<div class="ca-media-list-item" data-id="{file_id}" data-date="{pub_date}" title="'.esc_html( __('Click to play sermon','church-admin' ) ).'"><span class="ca-dashicons dashicons dashicons-controls-play ca-play"></span><h3>{title}</h3><span class="ca-name">{speakers}</span><br>{human_date}</div>';
+    $template="\t".'<div class="ca-media-list-item" data-id="{file_id}" data-date="{pub_date}" title="'.esc_html( __('Click to play sermon','church-admin' ) ).'">'."\r\n";
+    $template.="\t\t".'<span class="ca-dashicons dashicons dashicons-controls-play ca-play"></span>'."\r\n";
+    $template.="\t\t".'<h3>{title}</h3><span class="ca-name">{speakers}</span><br>{human_date}'."\r\n";
+    $template.="\t".'</div>'."\r\n";
     $searchTerm='';
     if(!empty( $search) )
     {
@@ -196,29 +210,42 @@ function church_admin_podcast_menu( $page,$limit,$series_id)
     global $wpdb;
     $out='';
     $church_admin_podcast_settings=get_option('church_admin_podcast_settings');
-    if(!empty( $church_admin_podcast_settings['itunes_link'] )||!empty( $church_admin_podcast_settings['spotify_link'] ) )$out.='<div class="ca-podcast-links">';
-	if(!empty( $church_admin_podcast_settings['itunes_link'] ) )$out.='<a title="Download on Itunes" href="'.esc_url($church_admin_podcast_settings['itunes_link']).'">
-<img  alt="Apple Podcasts" src="'.esc_url(plugins_url('/images/apple-podcasts.png',dirname(__FILE__) )).'" width="155" height="40" /></a>';
-    if(!empty( $church_admin_podcast_settings['spotify_link'] ) )$out.='&nbsp; <a title="Download on Spotify" href="'.esc_url($church_admin_podcast_settings['spotify_link']).'">
-<img alt="Spotify" class="ca-podcast-logo" src="'.esc_url(plugins_url('/images/spotify.png',dirname(__FILE__) )).'" width="110" height="40" /></a>';
-if(!empty( $church_admin_podcast_settings['amazon_link'] ) )$out.='&nbsp; <a title="Download on Amazon" href="'.esc_url($church_admin_podcast_settings['amazon_link']).'">
-<img alt="Amazon Music" class="ca-podcast-logo" src="'.esc_url(plugins_url('/images/amazon-podcast.png',dirname(__FILE__) )).'" width="110" height="40" /></a>';
-    if(!empty( $church_admin_podcast_settings['itunes_link'] )||!empty( $church_admin_podcast_settings['spotify_link'] ) )$out.='</div>';
+    if(!empty( $church_admin_podcast_settings['itunes_link'] )||!empty( $church_admin_podcast_settings['spotify_link'] ) ){
+        $out.='<div class="ca-podcast-links">'."\r\n";
+    }
+	if(!empty( $church_admin_podcast_settings['itunes_link'] ) ){
+        $out.="\t".'<a title="Download on Itunes" href="'.esc_url($church_admin_podcast_settings['itunes_link']).'">'."\r\n";
+        $out.="\t".'<img  alt="Apple Podcasts" src="'.esc_url(plugins_url('/images/apple-podcasts.png',dirname(__FILE__) )).'" width="155" height="40" /></a>'."\r\n";
+    }
+    if(!empty( $church_admin_podcast_settings['spotify_link'] ) ){
+        $out.="\t".'&nbsp; <a title="Download on Spotify" href="'.esc_url($church_admin_podcast_settings['spotify_link']).'">'."\r\n";
+        $out.="\t".'<img alt="Spotify" class="ca-podcast-logo" src="'.esc_url(plugins_url('/images/spotify.png',dirname(__FILE__) )).'" width="110" height="40" /></a>'."\r\n";
+    }
+    if(!empty( $church_admin_podcast_settings['amazon_link'] ) ){
+        $out.="\t".'&nbsp; <a title="Download on Amazon" href="'.esc_url($church_admin_podcast_settings['amazon_link']).'">'."\r\n";
+        $out.="\t".'<img alt="Amazon Music" class="ca-podcast-logo" src="'.esc_url(plugins_url('/images/amazon-podcast.png',dirname(__FILE__) )).'" width="110" height="40" /></a>'."\r\n";
+    }
+    if(!empty( $church_admin_podcast_settings['itunes_link'] )||!empty( $church_admin_podcast_settings['spotify_link'] ) ){
+        $out.='</div>';
+    }
     //search
-    $out.='<div class="ca-podcast-search church-admin-form-group">
-    <input type="text" class="sermon-search" name="sermon-search" placeholder="'.esc_html( __('Search sermons','church-admin' ) ).'"><button class="ca-sermon-search btn btn-secondary" data-page="'.(int)$page.'" data-limit="'.(int)$limit.'"  type="button">?</button></div>';
+    $out.='<div class="ca-podcast-search church-admin-form-group">'."\r\n";
+    $out.="\t".'<input type="text" class="sermon-search" name="sermon-search" placeholder="'.esc_html( __('Search sermons','church-admin' ) ).'">'."\r\n";
+    $out.="\t".'<button class="ca-sermon-search btn btn-secondary" data-page="'.(int)$page.'" data-limit="'.(int)$limit.'"  type="button">?</button>'."\r\n";
+    $out.='</div>'."\r\n";
     //series
     $series=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_sermon_series ORDER BY last_sermon DESC');
     if(!empty( $series) )
     {
-        $out.='<div class="church-admin-form-group">';
-        $out.='<select data-page="'.(int)$page.'" data-limit="'.(int)$limit.'" class="ca-series-dropdown" name="series_id">'."\r\n";
-        $out.='<option value="">'.esc_html( __('Or choose Series','church-admin' ) ).'</option>'."\r\n";
+        $out.='<div class="church-admin-form-group">'."\r\n";
+        $out.="\t".'<select data-page="'.(int)$page.'" data-limit="'.(int)$limit.'" class="ca-series-dropdown" name="series_id">'."\r\n";
+        $out.="\t\t".'<option value="">'.esc_html( __('Or choose Series','church-admin' ) ).'</option>'."\r\n";
         foreach( $series AS $seriesRow)
         {
-            $out.="\t".'<option value="'.(int)$seriesRow->series_id.'">'.esc_html( $seriesRow->series_name).'</option>'."\r\n";
+            $out.="\t\t".'<option value="'.(int)$seriesRow->series_id.'">'.esc_html( $seriesRow->series_name).'</option>'."\r\n";
         }
-        $out.='</select></div>'."\r\n";
+        $out.="\t".'</select>'."\r\n";
+        $out.='</div>'."\r\n";
     }
     //speaker
     $speakers=$wpdb->get_results('SELECT DISTINCT(speaker) FROM '.$wpdb->prefix.'church_admin_sermon_files');
@@ -244,14 +271,20 @@ if(!empty( $church_admin_podcast_settings['amazon_link'] ) )$out.='&nbsp; <a tit
         $speakerArray=array_unique(array_filter( $speakerArray),SORT_STRING );
         asort( $speakerArray);
         $out.='<div class="church-admin-form-group">'."\r\n";
-        $out.='<select data-page="'.(int)$page.'" data-limit="'.(int)$limit.'" class="ca-speaker-dropdown" name="speaker">'."\r\n";
-        $out.='<option value="">'.esc_html( __('Or choose Speaker','church-admin' ) ).'</option>'."\r\n";
+        $out.="\t".'<select data-page="'.(int)$page.'" data-limit="'.(int)$limit.'" class="ca-speaker-dropdown" name="speaker">'."\r\n";
+        $out.="\t\t".'<option value="">'.esc_html( __('Or choose Speaker','church-admin' ) ).'</option>'."\r\n";
         foreach( $speakerArray AS $key=>$name)
         {
-            $out.="\t".'<option value="'.esc_html(trim( $name) ).'">'.esc_html(trim( $name) ).'</option>'."\r\n";
+            $out.="\t\t".'<option value="'.esc_html(trim( $name) ).'">'.esc_html(trim( $name) ).'</option>'."\r\n";
         }
-        $out.='</select></div>'."\r\n";
-        $out.='<div class="church-admin-form-group"><select data-page="'.(int)$page.'" data-limit="'.(int)$limit.'" class="ca-order" name="order"><option value="DESC">'.esc_html( __('Newest first','church-admin' ) ).'</option><option value="ASC">'.esc_html( __('Oldest First','church-admin' ) ).'</option></select></div>'."\r\n";
+        $out.="\t".'</select>'."\r\n";
+        $out.='</div>'."\r\n";
+        $out.='<div class="church-admin-form-group">'."\r\n";
+        $out.="\t".'<select data-page="'.(int)$page.'" data-limit="'.(int)$limit.'" class="ca-order" name="order">'."\r\n";
+        $out.="\t\t".'<option value="DESC">'.esc_html( __('Newest first','church-admin' ) ).'</option>'."\r\n";
+        $out.="\t\t".'<option value="ASC">'.esc_html( __('Oldest First','church-admin' ) ).'</option>'."\r\n";
+        $out.="\t".'</select>'."\r\n";
+        $out.='</div>'."\r\n";
     }
     return $out;
 }
@@ -259,6 +292,7 @@ if(!empty( $church_admin_podcast_settings['amazon_link'] ) )$out.='&nbsp; <a tit
  function church_admin_podcast_series_detail( $series_id=NULL,$exclude=array() )
  {
  		global $wpdb,$podcastSettings;
+        if(empty($exclude)){$exclude = array();}
         if(!empty( $exclude) && !is_array( $exclude) )$exclude=explode(",",$exclude);
 
  		$out='';
@@ -269,7 +303,7 @@ if(!empty( $church_admin_podcast_settings['amazon_link'] ) )$out.='&nbsp; <a tit
  			if(!empty( $detail) )
  			{
 
- 				if(!empty( $detail->series_name)&&!in_array('seriesName',$exclude) )  {
+ 				if(!empty( $detail->series_name) && !in_array('seriesName',$exclude) )  {
                     $out.='<h2>'.esc_html(sprintf(__('%1$s series','church-admin' ) ,esc_html( $detail->series_name) ) ).'</h2>';
                 }
  				if(!empty( $detail->series_image)&&!in_array('seriesImage',$exclude) )  {
@@ -315,8 +349,8 @@ function church_admin_podcast_file_detail( $fileID,$exclude=array(),$nowhite=FAL
 		{
 			
 			//now playing tab
-				if(!empty( $data->file_title) )$out.='<h2 class="ca-sermon-title">'.esc_html( $data->file_title).'</h2>';
-                if(!empty( $data->file_subtitle) &&!in_array('subtitle',$exclude) )$out.='<p class="ca-sermon-subtitle">'.$data->file_subtitle.'</p>';
+				if(!empty( $data->file_title) )$out.='<h2 class="ca-sermon-title">'.esc_html( $data->file_title).'</h2>'."\r\n";
+                if(!empty( $data->file_subtitle) &&!in_array('subtitle',$exclude) )$out.='<p class="ca-sermon-subtitle">'.$data->file_subtitle.'</p>'."\r\n";
 				if(!empty( $data->video_url) )
                 {
                     if(strpos( $data->video_url, 'amazonaws.com/') !== false)
@@ -340,7 +374,10 @@ function church_admin_podcast_file_detail( $fileID,$exclude=array(),$nowhite=FAL
 
 				if(!empty( $data->file_name)&& file_exists( $path.$data->file_name) )
                 {
-                    $out.='<p><!--file_name method--><audio class="sermonmp3" data-id="'.esc_html( $data->file_id).'" src="'.esc_url( $url.$data->file_name).'" preload="auto" controls></audio></p>';
+                    $out.='<p><!--file_name method-->'."\r\n";
+                    $out.="\t".'<audio class="sermonmp3" data-id="'.esc_html( $data->file_id).'" controls>'."\r\n";
+                    $out.="\t\t".'<source src="'.esc_url( $url.$data->file_name).'" type="audio/mpeg">'."\r\n";
+                    $out.="\t".'</audio></p>'."\r\n";
 				    if(!in_array('download',$exclude) )$download='<a href="'.esc_url( $url.$data->file_name).'" class="mp3download" data-id="'.(int)$data->file_id.'" title="'.esc_html( $data->file_title).'" download>'.esc_html( $data->file_title).'</a>'."\r\n";
 				}
 				elseif(!empty( $data->external_file) )
@@ -383,22 +420,22 @@ function church_admin_podcast_file_detail( $fileID,$exclude=array(),$nowhite=FAL
 						
 						$plays=church_admin_plays( $data->file_id);
 						$out.='<div class="ca-podcast-file-content ca-tab-content">';
-							if(!empty( $data->file_description)&&!in_array('fileDescription',$exclude) )$out.='<div class="sermon-file-description">'.wp_kses_post($data->file_description).'</div>';
+							if(!empty( $data->file_description)&&!in_array('fileDescription',$exclude) )$out.='<div class="sermon-file-description">'.wp_kses_post($data->file_description).'</div>'."\r\n";
 							$out.='<table>';
-								if(!empty( $data->speaker)&&!in_array('speaker',$exclude) )$out.='<tr><td>'.esc_html( __('Speaker','church-admin' ) ).':&nbsp;</td><td class="ca-names">'.esc_html( $data->speaker).'</td></tr>';
-								if(!empty( $data->series_name)&&!in_array('seriesName',$exclude) )$out.='<tr><td>'.esc_html( __('Series','church-admin' ) ).':&nbsp;</td><td>'.esc_html( $data->series_name).'</td></tr>';
-								if(!empty( $data->pub_date)&&!in_array('date',$exclude) )$out.='<tr><td>'.esc_html( __('Date','church-admin' ) ).':&nbsp;</td><td>'.esc_html(mysql2date(get_option('date_format'),$data->pub_date)).'</td></tr>';
-								if(!empty( $download)&&!in_array('download',$exclude) )$out.='<tr><td>'.esc_html( __('Download','church-admin' ) ).':&nbsp;</td><td>'.$download.'</td></tr>';
+								if(!empty( $data->speaker)&&!in_array('speaker',$exclude) )$out.='<tr><td>'.esc_html( __('Speaker','church-admin' ) ).':&nbsp;</td><td class="ca-names">'.esc_html( $data->speaker).'</td></tr>'."\r\n";
+								if(!empty( $data->series_name)&&!in_array('seriesName',$exclude) )$out.='<tr><td>'.esc_html( __('Series','church-admin' ) ).':&nbsp;</td><td>'.esc_html( $data->series_name).'</td></tr>'."\r\n";
+								if(!empty( $data->pub_date)&&!in_array('date',$exclude) )$out.='<tr><td>'.esc_html( __('Date','church-admin' ) ).':&nbsp;</td><td>'.esc_html(mysql2date(get_option('date_format'),$data->pub_date)).'</td></tr>'."\r\n";
+								if(!empty( $download)&&!in_array('download',$exclude) )$out.='<tr><td>'.esc_html( __('Download','church-admin' ) ).':&nbsp;</td><td>'.$download.'</td></tr>'."\r\n";
 								$showPlays=FALSE;
                                 if(!empty( $data->file_name) )$showPlays=TRUE;
                                 if(!empty( $data->external_file) )$showPlays=TRUE;
                                 if(isset( $plays)&&!in_array('plays',$exclude)&&$showPlays)
                                 {
-                                    $out.='<tr><td>'.esc_html( __('Plays','church-admin' ) ).':&nbsp;</td><td class="plays">'.$plays.'</td></tr>';
+                                    $out.='<tr><td>'.esc_html( __('Plays','church-admin' ) ).':&nbsp;</td><td class="plays">'.$plays.'</td></tr>'."\r\n";
                                 }
                                 if(!empty( $views)&&!in_array('views',$exclude)&&$showPlays)
                                 {
-                                    $out.='<tr><td>'.esc_html( __('Views','church-admin' ) ).':&nbsp;</td><td class="views">'.$views.'</td></tr>';
+                                    $out.='<tr><td>'.esc_html( __('Views','church-admin' ) ).':&nbsp;</td><td class="views">'.$views.'</td></tr>'."\r\n";
                                 }
 								if(!empty( $data->bible_texts) )
 								{
@@ -409,12 +446,12 @@ function church_admin_podcast_file_detail( $fileID,$exclude=array(),$nowhite=FAL
 									{
 										foreach( $passages AS $passage)$pass[]='<a href="https://www.biblegateway.com/passage/?search='.urlencode( $passage).'&version='.$version.'&interface=print" target="_blank">'.esc_html( $passage).'</a>'."\r\n";
 
-										if(!in_array('bible',$exclude) )$out.='<tr><td>'.esc_html( __('Scriptures','church-admin' ) ).':&nbsp;</td><td>'.implode(", ",$pass).'</td></tr>';
+										if(!in_array('bible',$exclude) )$out.='<tr><td>'.esc_html( __('Scriptures','church-admin' ) ).':&nbsp;</td><td>'.implode(", ",$pass).'</td></tr>'."\r\n";
 									}
 								}
                                 if(!empty( $data->transcript) )
                                 {
-                                    $out.='<tr><td>'.esc_html( __('Sermon Notes','church-admin' ) ).':&nbsp;</td><td><a  rel="nofollow" href="'.site_url().'?church_admin_download=sermon-notes&amp;file_id='.(int)$data->file_id.'">PDF</a></td></tr>';
+                                    $out.='<tr><td>'.esc_html( __('Sermon Notes','church-admin' ) ).':&nbsp;</td><td><a  rel="nofollow" href="'.site_url().'?church_admin_download=sermon-notes&amp;file_id='.(int)$data->file_id.'">PDF</a></td></tr>'."\r\n";
                                 }
                                 if(!in_array('sharing',$exclude) )
                                 {
@@ -428,15 +465,8 @@ function church_admin_podcast_file_detail( $fileID,$exclude=array(),$nowhite=FAL
                                     //email
                                     $share.='<a style="text-decoration:none" href="'.esc_url('mailto:?subject='.$title.'&amp;body='.$url).'"><span class="ca-dashicons dashicons dashicons-email"></span></a>&nbsp;'."\r\n";
                                     //link
-                                    $share.='<a class="copy-me" style="text-decoration:none" data-url="'.esc_url($URL.'?sermon='.$data->file_slug).'"><span class="ca-dashicons dashicons dashicons-admin-links"></span></a>'."\r\n";
-                                    $share.='<script>
-                                        jQuery(document).ready(function($){
-                                            $(".copy-me").click(function(){
-                                                console.log("copy me");
-                                                navigator.clipboard.writeText($(this).data(\'url\'));
-                                                alert("'.esc_html(__('Link copied to clipboard','church-admin')).'");
-                                            })
-                                        });</script>';
+                                    $share.='<a style="text-decoration:none" data-url="'.esc_url($URL.'?sermon='.$data->file_slug).'"><span class="ca-dashicons dashicons dashicons-admin-links"></span></a>'."\r\n";
+                                    
                                     //sms
                                     $share.='<a href="'.esc_url('sms:?body='.$url).'"><span class="ca-dashicons dashicons dashicons-smartphone" style="text-decoration:none"></span></a>'."\r\n";
 

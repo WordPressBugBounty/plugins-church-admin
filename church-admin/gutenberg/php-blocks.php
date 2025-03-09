@@ -179,7 +179,17 @@ function church_admin_block_editor_assets()
 	/**************************
 	 * Add data for dropdowns
 	 **************************/
+	$seriesArray=array(array('value'=>null,'label'=>esc_html( __('All series')) ));
+	$series = $wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_sermon_series ORDER BY series_name ASC');
 	
+
+	if(!empty($series)){
+		
+		foreach($series AS $item){
+			$seriesArray[]=array('value'=>(int)$item->series_id,'label'=>esc_html( $item->series_name) );
+		}
+	}
+
 	$peopleArray=array();
 	$people_type=get_option('church_admin_people_type');
 	foreach( $people_type AS $id=>$type)
@@ -199,6 +209,9 @@ function church_admin_block_editor_assets()
 	
 	
 	$addJSData="const peopleTypeOptions =".json_encode( $peopleArray)."\r\n";
+	$addJSData.="const seriesOptions =".json_encode( $seriesArray)."\r\n";
+	
+	$addJSData.="const membTypeOptions =".json_encode( $MTArray)."\r\n";
 	wp_add_inline_script( 'church-admin-php-blocks', $addJSData );
 	
 
