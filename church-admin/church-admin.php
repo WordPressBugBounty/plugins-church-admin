@@ -4,7 +4,7 @@
 Plugin Name: Church Admin
 Plugin URI: http://www.churchadminplugin.com/
 Description: Manage church life with address book, schedule, classes, small groups, and advanced communication tools - bulk email and sms. 
-Version: 5.0.23
+Version: 5.0.30
 Tags: sermons, sermons, prayer, membership, SMS, Bible, events, calendar, email, small groups, contact form, giving, administration, management, child protection, safeguarding
 Author: Andy Moyle
 Text Domain: church-admin
@@ -50,7 +50,7 @@ Copyright (C) 2010-2022 Andy Moyle
 
 
 */
-if(!defined('CHURCH_ADMIN_VERSION')){define('CHURCH_ADMIN_VERSION','5.0.23');}
+if(!defined('CHURCH_ADMIN_VERSION')){define('CHURCH_ADMIN_VERSION','5.0.30');}
 
 define('CA_PAYPAL',"https://www.paypal.com/cgi-bin/webscr");
 require_once( plugin_dir_path( __FILE__ ) .'includes/functions.php');
@@ -689,7 +689,7 @@ function church_admin_initialise() {
         else{
             echo'<h3>No licence found</h3><p>Please contact <a href="mailto:support@churchadminplugin.com&subject=Licence+issue+'.site_url().'">support@churchadminplugin.com</a> if you think that is wrong.</p><p>Subscribe now...</p>';
             echo '<p class="church-admin-module-select">Choose upgrade subscription, prices will convert to your currency<select class="ca_upgrade_select">
-<option>Choose...</option><option value="https://buy.stripe.com/9AQ7ud5obdYZ836cNP">Monthly Subscription $9.99</option><option value="https://buy.stripe.com/28o6q9dUH3kl8365lp">Quarterly subscription $29.07 (save 3% a quarter)</option><option value="https://buy.stripe.com/28o8yhdUH6wx97a29e">Annual subscription $99.99 (equivalent to 2 months free per year)</option><option value="https://buy.stripe.com/bIY4i1dUH6wxdnqg05">Lifetime licence, one off payment $175</option><option value="https://buy.stripe.com/bIYbKt2bZ7AB6Z24ho">Special price for small congregations under 50 people, one off payment $30</option></select><script>
+<option>Choose...</option><option value="https://buy.stripe.com/9AQ7ud5obdYZ836cNP">Monthly Subscription $9.99</option><option value="https://buy.stripe.com/28o6q9dUH3kl8365lp">Quarterly subscription $29.07 (save 3% a quarter)</option><option value="https://buy.stripe.com/28o8yhdUH6wx97a29e">Annual subscription $99.99 (equivalent to 2 months free per year)</option><option value="https://buy.stripe.com/bIY4i1dUH6wxdnqg05">Lifetime licence, one off payment $175</option><option value="https://buy.stripe.com/bIYbKt2bZ7AB6Z24ho">Special price for small congregations under 50 people, one off payment $50</option></select><script>
         jQuery(document).ready(function($){ 
         $(function(){
         
@@ -720,50 +720,7 @@ function church_admin_initialise() {
 	
 
     //front end actions
-    /**************************************
-     * handle unsubscribe link from email
-     * ************************************/
-	if(!empty( $_GET['ca_unsub'] ) )
-	{
-        //update sanitize, validate,escape v 3.7.25 2023-05-08
-        //sanitize
-        
-        $unsub = !empty($_GET['ca_unsub'])?sanitize_text_field(stripslashes($_GET['ca_unsub'])):null;
-        //validate
-        $validMD5 = FALSE;
-        if(!empty($unsub)){
-            $validMD5 = preg_match('/^[a-f0-9]{32}$/', $unsub);
-        }
-        
-        if(!empty($validMD5)){
-            $details=$wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'church_admin_people WHERE md5(people_id)="'.esc_sql( $unsub ).'"');
-			$wpdb->query('UPDATE '.$wpdb->prefix.'church_admin_people SET email_send=0 WHERE md5(people_id)="'.esc_sql( $unsub ).'"');
-			require_once( plugin_dir_path( __FILE__ ).'includes/unsubscribe.php');
-			exit();
-        }
-	}
-    /***************************
-     * handle re-subscribe
-     ***************************/
-	if(!empty( $_GET['ca_sub'] ) )
-	{
-        //update sanitize, validate,escape v 3.7.25 2023-05-08
-        //sanitize
-        
-        $resub = !empty($_GET['ca_unsub'])?sanitize_text_field(stripslashes($_GET['ca_sub'])):null;
-        //validate
-        $validMD5 = FALSE;
-        if(!empty($resub)){
-            $validMD5 = preg_match('/^[a-f0-9]{32}$/', $resub);
-        }
-        
-        if(!empty($validMD5)){
-		    $details=$wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'church_admin_people WHERE md5(people_id)="'.esc_sql( $resub ).'"');
-			$wpdb->query('UPDATE '.$wpdb->prefix.'church_admin_people SET email_send=1 WHERE md5(people_id)="'.esc_sql( $resub ).'"');
-			require_once( plugin_dir_path( __FILE__ ).'includes/resubscribe.php');
-			exit();
-        }
-	}
+
 
         /**************************************
      * handle confirm email 
@@ -828,21 +785,7 @@ function church_admin_initialise() {
         exit();
     }
 
-    //church admin app initialisation
-
-	if(!empty( $_GET['ca-app'] ) )
-	{
-		require_once( plugin_dir_path( __FILE__ ).'app/app-admin.php');
-		switch( $_GET['ca-app'] )
-		{
-			case'latest_media': 
-                header("Content-Type: application/json"); 
-                echo church_admin_json_latest_media();
-                exit();
-            break;
-
-		}
-	}
+ 
     //reset version
 	if(!empty( $_GET['page'] )&&( $_GET['page']=='church_admin/index.php')&&!empty( $_GET['action'] )&& $_GET['action']=='reset-version')
 	{
@@ -1020,28 +963,18 @@ function church_admin_initialise() {
     {
         if ( empty( $level['Units'] ) )$level['Units']='administrator';
         if ( empty( $level['Ministries'] ) )$level['Ministries']='administrator';
-        if ( empty( $level['Giving'] ) )$level['Giving']='administrator';
+       
         if ( empty( $level['Directory'] ) )$level['Directory']='administrator';
         if ( empty( $level['Kidswork'] ) )$level['Kidswork']='administrator';
-        if ( empty( $level['Small Groups'] ) )$level['Small Groups']='administrator';
-        
+       
         if ( empty( $level['Funnel'] ) ) $level['Funnel']='administrator';
         if ( empty( $level['Bulk Email'] ) )$level['Bulk Email']='administrator';
         if ( empty( $level['Sermons'] ) )$level['Sermons']='administrator';
         if ( empty( $level['Bulk SMS'] ) )$level['Bulk SMS']='administrator';
         if ( empty( $level['Calendar'] ) )$level['Calendar']='administrator';
-        if ( empty( $level['Attendance'] ) )$level['Attendance']='administrator';
+       
         if ( empty( $level['Member Type'] ) )$level['Member Type']='administrator';
-        if ( empty( $level['Service'] ) )$level['Service']='administrator';
-        if ( empty( $level['Sessions'] ) )$level['Sessions']='administrator';
-        if(empty($level['Pastoral']))$level['Pastoral']='administrator';
-        if ( empty( $level['Sessions'] ) )$level['Sessions']='administrator';
-        if ( empty( $level['App'] ) )$level['App']='administrator';
-        if ( empty( $level['Prayer Requests'] ) )$level['Prayer Requests']='administrator';
-        if ( empty( $level['Events'] ) )$level['Events']='administrator';
-        if ( empty( $level['Ministries'] ) )$level['Ministries']='administrator';
-        if ( empty( $level['Classes'] ) )$level['Classes']='administrator';
-        if ( empty( $level['Contact form'] ) )$level['Contact form']='administrator';
+        
         update_option('church_admin_levels',$level);
     }
     if(!empty( $_POST['one_site'] ) ){
@@ -1197,140 +1130,6 @@ add_action('admin_bar_menu', 'church_admin_menu_item',71);
 
 
 
-/******************************************************************************************************************************
-*
-* For prayer request, if made private in settings we want to show the login form at the template_redirect hook 
-*
-******************************************************************************************************************************/
-function church_admin_private_prayer_template( $archive_template ) {
-    global $post;
-    $private=get_option('church-admin-private-prayer-requests');
-    //church_admin_debugget_post_type());
-    if ( (is_post_type_archive ( 'prayer-requests' ) ||   'prayer-requests'==get_post_type()) && !is_user_logged_in() && !empty($private) ) {
-        //church_admin_debug('Prayer request not logged in');
-        $located = locate_template( 'private-prayer.php' );
-        //church_admin_debug($located);
-        if(!empty($located)){
-            
-            $archive_template = $located;
-        }
-        else
-        {
-            $archive_template = dirname( __FILE__ ) . '/display/private-prayer.php';
-        }
-    } 
-    return $archive_template;
-}
-add_filter( 'archive_template', 'church_admin_private_prayer_template' ) ;
-add_filter( 'single_template', 'church_admin_private_prayer_template' ) ;
-
-
-/******************************************************************************************************************************
-*
-* Show a submit prayer requests form at the top of the archive
-*
-******************************************************************************************************************************/
-$theme = wp_get_theme(); // gets the current theme
-
-if ( 'Avada' == $theme->name || 'Avada' == $theme->parent_theme ) {
-    add_action('avada_before_main_container', 'church_admin_draft_prayer_request');
-	define('CA_PRY_STYLE','style="min-width:80vw;"');
-}
-elseif ( 'The7' == $theme->name || 'The7' == $theme->parent_theme ) {
-    add_action('presscore_before_loop', 'church_admin_draft_prayer_request');
-}
-elseif( 'Omega' == $theme->name || 'Omega' == $theme->parent_theme )  {
-    
-    add_action('omega_before_content', 'church_admin_draft_prayer_request');
-}
-elseif(has_action('church_admin_theme_before_loop') )
-{
-    add_action('church_admin_theme_before_loop', 'church_admin_draft_prayer_request');
-}
-elseif(has_action('fusion_blog_shortcode_before_loop') )
-{
-    add_action('fusion_blog_shortcode_before_loop', 'church_admin_draft_prayer_request');
-}
-else{
-add_action('loop_start', 'church_admin_draft_prayer_request');
-}
-
-function church_admin_draft_prayer_request( $content)
-{
-    global $wpdb,$church_admin_prayer_request_success;
-    
-		if(is_post_type_archive('prayer-requests')&& is_archive() )
-        {
-			$private=get_option('church-admin-private-prayer-requests');
-			//only show form if not private or logged in
-			if (!$private ||(is_user_logged_in() && $private) )
-			{
-				$out='';
-
-                if ( empty( $_POST['save_prayer_request'] )&&empty( $_POST['non_spammer'] )||!wp_verify_nonce( $_POST['non_spammer'],'prayer-request') )
-                {
-                        $out.='<div class="church-admin-prayer-request alignwide" ';
-                        if(defined('CA_PRY_STYLE') ) $out.= CA_PRY_STYLE;
-                        $out.='><h3>'.esc_html( __('Submit a prayer request','church-admin' ) ).'</h3>';
-                        $message=get_option('church_admin_prayer_request_message');
-                        if(!empty( $message) )$out.='<p>'. wp_kses_post( $message).'</p>';
-                        $out.='<form action="" method="POST">';
-                    
-                        $out.='<div class="church-admin-form-group"><label>'.esc_html( __('Title','church-admin' ) ).'</label><input type="text" name="request_title" class="church-admin-form-control"></div>';
-                        $out.='<div class="church-admin-form-group"><label>'.esc_html( __('Prayer request','church-admin' ) ).'</label><textarea name="request_content" class="church-admin-form-control" style="height:100px"></textarea></div>';
-                        $out.='<div id="spam-proof">&nbsp;</div>';
-                        $out.='<div class="church-admin-form-group"><input type="hidden" value="TRUE" name="save_prayer_request" /><input type="submit" value="'.esc_html( __('Save','church-admin' ) ).'" /></div>';
-
-                        $out.='</form></div>';
-                        $nonce=wp_create_nonce('prayer-request');
-                        $out.='<script>jQuery(document).ready(function( $) {var content="<div class=\"form-check\"><label>'.esc_html( __('Check box if not a spammer','church-admin' ) ).'<input type=\"checkbox\" name=\"non_spammer\" value=\"'.esc_attr($nonce).'\" /></label></div>"; $("#spam-proof").html(content);});</script>';
-                }
-                else{
-                    $out=$church_admin_prayer_request_success;
-                }
-                echo $out;
-            }
-		}
-
-}
-add_action('loop_start', 'church_admin_draft_act_of_courage');
-
-function church_admin_draft_act_of_courage( $content)
-{
-    global $wpdb,$church_admin_acts_success;
-
-		if(is_post_type_archive('acts-of-courage') )
-    {
-			$private=get_option('church-admin-private-acts-of-courage');
-			//only show form if not private or logged in
-			if (!$private ||(is_user_logged_in() && $private) )
-			{
-				$out='';
-
-      	if ( empty( $_POST['save_acts_request'] )&&empty( $_POST['non_spammer'] )||!wp_verify_nonce( $_POST['non_spammer'],'acts-of-courage') )
-      	{
-					$out.='<h3>'.esc_html( __('Submit an act of courage','church-admin' ) ).'</h3>';
-					$message=get_option('church-admin-acts-of-courage-message');
-					if(!empty( $message) )$out.='<p>'. wp_kses_post( $message).'</p>';
-        	$out.='<form action="" method="POST">';
-        	$out.='<table class="form-table"><tbody>';
-        	$out.='<tr><th scope="row">'.esc_html( __('Title','church-admin' ) ).'</th><td><input type="text" name="request_title"></td></tr>';
-        	$out.='<tr><th scope="row">'.esc_html( __('Your act of courage','church-admin' ) ).'</th><td><textarea name="request_content"></textarea></td></tr>';
-					$out.='<tr id="spam-proof">&nbsp;</td></tr>';
-					$out.='<tr><td cellspacing=2><input type="hidden" value="TRUE" name="save_act_of_courage_request" /><input type="submit" value="'.esc_html( __('Save','church-admin' ) ).'" /></td></tr></table>';
-
-					$out.='</form>';
-					$nonce=wp_create_nonce('acts-of-courage');
-					$out.='<script>jQuery(document).ready(function( $) {var content="<th scope=\"row\">'.esc_html( __('Check box if not a spammer','church-admin' ) ).'</th><td><input type=\"checkbox\" name=\"non_spammer\" value=\"'.esc_attr($nonce).'\" /></td></tr>"; $("#spam-proof").html(content);});</script>';
-				}
-				else{
-                    $out = $church_admin_acts_success;
-                }
-      	echo $out;
-			}
-		}
-
-}
 /****************************************************************************
 *
 *	From 1.2800 register front end scripts early then enqueue on shortcode process
@@ -1613,7 +1412,7 @@ function church_admin_init()
             case'church_admin_new_household':
                 church_admin_form_script();
                 church_admin_map_script();
-                
+                wp_enqueue_script('ca-draganddrop');
                 church_admin_media_uploader_enqueue();
                 church_admin_date_picker_script();
             break;
@@ -1650,7 +1449,9 @@ function church_admin_init()
             break;
 			case'get_people':church_admin_ajax_people(TRUE);break;
 			case'people':case'edit_funnel':case'delete_funnel':church_admin_sortable_script();break;
-            case 'upload-mp3':church_admin_date_picker_script();church_admin_autocomplete_script();break;
+            case 'upload-mp3':
+                church_admin_date_picker_script();church_admin_autocomplete_script();
+            break;
       
 		}
 	}
@@ -2762,10 +2563,7 @@ function church_admin_download()
                     echo'<div class="error"><p>'.esc_html( __("You don't have permissions",'church-admin' ) ).'</p></div>';
                 }
             break;
-            case 'smallgroup-signup':
-                require_once( plugin_dir_path( __FILE__ ).'includes/pdf_creator.php');
-                church_admin_smallgroup_signup_pdf( $title);
-            break;
+            
             case 'sermon-notes':
                 require_once( plugin_dir_path( __FILE__ ).'includes/pdf_creator.php');
                 church_admin_sermon_notes_pdf( $file_id);
@@ -3782,6 +3580,8 @@ add_action('wp_ajax_church_admin_image_upload','church_admin_image_upload');
 add_action('wp_ajax_nopriv_church_admin_image_upload', 'church_admin_image_upload');
 function church_admin_image_upload()
 {
+    check_ajax_referer('image-upload');
+    if(!is_user_logged_in()){exit();}
 	//church_admin_debug("********************\r\nAJAX Image upload");
 	// These files need to be included as dependencies when on the front end.
 	require_once( ABSPATH . 'wp-admin/includes/image.php' );
@@ -4326,7 +4126,7 @@ function church_admin_ajax_handler()
                 $series_id=!empty($_REQUEST['series_id'])?sanitize_text_field(stripslashes($_REQUEST['series_id'])):null;
                 //validate
                 if(!church_admin_int_check($series_id)){exit();}
-                $wpdb->query('UPDATE '.$wpdb->prefix.'church_admin_services SET attachment_id="" WHERE series_id="'.(int)$series_id.'"');
+                $wpdb->query('UPDATE '.$wpdb->prefix.'church_admin_sermon_series SET attachment_id="" WHERE series_id="'.(int)$series_id.'"');
                 wp_delete_attachment( $series_id );
                 exit();
             break;
@@ -4831,7 +4631,7 @@ function church_admin_ajax_handler()
 					exit();
 			break;
 			case 'image_upload':
-			check_ajax_referer('church_admin_image_upload','nonce',TRUE);
+			    check_ajax_referer('church_admin_image_upload','nonce',TRUE);
 				// These files need to be included as dependencies when on the front end.
 				require_once( ABSPATH . 'wp-admin/includes/image.php' );
 				require_once( ABSPATH . 'wp-admin/includes/file.php' );

@@ -1104,7 +1104,26 @@ $wpdb->query('UPDATE '.$wpdb->prefix.'church_admin_people SET date_of_birth = NU
 	}
 	
 
-
+	/*********************************
+	 * Turn services into an option
+	 **********************************/
+	if( $wpdb->get_var('SHOW TABLES LIKE "'.$wpdb->prefix.'church_admin_services"') == $wpdb->prefix.'church_admin_services')
+	{
+		church_admin_debug('found services table');
+		$services = $wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_services ORDER BY service_id');
+		church_admin_debug($wpdb->last_query);
+		church_admin_debug($services);
+		if(!empty($services)){
+			$servicesArray=array();
+			foreach($services AS $service){
+				$details = $service->service_name;
+				if(!empty($service->service_time)){$details.=' '.$service->service_time;}
+				$servicesArray[$service->service_id]=$details;
+			}
+			update_option('church_admin_services',$servicesArray);
+			$wpdb->query('DROP TABLE '.$wpdb->prefix.'church_admin_services');
+		}
+	}
 
 	church_admin_debug("Install function finished ".date("Y-m-d H:i:s") );
 }//end of install function

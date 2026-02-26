@@ -24,12 +24,12 @@ function church_admin_import_from_users()
             $wpdb->query('INSERT INTO '.$wpdb->prefix.'church_admin_household (address) VALUES("")');
             $household_id=$wpdb->insert_id;
             $people_id=$wpdb->query('INSERT INTO '.$wpdb->prefix.'church_admin_people (updated_by,people_type_id,head_of_household,member_type_id,user_id,household_id,show_me,gdpr_reason,first_name,last_name,email,first_registered) VALUES("'.$current_user->ID.'",1,1,1,"'.(int)$row->ID.'","'.(int)$household_id.'",0,"'.esc_sql(__('Imported from website user account')).'","'.esc_sql( $first_name).'","'.esc_sql( $last_name).'","'.esc_sql( $row->user_email).'","'.esc_sql(mysql2date('Y-m-d',$row->user_registered)).'")');
-            //translators: %1$s is a user ID, 2,3,4 are parts of a  name
+            /* translators: 1: is a user ID, 2:name part 3: name part 4:part of a name */
             echo '<p>'.esc_html(sprintf(__('User %1$s: %2$s %3$s %4$s added.','church-admin' ) ,(int)$row->ID,esc_html( $first_name),esc_html( $last_name),esc_html( $row->user_email) ));
         }
         else
         {
-             //translators: %1$s is a user ID, 2,3  are  parts of a  name
+             /* translators: 1: is a user ID, 2: name part 3: name part */
             echo'<p>'.esc_html(sprintf(__('User %1$s: %2$s %3$s already in the directory','church-admin' ) ,(int)$row->ID, $first_name, $last_name)).'</p>';
         }
     }

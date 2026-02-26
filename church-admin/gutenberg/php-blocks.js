@@ -383,27 +383,9 @@
 								checked: props.attributes.full_privacy_show,
 								onChange: ( value ) => { props.setAttributes( { full_privacy_show: value } ); },
 							} ),
-							el( CheckboxControl, {
-								key:'allow-sites',
-								label: 'Show sites to logged in users',
-								value: props.attributes.sites,
-								checked: props.attributes.sites,
-								onChange: ( value ) => { props.setAttributes( { sites: value } ); },
-							} ),
-							el( CheckboxControl, {
-								key:'allow-groups',
-								label: 'Show groups to logged in users',
-								value: props.attributes.groups,
-								checked: props.attributes.groups,
-								onChange: ( value ) => { props.setAttributes( { groups: value } ); },
-							} ),
-							el( CheckboxControl, {
-								key:'allow-ministries',
-								label: 'Show ministries to logged in users',
-								value: props.attributes.ministries,
-								checked: props.attributes.ministries,
-								onChange: ( value ) => { props.setAttributes( { ministries: value } ); },
-							} ),
+							
+							
+							
 						)
 					];
 				},
@@ -550,13 +532,7 @@
 							value: props.attributes.member_type_id,
 							onChange: ( value ) => { props.setAttributes( { member_type_id: value } ); },
 						} ),
-						el( SelectControl, {
-							key:'site-id',
-							label: 'Which Site?',
-							value: props.attributes.site_id,
-							onChange: ( value ) => { props.setAttributes( { site_id: value } ); },
-							options:  siteOptions
-						} ),
+						
 					el( CheckboxControl, {
 							key:'pdf-links',
 							label: 'PDF links?',

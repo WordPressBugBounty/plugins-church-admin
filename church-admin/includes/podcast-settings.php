@@ -20,7 +20,7 @@ $url=$upload_dir['baseurl'].'/sermons/';
     
     global $wpdb,$church_admin_podcast_settings;
     echo'<h2>'.esc_html( __('Podcast Settings for RSS file','church-admin' ) ).'</h2>';
-    if(!empty( $settings )){echo'<p><a href="'.$url.'podcast.xml">Podcast RSS file</a></p>';}
+    if(!empty( $settings )){echo'<p><a href="'.esc_url($url).'podcast.xml">Podcast RSS file</a></p>';}
    
     $language_codes = array(
 		'en-GB' => 'English UK' ,
@@ -273,7 +273,7 @@ $url=$upload_dir['baseurl'].'/sermons/';
             
             update_option('church_admin_podcast_settings',$new_settings);
             
-            echo'<div class="notice notice-success inline"><p><strong>Podcast Settings Updated<br><a href="'.$url.'podcast.xml">Check Podcast RSS file</a></p></div>';
+            echo'<div class="notice notice-success inline"><p><strong>Podcast Settings Updated<br><a href="'.esc_url($url).'podcast.xml">Check Podcast RSS file</a></p></div>';
             require_once(plugin_dir_path(dirname(__FILE__) ).'includes/sermon-podcast.php');
             church_admin_podcast_xml();
             
@@ -317,19 +317,19 @@ $url=$upload_dir['baseurl'].'/sermons/';
             if(!empty( $settings['owner_email'] ) ) echo ' value="'.esc_html( $settings['owner_email'] ).'"';
             echo '/></td></tr>';
             echo'<tr><th scope="row">Language</th><td><select id="language" name="language">';
-            $first=$option='';
+            
             foreach( $language_codes AS $key=>$value)
             {
-                if( $key==$settings['language'] )  {$first='<option value="'.esc_html( $key).'" selected="selected" >'.esc_html( $value).'</option>';}else{ $option.='<option value="'.esc_html( $key).'">'.esc_html( $value).'</option>';}
+                echo '<option value="'.esc_html( $key).'" '.selected($key,$settings['language'],false).' >'.esc_html( $value).'</option>';
             }
-            echo $first.$option.'</select></td></tr>';
+            echo '</select></td></tr>';
             echo'<tr><th scope="row">Itunes Category</th><td><select id="category" name="category">';
-            $first=$option='';
+            
             foreach( $cats AS $key=>$value)
             {
-                if( $value==$settings['category'] )  {$first='<option value="'.(int)$value.'" selected="selected" >'.esc_html( $value).'</option>';}else{ $option.='<option value="'.(int)$value.'">'.esc_html( $value).'</option>';}
+                $first='<option value="'.(int)$value.'" '.selected($value,$settings['category'] ,false).' >'.esc_html( $value).'</option>';
             }
-            echo $first.$option.'</select></td></tr>';
+            echo '</select></td></tr>';
             echo'<tr><th scope="row">Image (1400px square)</th><td>';
             echo'<input type="hidden" name="image_id" id="podcast_image_id" ';
             if(!empty( $settings['image_id'] ) )echo' value="'.(int)$settings['image_id'].'" ';
@@ -339,7 +339,9 @@ $url=$upload_dir['baseurl'].'/sermons/';
                 $imagePath= wp_get_attachment_image_src( $settings['image_id'],'thumbnail');
                 echo'<img src="'.$imagePath[0].'" id="podcast-image"><button id="remove-podcast-image"  class="button-secondary " >'.esc_html( __('Remove Image','church-admin' ) ).'</button>';
             }
-            elseif(!empty( $settings['image_path'] ) )  {echo'<img src="'.esc_url( $settings['image_path'] ).'" id="podcast-image"><button id="remove-podcast-image"  class="button-secondary " >'.esc_html( __('Remove Image','church-admin' ) ).'</button>';}
+            elseif(!empty( $settings['image_path'] ) )  {
+                echo'<img src="'.esc_url( $settings['image_path'] ).'" id="podcast-image"><button id="remove-podcast-image"  class="button-secondary " >'.esc_html( __('Remove Image','church-admin' ) ).'</button>';
+            }
             else{echo'<img src="https://dummyimage.com/300x300/000/fff&text=Podcast+Image" width="300" height="300" id="podcast-image" />';}
             
             echo'<button id="podcast-image-upload"  class="button-secondary " >'.esc_html( __('Upload Image','church-admin' ) ).'</button>';
@@ -350,7 +352,9 @@ $url=$upload_dir['baseurl'].'/sermons/';
             if(!empty( $settings['sermons'] ) )  {echo esc_html( $settings['sermons'] );}else{echo __('Sermons','church-admin');}
             echo'"></td></tr>';
             echo'<tr><th scope="row">'.esc_html( __('Series','church-admin' ) ).'</td><td><input type="text" name="series" value="';
-            if(!empty( $settings['series'] ) )  {echo esc_html( $settings['series'] );}else{echo __('Series','church-admin');}
+            if(!empty( $settings['series'] ) )  {
+                echo esc_html( $settings['series'] );}else{echo esc_html(__('Series','church-admin'));
+            }
             echo'"></td></tr>';
             echo'<tr><th scope="row">'.esc_html( __('Most popular','church-admin' ) ).'</td><td><input type="text" name="most-popular" value="';
             if(!empty( $settings['most-popular'] ) )  {echo esc_html( $settings['most-popular'] );}else{echo __('Most popular','church-admin');}

@@ -16,16 +16,16 @@ function church_admin_list_custom_fields()
 
 	global $wpdb;
 	//$wpdb->show_errors;
-    $out='<h2>'.esc_html( __('Custom fields','church-admin' ) ).'</h2>';
+    echo'<h2>'.esc_html( __('Custom fields','church-admin' ) ).'</h2>';
 	
-	$out.='<p><a class="button-primary" href="'.wp_nonce_url('admin.php?page=church_admin/index.php&amp;action=edit-custom-field&amp;section=people','edit-custom-field').'">'.esc_html( __('Add a custom field','church-admin' ) ).'</a></p>';
+	echo '<p><a class="button-primary" href="'.esc_url(wp_nonce_url('admin.php?page=church_admin/index.php&amp;action=edit-custom-field&amp;section=people','edit-custom-field')).'">'.esc_html( __('Add a custom field','church-admin' ) ).'</a></p>';
 	$custom_fields=$wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_custom_fields WHERE section="household" OR section="people" ORDER BY section,custom_order,name');
 	if(!empty( $custom_fields) )
 	{
-		$out.=__('Drag and Drop to change row display order','church-admin');
+		echo esc_html(__('Drag and Drop to change row display order','church-admin'));
 		$thead='<tr><th class="column-primary">'.esc_html( __('Custom field name','church-admin' ) ).'</th><th>'.esc_html( __('Edit','church-admin' ) ).'</th><th>'.esc_html( __('Delete','church-admin' ) ).'</th><th>'.esc_html( __('Section','church-admin' ) ).'</th><th>'.esc_html( __('Custom field type','church-admin' ) ).'</th><th>'.esc_html( __('Default','church-admin' ) ).'</th><th>'.esc_html( __('First registration only','church-admin') ).'</th></tr>';
 		
-		$out.='<table  id="sortable" class="widefat striped"><thead>'.$thead.'</thead><tbody class="content">';
+		echo '<table  id="sortable" class="widefat striped"><thead>'.wp_kses_post($thead).'</thead><tbody class="content">';
 		
 		foreach( $custom_fields AS $custom_field)
 		{
@@ -33,17 +33,17 @@ function church_admin_list_custom_fields()
 			if(!empty( $custom_field->default_value) )  {$default=$custom_field->default_value;}else{$default="";}
 			$edit='<a href="'.wp_nonce_url('admin.php?page=church_admin/index.php&amp;action=edit-custom-field&amp;section=people&amp;id='.(int)$custom_field->ID,'edit-custom-field').'">'.esc_html( __('Edit','church-admin' ) ).'</a>';
 			$delete='<a href="'.wp_nonce_url('admin.php?page=church_admin/index.php&amp;action=delete-custom-field&amp;section=people&amp;id='.(int)$custom_field->ID,'delete-custom-field').'">'.esc_html( __('Delete','church-admin' ) ).'</a>';
-			$out.='<tr  class="sortable" id="'.(int)$custom_field->ID.'">';
-			$out.='<td data-colname="'.esc_html( __('Custom field','church-admin' ) ).'" class="column-primary">'.esc_html( $custom_field->name).'</td>';
-			$out.='<td data-colname="'.esc_html( __('Edit','church-admin' ) ).'">'.$edit.'</td>';
-			$out.='<td data-colname="'.esc_html( __('Delete','church-admin' ) ).'">'.$delete.'</td>';
+			echo '<tr  class="sortable" id="'.(int)$custom_field->ID.'">';
+			echo '<td data-colname="'.esc_html( __('Custom field','church-admin' ) ).'" class="column-primary">'.esc_html( $custom_field->name).'</td>';
+			echo '<td data-colname="'.esc_html( __('Edit','church-admin' ) ).'">'.$edit.'</td>';
+			echo '<td data-colname="'.esc_html( __('Delete','church-admin' ) ).'">'.$delete.'</td>';
 			
-			$out.='<td data-colname="'.esc_html( __('Custom field section','church-admin' ) ).'">'.esc_html( $custom_field->section).'</td>';
-			$out.='<td data-colname="'.esc_html( __('Custom field type','church-admin' ) ).'">'.esc_html( $custom_field->type).'</td>';
-			$out.='<td data-colname="'.esc_html( __('Default value','church-admin' ) ).'">'.esc_html( $default).'</td>';
-			$out.='<td data-colname="'.esc_html( __('Onboarding only','church-admin' ) ).'">'.esc_html($onboarding).'</td></tr>';
+			echo '<td data-colname="'.esc_html( __('Custom field section','church-admin' ) ).'">'.esc_html( $custom_field->section).'</td>';
+			echo '<td data-colname="'.esc_html( __('Custom field type','church-admin' ) ).'">'.esc_html( $custom_field->type).'</td>';
+			echo '<td data-colname="'.esc_html( __('Default value','church-admin' ) ).'">'.esc_html( $default).'</td>';
+			echo '<td data-colname="'.esc_html( __('Onboarding only','church-admin' ) ).'">'.esc_html($onboarding).'</td></tr>';
 		}
-		$out.='</tbody><tfoot>'.$thead.'</tfoot></table>';
+		echo '</tbody><tfoot>'.wp_kses_post($thead).'</tfoot></table>';
 	}
 	echo' <script type="text/javascript">
 
@@ -141,31 +141,33 @@ function church_admin_list_custom_fields()
 					}
 			}
 		}
- 		$out.='<div class="notice notice-success"><h2>'.esc_html( __('Custom field saved','church-admin' ) ).'</h2></div>';
- 		$out.=church_admin_list_custom_fields();
+ 		echo '<div class="notice notice-success"><h2>'.esc_html( __('Custom field saved','church-admin' ) ).'</h2></div>';
+ 		church_admin_list_custom_fields();
   	}
  	else
  	{
- 		$out='<h2>'.esc_html( __('Edit custom field','church-admin' ) ).'</h2>';
- 		$out.='<form action="" method="POST">';
- 		$out.='<table class="form-table">';
- 		$out.='<tr><th scope="row">'.esc_html( __('Custom field name','church-admin' ) ).'</th><td><input type="text" name="custom-field-name" ';
- 		if(!empty( $data->name) )$out.=' value="'.esc_html( $data->name).'" ';
- 		$out.='/>';
+ 		echo'<h2>'.esc_html( __('Edit custom field','church-admin' ) ).'</h2>';
+ 		echo'<form action="" method="POST">';
+ 		echo'<table class="form-table">';
+ 		echo'<tr><th scope="row">'.esc_html( __('Custom field name','church-admin' ) ).'</th><td><input type="text" name="custom-field-name" ';
+ 		if(!empty( $data->name) ){
+			echo' value="'.esc_html( $data->name).'" ';
+		}
+ 		echo '/>';
 
 		//TYPE
 		if ( empty( $data->section) )$data->section='';
 		if ( empty( $data->default_value) )$data->default_value='';
  		if ( empty( $data->type) )$data->type='';
- 		$out.='<tr><th scope="row">'.esc_html( __('Custom field type','church-admin' ) ).'</th><td><select name="custom-field-type" class="custom-type"><option value="boolean" '.selected('boolean',$data->type,FALSE).'>'.esc_html( __('Yes/No','church-admin' ) ).'</option><option value="date" '.selected('date',$data->type,FALSE).'>'.esc_html( __('Date','church-admin' ) ).'</option><option value="text" '.selected('text',$data->type,FALSE).'>'.esc_html( __('Text field','church-admin' ) ).'</option><option value="radio"'.selected('radio',$data->type,FALSE).'>'.esc_html( __('Radio buttons','church-admin' ) ).'</option>
+ 		echo'<tr><th scope="row">'.esc_html( __('Custom field type','church-admin' ) ).'</th><td><select name="custom-field-type" class="custom-type"><option value="boolean" '.selected('boolean',$data->type,FALSE).'>'.esc_html( __('Yes/No','church-admin' ) ).'</option><option value="date" '.selected('date',$data->type,FALSE).'>'.esc_html( __('Date','church-admin' ) ).'</option><option value="text" '.selected('text',$data->type,FALSE).'>'.esc_html( __('Text field','church-admin' ) ).'</option><option value="radio"'.selected('radio',$data->type,FALSE).'>'.esc_html( __('Radio buttons','church-admin' ) ).'</option>
 		 <option value="checkbox"'.selected('checkbox',$data->type,FALSE).'>'.esc_html( __('Checkboxes','church-admin' ) ).'</option>
 		 <option value="select"'.selected('select',$data->type,FALSE).'>'.esc_html( __('Select dropdown','church-admin' ) ).'</option></select></td></tr>';
 		//SECTION
-		if(!empty( $data) )$out.='<tr><th scope="row" colspan=2>'.esc_html( __('Changing from Household to People will require editing people entries for which person in a household the data applies to.','church-admin' ) ).'</th></tr>';
-		$out.='<tr><th scope="row">'.esc_html( __('Custom field section','church-admin' ) ).'</th><td><select name="custom-field-section" class="custom-section"><option value="people" '.selected('people',$data->section,FALSE).'>'.esc_html( __('People','church-admin' ) ).'</option><option value="household" '.selected('household',$data->section,FALSE).'>'.esc_html( __('Household','church-admin' ) ).'</option>';
-		/* $out.='<option value="event" '.selected('event',$data->section,FALSE).'>'.esc_html( __('Event ticket','church-admin' ) ).'</option>';
+		if(!empty( $data) )echo'<tr><th scope="row" colspan=2>'.esc_html( __('Changing from Household to People will require editing people entries for which person in a household the data applies to.','church-admin' ) ).'</th></tr>';
+		echo'<tr><th scope="row">'.esc_html( __('Custom field section','church-admin' ) ).'</th><td><select name="custom-field-section" class="custom-section"><option value="people" '.selected('people',$data->section,FALSE).'>'.esc_html( __('People','church-admin' ) ).'</option><option value="household" '.selected('household',$data->section,FALSE).'>'.esc_html( __('Household','church-admin' ) ).'</option>';
+		/* echo '<option value="event" '.selected('event',$data->section,FALSE).'>'.esc_html( __('Event ticket','church-admin' ) ).'</option>';
 		*/
-		$out.='<option value="giving" '.selected('giving',$data->section,FALSE).'>'.esc_html( __('Giving','church-admin' ) ).'</option></select></td></tr>';
+		echo'</select></td></tr>';
 		if(!empty( $data->type) )
 		{
 			$option= !empty($data->options) ? maybe_unserialize($data->options):null;
@@ -204,26 +206,26 @@ function church_admin_list_custom_fields()
 				break;
 			}
 			
-			$out.='<tr class="boolean" '.$boolean.'><th scope="row">'.esc_html( __('Default','church-admin' ) ).'</th>';
-			$out.='<td><select name="custom-field-default" '.$booleanField.' class="boolean-default"><option value="1" ';
-			if(!empty( $data->default_value) )$out.=' selected="selected" ';
-			$out.='>'.esc_html( __('Yes','church-admin' ) ).'</option><option value="0" ';
-			if(isset( $data->default_value)&& $data->default_value=="0")$out.=' selected="selected" ';
-			$out.='>'.esc_html( __('No','church-admin' ) ).'</option></select></td></tr>';
+			echo'<tr class="boolean" '.$boolean.'><th scope="row">'.esc_html( __('Default','church-admin' ) ).'</th>';
+			echo'<td><select name="custom-field-default" '.$booleanField.' class="boolean-default"><option value="1" ';
+			if(!empty( $data->default_value) )echo' selected="selected" ';
+			echo'>'.esc_html( __('Yes','church-admin' ) ).'</option><option value="0" ';
+			if(isset( $data->default_value)&& $data->default_value=="0")echo' selected="selected" ';
+			echo'>'.esc_html( __('No','church-admin' ) ).'</option></select></td></tr>';
 
-			$out.='<tr class="text" '.$text.'><th scope="row">'.esc_html( __('Default','church-admin' ) ).'</th>';
-			$out.='<td ><input type="text" class="text-default" '.$textField.' name="custom-field-default" ';
-			if(!empty( $data->default_value) )$out.=' value="'.esc_html( $data->default_value).'" ';
-			$out.='/></td></tr>';
+			echo'<tr class="text" '.$text.'><th scope="row">'.esc_html( __('Default','church-admin' ) ).'</th>';
+			echo'<td ><input type="text" class="text-default" '.$textField.' name="custom-field-default" ';
+			if(!empty( $data->default_value) )echo' value="'.esc_html( $data->default_value).'" ';
+			echo'/></td></tr>';
 			//options
-			$out.='<tr class="options" '.$options.'><th scope="row">'.esc_html( __('Add upto 20 choices','church-admin' ) ).'</th><td>';
+			echo'<tr class="options" '.$options.'><th scope="row">'.esc_html( __('Add upto 20 choices','church-admin' ) ).'</th><td>';
 			$options_chosen = !empty($data->options)? unserialize($data->options) : array();
 			for($x=0;$x<=20;$x++){
-				$out.='<input type="text" name="options[]" ';
-				if(!empty($option[$x]))$out.=' value="'.esc_html( $option[$x]).'" ';
-				$out.='><br/>';
+				echo'<input type="text" name="options[]" ';
+				if(!empty($option[$x]))echo' value="'.esc_html( $option[$x]).'" ';
+				echo'><br/>';
 			}
-			$out.='</td></tr>';
+			echo'</td></tr>';
 			
 
 
@@ -231,39 +233,39 @@ function church_admin_list_custom_fields()
 			
 		}
 		else {
-			$out.='<tr class="boolean" style="display:table-row"><th scope="row">'.esc_html( __('Default','church-admin' ) ).'</th><td><select  class="boolean-default" name="custom-field-default"><option value="1" ';
-			if(!empty( $data->default_value) )$out.=' selected="selected" ';
-			$out.='>'.esc_html( __('Yes','church-admin' ) ).'</option><option value="0" ';
-			if(isset( $data->default_value)&& $data->default_value=="0")$out.=' selected="selected" ';
-			$out.='>'.esc_html( __('No','church-admin' ) ).'</option></select></td></tr>';
+			echo'<tr class="boolean" style="display:table-row"><th scope="row">'.esc_html( __('Default','church-admin' ) ).'</th><td><select  class="boolean-default" name="custom-field-default"><option value="1" ';
+			if(!empty( $data->default_value) )echo' selected="selected" ';
+			echo'>'.esc_html( __('Yes','church-admin' ) ).'</option><option value="0" ';
+			if(isset( $data->default_value)&& $data->default_value=="0")echo' selected="selected" ';
+			echo'>'.esc_html( __('No','church-admin' ) ).'</option></select></td></tr>';
 
-			$out.='<tr class="text"  style="display:none"><th scope="row">'.esc_html( __('Default','church-admin' ) ).'</th><td><input disabled="disabled" type="text" class="text-default" name="custom-field-default" ';
-			if(!empty( $data->default_value) )$out.=' value="'.esc_html( $data->default_value).'" ';
-			$out.='/></td></tr>';
+			echo'<tr class="text"  style="display:none"><th scope="row">'.esc_html( __('Default','church-admin' ) ).'</th><td><input disabled="disabled" type="text" class="text-default" name="custom-field-default" ';
+			if(!empty( $data->default_value) )echo' value="'.esc_html( $data->default_value).'" ';
+			echo'/></td></tr>';
 			//options
-			$out.='<tr class="options" style="display:none"><th scope="row">'.esc_html( __('Add up to 20 choices','church-admin' ) ).'</th><td>';
+			echo'<tr class="options" style="display:none"><th scope="row">'.esc_html( __('Add up to 20 choices','church-admin' ) ).'</th><td>';
 			$options_chosen = !empty($data->options)? unserialize($data->options) : array();
 			for($x=0;$x<20;$x++){
 				$y=$x+1;
-				$out.='<p>'.$y.' <input type="text" name="options[]" ';
-				if(!empty($option[$x]))$out.=' value="'.esc_html( $option[$x]).'" ';
-				$out.='></p>';
+				echo'<p>'.$y.' <input type="text" name="options[]" ';
+				if(!empty($option[$x]))echo' value="'.esc_html( $option[$x]).'" ';
+				echo'></p>';
 			}
-			$out.='</td></tr>';
+			echo'</td></tr>';
 		}
-		$out.='<tr class="all"><th scope="row">'.esc_html( __('Registration/Add New household forms only','church-admin' ) ).'</th>';
-		$out.='<td><input type="checkbox" name="onboarding" ';
-		if(!empty( $data->onboarding) ) $out.=' checked="checked" ';
-		$out.='/></td></tr>';
-		$out.='<tr class="all"><th scope="row">'.esc_html( __('Apply to everyone','church-admin' ) ).'</th>';
-			$out.='<td><input type="checkbox" name="custom-all" ';
-			if(!empty( $data->all) ) $out.=' checked="checked" ';
-			$out.='/></td></tr>';
-		$out.='<tr class="show_me"><th scope="row">'.esc_html( __('Show on address list etc','church-admin' ) ).'</th>';
-		$out.='<td><input type="checkbox" name="show-me" ';
-		if(!empty( $data->show_me) ) $out.=' checked="checked" ';
-		$out.='/></td></tr>';
-		$out.='<script>
+		echo'<tr class="all"><th scope="row">'.esc_html( __('Registration/Add New household forms only','church-admin' ) ).'</th>';
+		echo'<td><input type="checkbox" name="onboarding" ';
+		if(!empty( $data->onboarding) ) echo' checked="checked" ';
+		echo'/></td></tr>';
+		echo'<tr class="all"><th scope="row">'.esc_html( __('Apply to everyone','church-admin' ) ).'</th>';
+			echo'<td><input type="checkbox" name="custom-all" ';
+			if(!empty( $data->all) ) echo' checked="checked" ';
+			echo'/></td></tr>';
+		echo'<tr class="show_me"><th scope="row">'.esc_html( __('Show on address list etc','church-admin' ) ).'</th>';
+		echo'<td><input type="checkbox" name="show-me" ';
+		if(!empty( $data->show_me) ) echo' checked="checked" ';
+		echo'/></td></tr>';
+		echo'<script>
 				jQuery(document).ready(function( $)  {
 					$(".custom-type").change(function()  {
 							var val=$(this).val();
@@ -322,9 +324,9 @@ function church_admin_list_custom_fields()
 				
 			});
 		</script>';
- 		$out.='<tr><td>&nbsp;</td><td><input type="hidden" name="save_custom_field" value="yes" /><input type="submit" class="button-primary" value="'.esc_html( __('Save','church-admin' ) ).'" /></td></tr></table></form>';
+ 		echo'<tr><td>&nbsp;</td><td><input type="hidden" name="save_custom_field" value="yes" /><input type="submit" class="button-primary" value="'.esc_html( __('Save','church-admin' ) ).'" /></td></tr></table></form>';
  	}
- 	return $out;
+ 	
 
 
 }
@@ -342,9 +344,9 @@ function church_admin_list_custom_fields()
 	 global $wpdb;
 	$wpdb->query('DELETE FROM '.$wpdb->prefix.'church_admin_custom_fields_meta WHERE custom_id="'.(int)$ID.'"');
 	$wpdb->query('DELETE FROM '.$wpdb->prefix.'church_admin_custom_fields WHERE ID="'.(int)$ID.'"');
-	$out='<div class="notice notice-success"><h2>'.esc_html( __('Custom field deleted','church-admin' ) ).'</h2></div>';
+	echo'<div class="notice notice-success"><h2>'.esc_html( __('Custom field deleted','church-admin' ) ).'</h2></div>';
 
 
- 	$out.=church_admin_list_custom_fields();
+ 	church_admin_list_custom_fields();
  	return $out;
  }

@@ -280,7 +280,7 @@ for( $counter = 1; $counter <= $numdaysinmonth; $counter ++ )
                 $popup.='<a title="'.esc_attr(__('Edit Entry','church-admin' ) ).'" href="'.esc_url( wp_nonce_url(admin_url().'admin.php?page=church_admin/index.php&amp;action='.esc_attr( $type ).'&amp;event_id='.(int)$row->event_id.'&amp;date_id='.(int)$row->date_id,$nonce) ).'"><span class="ca-dashicons dashicons dashicons-edit"></span>'.esc_html( __('Edit','church-admin') ).'</a>';
             }
              		
-            $day[$row->event_id]= '<div class="church_admin_cal_item" id="ca'.(int)$row->date_id.'" style="background-color:'.esc_attr($row->bgcolor).';border-left:3px solid '.$border.';padding:5px;color:'.esc_attr($row->text_color).'" >'.esc_html(mysql2date(get_option('time_format'),$row->start_time)).' '.esc_html( $row->title).'... <div id="div'.intval( $row->date_id).'" class="church_admin_tooltip"  style="background-color:'.esc_attr($row->bgcolor).';border-left:3px solid '.esc_html($border).';padding:5px;;color:'.esc_attr($row->text_color).'" >'.wp_kses_post($popup).'</div></div>';
+            $day[$row->event_id]= '<div class="church_admin_cal_item" id="ca'.(int)$row->date_id.'" style="background-color:'.esc_attr($row->bgcolor).';border-left:3px solid '.$border.';padding:5px;color:'.esc_attr($row->textcolor).'" >'.esc_html(mysql2date(get_option('time_format'),$row->start_time)).' '.esc_html( $row->title).'... <div id="div'.intval( $row->date_id).'" class="church_admin_tooltip"  style="background-color:'.esc_attr($row->bgcolor).';border-left:3px solid '.esc_html($border).';padding:5px;;color:'.esc_attr($row->textcolor).'" >'.wp_kses_post($popup).'</div></div>';
         
         }
         //church_admin_debug($day);
@@ -318,10 +318,10 @@ jQuery(document).ready(function( $)  {
     $('.church_admin_cal_item').hover(
         function() {
             var hideNo=this.id.substr(2);
-          $('#div'+hideNo).fadeIn(1000);
+          $('#div'+hideNo).show();
         }, function() {
             var hideNo=this.id.substr(2);
-          $('#div'+hideNo).fadeOut(1000);
+          $('#div'+hideNo).hide();
         }
       );
 

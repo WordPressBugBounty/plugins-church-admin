@@ -306,7 +306,7 @@ function church_admin_category_list()
         $edit_url='<a href="'.wp_nonce_url('admin.php?page=church_admin/index.php&amp;action=edit-category&section=calendar&amp;id='.$row->cat_id,'edit-category').'">'.esc_html( __('Edit','church-admin' ) ).'</a>';
         $delete_url='<a onclick="return confirm(\''.esc_html( __('Are you sure?','church-admin' ) ).'\');" href="'.wp_nonce_url('admin.php?page=church_admin/index.php&amp;action=delete-category&section=calendar&amp;id='.$row->cat_id,'delete-category').'">'.esc_html( __('Delete','church-admin' ) ).'</a>';
         $shortcode='[church_admin type=calendar-list category='.$row->cat_id.' weeks=4]';
-        $table.='<tr><td>'.$edit_url.'</td><td>'.$delete_url.'</td><td style="background:'.esc_attr($row->bgcolor).';color:'.esc_attr($row->text_color).'">'.esc_html( $row->category).'</td><td>'.$shortcode.'</td></tr>';
+        $table.='<tr><td>'.$edit_url.'</td><td>'.$delete_url.'</td><td style="background:'.esc_attr($row->bgcolor).';color:'.esc_attr($row->textcolor).'">'.esc_html( $row->category).'</td><td>'.$shortcode.'</td></tr>';
     }
     $table.='</tbody><tfoot>'.$thead.'</tfoot></table>';
     echo '<h2>'.esc_html( __('Calendar Categories','church-admin' ) ).'</h2><p><a class="button-primary" href="'.wp_nonce_url('admin.php?page=church_admin/index.php&amp;action=edit-category&section=calendar','edit-category').'">'.esc_html( __('Add a category','church-admin' ) ).'</a></p>'.$table;
@@ -352,7 +352,7 @@ function church_admin_edit_category( $id)
 		//sanitize
 		$color = church_admin_sanitize($_POST['color']);
 		
-		$text_color = church_admin_light_or_dark($color);
+		$textcolor = church_admin_light_or_dark($color);
 		$category_name = church_admin_sanitize($_POST['category']);
 		if(!empty( $id) )
         {
@@ -397,8 +397,8 @@ function church_admin_edit_category( $id)
  		if(!empty( $data->category) ) echo 'value="'.esc_attr( $data->category).'"';
 			echo'/></div>';
  		echo'<div class="church-admin-form-group"><label>'.esc_html( __('Background Colour','church-admin' ) ).'</label><input  class="church-admin-form-control" type="text" ';
-  		if(!empty( $data->bgcolor) && !empty($data->text_color)) {
-			echo' style="background:'.esc_attr( $data->bgcolor).';color:'.esc_attr($data->text_color).'" ';
+  		if(!empty( $data->bgcolor) && !empty($data->textcolor)) {
+			echo' style="background:'.esc_attr( $data->bgcolor).';color:'.esc_attr($data->textcolor).'" ';
 		}
   		echo' id="color" name="color" ';
   		if(!empty( $data->bgcolor) )echo' value="'.esc_attr( $data->bgcolor).'" ';
@@ -866,11 +866,11 @@ function church_admin_calendar_form( $data,$error,$recurring,$date,$edit_type)
 	{
     	if(!empty( $data->cat_id)&&$data->cat_id==$row->cat_id)
     	{
-			$first='<option value="'.(int)$data->cat_id.'" style="background-color:'.esc_html( $row->bgcolor).';color:'.esc_attr($row->text_color).'" selected="selected">'.esc_html( $data->category).'</option>';
+			$first='<option value="'.(int)$data->cat_id.'" style="background-color:'.esc_html( $row->bgcolor).';color:'.esc_attr($row->textcolor).'" selected="selected">'.esc_html( $data->category).'</option>';
     	}
     	else
     	{
-        	$select.='<option value="'.(int)$row->cat_id.'" style="background-color:'.esc_html( $row->bgcolor).';color:'.esc_attr($row->text_color).'">'.esc_html( $row->category).'</option>';
+        	$select.='<option value="'.(int)$row->cat_id.'" style="background-color:'.esc_html( $row->bgcolor).';color:'.esc_attr($row->textcolor).'">'.esc_html( $row->category).'</option>';
     	}
 	}
 	$out.=$first.$select;//have original value first!

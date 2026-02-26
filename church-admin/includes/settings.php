@@ -26,7 +26,7 @@ function church_admin_modules()
 		}
 
 		update_option('church_admin_modules',$modules);
-        echo '<div class="notice notice-success inline"><h2>'.esc_html( __('Modules updated - refresh page to show changes in menu')).'</h2></div>';
+        echo '<div class="notice notice-success inline"><h2>'.esc_html( __('Modules updated - refresh page to show changes in menu','church-admin')).'</h2></div>';
 	}
 
 		echo'<h1 class="modules">'.esc_html( __('Set which module tabs are visible ','church-admin' ) ).'</h2>';
@@ -48,17 +48,9 @@ function church_admin_modules()
 				case'Comms':$display=__('Comms','church-admin');break;
 				case'Groups':$display=__('Groups','church-admin');break;
 				case'Calendar':$display=__('Calendar','church-admin');break;
-                case'Giving':$display=__('Giving','church-admin');break;
+              
 				case'Media':$display=__('Media','church-admin');break;
-				case'Facilities':$display=__('Facilities','church-admin');break;
-				case'Ministries':$display=__('Ministries','church-admin');break;
-				case'Services':$display=__('Services','church-admin');break;
-				case'Sessions':$display=__('Sessions','church-admin');break;
-				case'Classes':$display=__('Classes','church-admin');break; //Added by Jostein 3.04.2019
-				case'Attendance':$display=__('Attendance','church-admin');break; //Added by Jostein 3.04.2019
-				case'Units':$display=__('Units','church-admin');break;
-                case "Events": $display=__('Events','church-admin');break;
-				case "Gifts":$display=__('Spiritual Gifts','church-admin');break;
+				
 				default:$display=$mod;break;
 			}
 			if( $mod!='Podcast' && $mod!='App')
@@ -343,7 +335,7 @@ function church_admin_email_settings()
 	echo'<div class="church-admin-form-group"><input type="radio" class="speed" id="immediate"  name="cron" value="immediate" '.checked( $current_cron,'immediate',false).'/><label>'.esc_html( __('Send Emails Immediately','church-admin' ) ).' ('.esc_html( __("Use this option if your hosting company doesn't limit how many emails you can send an hour",'church-admin' ) ).')</label></div>';
 	echo'<div class="church-admin-form-group"><input type="radio"  class="speed cron" name="cron" value="cron" '.checked( $current_cron,'cron',false).'/><label>'.esc_html( __('I want to use cron','church-admin' ) ).' ('.esc_html( __('Use this option if you are on a Linux server and are limited how many emails you can send an hour','church-admin' ) ).')</label></div>';
 	$cronCommand='<strong>curl --silent '.admin_url().'/admin-ajax.php?action=church_admin_cronemail</strong>';
-	//translators: %1$s is a cron command
+	/* translators: 1: is a cron command */
 	echo'<p>'.wp_kses_post(sprintf(__('Set up a cron job with the command %1$s in your cPanel or hosting account','church-admin' ) ,$cronCommand)).'</p>';
 	echo'<div class="church-admin-form-group"><input  id="wp-cron" type="radio" class="speed wp-cron" name="cron" value="wp-cron" '.checked( $current_cron,'wp-cron',FALSE).'/><label>'.esc_html( __('I want to use wp-cron','church-admin' ) ).' ('.esc_html( __("Use this option if you are on a Windows server or don't understand cron and are limited how many emails you can send an hour. It will be set to send a batch every hour.",'church-admin' ) ).')</label></div>';
 	echo '<div id="batch-size" ';
@@ -523,20 +515,7 @@ function church_admin_roles(){
 					'Directory'=>__('Directory','church-admin'),
 					'Events'=>__('Events','church-admin'),
 					'Facilities'=>__('Facilities','church-admin'),
-					'Funnel'=>__('Follow Up Funnels','church-admin'),
-					'Giving'=>__('Giving','church-admin'),
-					'Groups'=>__('Groups','church-admin'),
-					'Inventory'=>__('Inventory','church-admin'),
-					'Kidswork'=>__('Childrens Ministry','church-admin'),
-					'Ministries'=>__('Ministries','church-admin'),
-					'Pastoral'=>__('Pastoral','church-admin'),
-					'Push'=>__('Push','church-admin'),
 					
-					'Service'=>__('Services','church-admin'),
-					'Sessions'=>__('Sessions','church-admin'),
-					
-					'Gifts'=>__('Spiritual Gifts','church-admin'),
-					'Units'=>__('Units','church-admin'),
 				);
 		echo'<h2>'.esc_html( __('Roles','church-admin' ) ).'</h2>';
 		echo'<p><a class="tutorial-link" target="_blank" href="https://www.churchadminplugin.com/tutorials/permissions-and-roles/"><span class="dashicons dashicons-welcome-learn-more"></span>&nbsp;'.esc_html(__('Learn more','church-admin')).'</a></p>';
@@ -675,231 +654,7 @@ function church_admin_roles_old()
 
 
 
-/**
- * This function sets up Bulk SMS
- *
- * Author:     Andy Moyle
- * Author URI: http://www.churchadminplugin.com
- *
- *
- */
 
-
-function church_admin_sms_settings()
-{
-    require_once(plugin_dir_path(dirname(__FILE__) ).'/includes/sms.php');
-    $sms_country_code=get_option('church_admin_sms_iso');
-    $sms_sender=get_option('church_admin_sms_reply');
-    /********************************************************
-    *
-    * Check if old style provider is set already
-    *
-    **********************************************************/
-    $smsProvider=get_option('church_admin_sms_provider');
-    if ( empty( $smsProvider) )
-    {
-        $bulksms=get_option('church_admin_bulksms');
-        if(!empty( $bulksms) )
-        {
-            $smsProvider='bulksms.com';
-            update_option('church_admin_sms_provider','bulksms.com');
-            delete_option('church_admin_bulksms');
-        }
-        $cloudservicezm=get_option('church_admin_cloudservicezm');
-        if(!empty( $cloudservicezm) )
-        {
-            $smsProvider='cloudservicezm.com';
-            update_option('church_admin_sms_provider','cloudservicezm.com');
-            delete_option('church_admin_cloudservicezm');
-        }
-    }
-    if(!empty( $smsProvider) )
-    {
-        $sender=get_option('church_admin_sms_reply');
-        switch( $smsProvider)
-        {
-            case 'bulksms.com':
-            case'cloudservicezm.com':
-                    $sms_username=get_option('church_admin_sms_username');
-                    $sms_password=get_option('church_admin_sms_password');
-            break;
-            case 'textmagic.com':
-                    $sms_username=get_option('church_admin_sms_username');
-                    $api_key=get_option('church_admin_sms_api_key');
-            break;
-            case 'twilio':
-                    $smsSID=get_option('church_admin_twilio_SID');
-                    $smsToken=get_option('church_admin_twilio_token');
-            break;
-        }
-    }
-    echo'<h2>'.esc_html( __("You can send bulk SMS to your directory using one of these SMS service providers",'church-admin' ) ).'</h2>';
-    if ( empty( $_POST) )
-	{
-		echo'<p>'.esc_html( __("Click on an image to sign up with a provider",'church-admin' ) ).'</p>';
-		echo'<table class="widefat wp-list-table"><thead><tr><th class="column-primary">'.esc_html( __('SMS provider','church-admin' ) ).'</th><th>'.esc_html( __('Details','church-admin' ) ).'</th></thead><tbody><tr>';
-		echo'<tr><td class="column-primary" data-colname="Twilio">Twilio<button type="button" class="toggle-row">
-		<span class="screen-reader-text">show details</span>
-		</button></td><td><a href="https://www.twilio.com/referral/YjV7bl"><img src="'.plugins_url('/images/twilio-logo.png',dirname(__FILE__) ).'" alt="Twilio" /><br>'.esc_html( __('Get $10 free when you purchase $10 of credit','church-admin' ) ).'</a><br>'.esc_html( __('Twilio require you to purchase a cell number from them to send SMS at $1pm, but that allows you to send and receive SMS from this website','church-admin' ) ).'<button type="button" class="toggle-row">
-			<span class="screen-reader-text">show details</span>
-		</button></td></tr>';
-			echo'<tr><td class="column-primary"  data-colname="Textmagic">Textmagic<button type="button" class="toggle-row">
-			<span class="screen-reader-text">show details</span>
-		</button></td><td><a href="https://shareasale.com/r.cfm?b=1370513&u=2478286&m=75317&urllink=&afftrack="><img src="'.plugins_url('/images/textmagic-logo.jpeg',dirname(__FILE__) ).'" alt="textmagic.com" /><br>'.esc_html( __('Pricing available in USD, GBP, AUD and EUR','church-admin' ) ).'</a></td></tr>';
-			
-			echo'<tr><td class="column-primary"  data-colname="BulkSMS">BulkSMS<button type="button" class="toggle-row">
-			<span class="screen-reader-text">show details</span>
-		</button></td><td><a href="https://www.bulksms.com"><img src="'.plugins_url('/images/bulksms-logo.png',dirname(__FILE__) ).'" alt="bulksms.com" /></a><br>'.esc_html( __('Pricing available in GBP','church-admin' ) ).'</td></tr>';
-			echo'<tr><td  class="column-primary" data-colname="Zambia CloudService">Cloudservice Zambia<button type="button" class="toggle-row">
-			<span class="screen-reader-text">show details</span>
-		</button></td><td><a href="https://www.cloudservicezm.com/"><img src="'.plugins_url('/images/cloudservicezm-logo.jpeg',dirname(__FILE__) ).'" alt="cloudservicezm.com" /></a><br>'.esc_html( __('Unknown pricing - Zambia only','church-admin' ) ).'</td></tr>';
-			echo'</tr></tbody></table>';
-	}
-    if(!empty( $_POST['save-sms-settings'] ) )
-    {
-        switch( $_POST['sms-provider'] )
-        {
-            case'twilio':
-                update_option('church_admin_sms_provider','twilio');
-                update_option('church_admin_twilio_token',church_admin_sanitize( $_POST['sms-token'] ) );
-                update_option('church_admin_twilio_SID',church_admin_sanitize($_POST['sms-SID'] ) );
-                $smsSID=church_admin_sanitize( $_POST['sms-SID'] );
-                $smsToken=church_admin_sanitize($_POST['sms-token'] );
-                $smsProvider='twilio';
-            break;
-            case'textmagic.com':
-                update_option('church_admin_sms_provider','textmagic.com');
-                update_option('church_admin_sms_api_key',church_admin_sanitize( $_POST['sms-api-key'] ) );
-                $smsProvider='textmagic.com';
-                $sms_api_key=church_admin_sanitize( $_POST['sms-api-key'] );
-            break;
-            case'bulksms.com':
-                update_option('church_admin_sms_provider','bulksms.com');
-                update_option('church_admin_sms_password',sanitize_text_field( $_POST['sms-password'] ) );
-                $smsProvider='bulksms.com';
-                $sms_password=church_admin_sanitize( $_POST['sms-password'] );
-            break;
-            case'cloudservicezm.com':
-                update_option('church_admin_sms_provider','cloudservicezm.com');
-                update_option('church_admin_sms_password',sanitize_text_field( $_POST['sms-password'] ) );
-                $smsProvider='cloudservicezm.com';
-                $sms_password=church_admin_sanitize( $_POST['sms-password'] );
-            break;     
-        }
-        update_option('church_admin_sms_username',church_admin_sanitize( $_POST['sms-username'] ) );
-        $sms_username=sanitize_text_field( $_POST['sms-username'] );
-        update_option('church_admin_sms_iso',church_admin_sanitize( $_POST['sms-iso'] ) );
-        $sms_iso=sanitize_text_field( $_POST['sms-iso'] );
-        update_option('church_admin_sms_reply',church_admin_sanitize( $_POST['sms-sender'] ) );
-        $sms_sender = church_admin_sanitize( $_POST['sms-sender'] );
-        echo'<div class="notice notice-success inline"><h2>'.esc_html( __('SMS provider settings saved','church-admin' ) ).'</h2></div>';
-    }
-        echo'<h2>'.esc_html( __('SMS provider settings','church-admin' ) ).'</h2>';
-        echo'<form action="" method="post">';
-        echo'<table class="form-table">';
-        echo'<tr><th scope="row">'.esc_html( __('Country code (eg 44 for GB)','church-admin' ) ).'</th><td><input type="text" name="sms-iso" ';
-        if(!empty( $sms_country_code) ) echo' value="'.esc_html( $sms_country_code).'" ';
-        echo'/></td></tr>';
-        echo'<tr><th scope="row">'.esc_html( __('SMS sender cell eg:4412345678901, except Twilio +4412345678901','church-admin' ) ).'</th><td><input type="text" name="sms-sender" ';
-        if(!empty( $sms_sender) ) echo' value="'.esc_html( $sms_sender).'" ';
-        echo'/></td></tr>';
-        echo'<tr><th scope="row">'.esc_html( __("Select SMS provider",'church-admin' ) ).'</th><td><select class="sms_provider" name="sms-provider">';
-        if(!empty( $smsProvider) )echo'<option selected="selected" value="'.esc_html( $smsProvider).'">'.esc_html( $smsProvider).'</option>';
-        echo'<option value="textmagic.com">textmagic.com</option>';
-        echo'<option value="twilio">Twilio</option>';
-        echo'<option value="bulksms.com">bulksms.com</option>';
-        echo'<option value="cloudservicezm.com">cloudservicezm.com</option>';
-        echo'</select></td></tr>';
-        
-        if(!empty( $smsProvider) )
-        {
-            switch( $smsProvider)
-            {
-                case 'twilio':
-                        $showAPI=FALSE;
-                        $showP=FALSE;
-                        $showSID=TRUE;
-                        $showToken=TRUE;
-                        $showUserName=FALSE;
-                    break;
-                    default:case'textmagic.com':
-                        $showAPI=TRUE; $showToken=$showSID=$showP=FALSE;
-                    break;
-                    case 'bulksms.com':case'cloudservicezm.com':
-                        $showToken=$showSID=$showAPI=FALSE;
-						$showUserName=$showP=TRUE;
-                    break;
-            }
-        }else{$showAPI=TRUE; $showUP=FALSE;}
-        
-        echo'<tr class="sms-username"';
-        if ( empty( $showUserName) )echo ' style="display:none" ';
-        echo'><th scope="row">'.esc_html( __('Username','church-admin' ) ).'</th><td><input type="text" name="sms-username" ';
-        if(!empty( $sms_username) )echo'value="'.esc_html( $sms_username).'" ';
-        echo'/></td></tr>';
-        echo'<tr class="sms-api-key"';
-        if ( empty( $showAPI) )echo ' style="display:none" ';
-        echo'><th scope="row">'.esc_html( __('API key','church-admin' ) ).'</th><td><input type="text" name="sms-api-key" ';
-        if(!empty( $api_key) )echo'value="'.esc_html( $api_key).'" ';
-        echo'/></td></tr>';
-        
-        echo'<tr class="sms-password" ';
-        if ( empty( $showP) )echo ' style="display:none" ';
-        echo'><th scope="row">'.esc_html( __('Password','church-admin' ) ).'</th><td><input type="text" name="sms-password" ';
-        if(!empty( $sms_password) )echo'value="'.esc_html( $sms_password).'" ';
-        echo'/></td></tr>';
-        /*******************
-        * Twilio
-        ********************/
-        echo'<tr class="sms-SID"';
-        if ( empty( $showSID) )echo ' style="display:none" ';
-        echo'><th scope="row">'.esc_html( __('Twilio SID','church-admin' ) ).'</th><td><input type="text" name="sms-SID" ';
-        if(!empty( $smsSID) )echo'value="'.esc_html( $smsSID).'" ';
-        echo'/></td></tr>';
-        echo'<tr class="sms-token"';
-        if ( empty( $showToken) )echo ' style="display:none" ';
-        echo'><th scope="row">'.esc_html( __('Twilio Token','church-admin' ) ).'</th><td><input type="text" name="sms-token" ';
-        if(!empty( $smsToken) )echo'value="'.esc_html( $smsToken).'" ';
-        echo'/></td></tr>';
-        echo'<tr><th scope="row">&nbsp;</th><td><input type="hidden" name="save-sms-settings" value="TRUE" /><input type="submit" value="'.esc_html( __('Save','church-admin' ) ).' &raquo;" class="button-primary" /></form>';
-         echo'</table>';
-        
-        
-        echo'<script>jQuery(document).ready(function( $)  {
-            $(".sms_provider").on("change",function()  {
-                var sms_provider=$(this).val();
-                switch(sms_provider)
-                {
-                    case "twilio":
-                        $(".sms-api-key").hide();
-                        $(".sms-password").hide();
-                        $(".sms-SID").show();
-                        $(".sms-token").show();
-                         $(".sms-username").hide();
-                    break;
-                    case "textmagic.com":
-                        $(".sms-api-key").show();
-                        $(".sms-password").hide();
-                        $(".sms-SID").hide();
-                        $(".sms-token").hide();
-                        $(".sms-username").show();
-                    break;
-                    case "bulksms.com":case"cloudservicezm.com":
-                        $(".sms-api-key").hide();
-                       $(".sms-username").show();
-                        $(".sms-password").show();
-                        $(".sms-SID").hide();
-                        $(".sms-token").hide();
-                    break;    
-                }
-            })
-        });</script>';
-    
-    
-    
-    
-    
-}
 /**
  * This function general settings
  *
@@ -961,43 +716,10 @@ function church_admin_sms_settings()
 			update_option('church_admin_login_redirect',church_admin_sanitize($_POST['login-redirect'] ));
 		}else{delete_option('church_admin_login_redirect');}
         
-		if(!empty( $_POST['no-push'] ) )
-        {
-            update_option('church_admin_no_push',TRUE);
-        }
-        else
-        {
-            delete_option('church_admin_no_push');
-        }
-		if ( empty( $_POST['private-prayer'] ) )
-		{
-			update_option('church-admin-private-prayer-requests',FALSE);
 
-		}else
-		{
-			update_option('church-admin-private-prayer-requests',TRUE);
-
-		}
 
 		
-		if(!empty( $_POST['prayer-request-admin-push'] ) )
-        {
-                $prayer_request_people_ids=maybe_unserialize(church_admin_get_people_id( church_admin_sanitize($_POST['prayer-request-admin-push'] ) ) );
-                update_option('church_admin_prayer_request_receive_push_to_admin', $prayer_request_people_ids);
-        }
-        else
-        {
-                delete_option('church_admin_prayer_request_receive_push_to_admin');
-        }
-		if ( empty( $_POST['private-acts-of-courage'] ) )
-		{
-			update_option('church-admin-private-acts-of-courage',FALSE);
-
-		}else
-		{
-			update_option('church-admin-private-acts-of-courage',TRUE);
-
-		}
+		
        
 		if ( empty( $_POST['wedding_anniversary'] ) )  {
 			update_option('church_admin_show_wedding_anniversary',FALSE);
@@ -1040,15 +762,7 @@ function church_admin_sms_settings()
 		}
 		
 		
-		if(!empty( $_POST['church_admin_receipt_email_from_name'] ) ){
-			update_option('church_admin_receipt_email_from_name',church_admin_sanitize( $_POST['church_admin_receipt_email_from_name'] ) );
-		}
-		if(!empty( $_POST['church_admin_receipt_email_from_email'] ) ){
-			update_option('church_admin_receipt_email_from_email',church_admin_sanitize( $_POST['church_admin_receipt_email_from_email'] ) );
-		}
-		if(!empty( $_POST['church_admin_receipt_email_template'] ) ){
-			update_option('church_admin_receipt_email_template',church_admin_sanitize( $_POST['church_admin_receipt_email_template'] ) );
-		}
+
 		if(isset( $_POST['church_admin_label'] ) )
 		{
 		switch( $_POST['church_admin_label'] )
@@ -1072,6 +786,12 @@ function church_admin_sms_settings()
 			update_option('church_admin_what_three_words','off');
 		}
 		
+		if(!empty($_POST['extra_genders'])){
+			$genders=get_option('church_admin_gender');
+			$extras = explode(', ',church_admin_premium_sanitize($_POST['extra_genders']));
+			foreach($extras AS $key=>$value){$genders[]=$value;}
+			update_option('church_admin_gender',$genders);
+		}
 		echo'<div class="notice notice-success inline"><p>'.esc_html( __('Settings updated','church-admin' ) ).'</p></div>';
 		$generalDisplay='display:block';
 	}
@@ -1082,7 +802,7 @@ function church_admin_sms_settings()
 		echo'<form action="" method="POST">';
 		
         echo'<h2>'.esc_html( __('General Settings','church-admin' ) ).'</h2>';
-		echo'<div class="church-admin-form-group"><label>'.esc_html( __('Remove data on plugin delete','church-admin' ) ).' </label>';
+
 		
 		
      
@@ -1138,12 +858,7 @@ function church_admin_sms_settings()
 		if( $wa) echo ' checked="checked"';
 		echo '/></td></tr>';
 
-		/*
-		echo'<tr><th scope="row">'.esc_html( __('Add nickname for names','church-admin' ) ).'</th><td><input type="checkbox" name="use_nickname" value="TRUE" ';
-		$nickname=get_option('church_admin_use_nickname');
-		if( $nickname)echo ' checked="checked"';
-		echo '/></td></tr>';
-		*/
+	
 		echo'<tr><th scope="row">'.esc_html( __('Google Maps API key','church-admin' ) ).'</th><td><input type="text" name="google_api" value="'.get_option('church_admin_google_api_key').'" /></td></tr>';
 		echo'<tr><td colspan="2"><a taregt="_blank" href="https://www.churchadminplugin.com/tutorials/google-api-key/">'.esc_html( __('How to get a Google API key','church-admin' ) ).'</a></td></tr>';
 		echo'<tr><th scope="row">'.esc_html( __('Directory Records per page','church-admin' ) ).'</th><td><input type="text" name="pagination" value="'.get_option('church_admin_pagination_limit').'" /></td></tr>';
@@ -1153,47 +868,19 @@ function church_admin_sms_settings()
         $no_push= get_option('church_admin_no_push');
         if( $no_push) echo' checked="checked" ';
         echo'/></td></tr>';
-		/***************************
-		 * What three words
-		 **************************/
-		$googleAPI=get_option('church_admin_google_api_key');
-		if(!empty( $googleAPI) )
-		{//requires google API key to work
-			$w3w='on';
-			$w3w=get_option('church_admin_what_three_words');
-			echo'<tr><th colspan=2><h2>'.esc_html( __('What three words','church-admin' ) ).'</h2></th></tr>';
-			echo'<tr><th colspan=2>'.esc_html( __('What Three Words has divided the world into 3 metre squares and gave each square a unique combination of three words. It’s the easiest way to find and share exact locations.','church-admin' ) ).'</th></tr>';
-			echo '<tr><th scope="row">'.esc_html( __('What Three Words enabled')).'</th><td><input type="checkbox" name="what-three-words" '.checked( $w3w,'on',false).'/></td></tr>';
-			//grab what three words languages
-			$response = wp_remote_get( esc_url_raw('https://api.what3words.com/v3/available-languages?key=7F5FVM60' ) );
-			$api_response = json_decode( wp_remote_retrieve_body( $response ), true );
-			
-			$w3wLanguage=get_option('church_admin_what_three_words_language');
-			if ( empty( $w3wLanguage) )$w3wLanguage='en';
-			$languages=$api_response['languages'];
-			if(!empty( $languages) )
-			{
-				echo '<tr><th scope="row">'.esc_html( __('What Three Words language')).'</th><td><select name="what-three-words-language">';
-				foreach( $languages AS $key=>$detail)
-				{
-					echo'<option value="'.esc_html( $detail['code'] ).'" '.selected( $w3wLanguage,$detail['code'],false).'>'.esc_html( $detail['nativeName'] ).'</option>';
-				}
-				echo'</select></td></tr>';
-			}
-
-			echo'</tbody></table>';
-		}
+	
 		/***********************
 		 * PDF and Mailing Label settings
 		 ***********************/
-		echo'<table class="form-table"><thead><tr><th colspan=2><h2>'.esc_html( __('PDF and Mailing Label settings','church-admin' ) ).'</th></tr><thead><tbody>';
-		echo '<tr><th scope="row">'.esc_html( __('PDF Page Size','church-admin' ) ).'</th><td><select name="pdf_size">';
+		echo'<h2>'.esc_html( __('PDF and Mailing Label settings','church-admin' ) ).'</h2>';
+		echo'<div class="church-admin-form-group"><label>'.esc_html( __('PDF Page Size','church-admin' ) ).'</label>';
+		echo '<select class="church-admin-form-control" name="pdf_size">';
 		$pdf_size=get_option('church_admin_pdf_size');
 		echo'<option value="A4" '.selected( $pdf_size,'A4').'>A4</option>';
 		echo'<option value="Letter" '.selected( $pdf_size,'Letter').'>Letter</option>';
 		echo'<option value="Legal" '.selected( $pdf_size,'Legal').'>Legal</option>';
-		echo'</select></td></tr>';
-		echo '<tr><th scope="row">Avery &#174; Label</th><td><select name="church_admin_label">';
+		echo'</select></div>';
+		echo '<div class="church-admin-form-group"><label>Avery &#174; Label</label><select class="church-admin-form-control" name="church_admin_label">';
 
 		$l=get_option('church_admin_label');
 		echo'<option value="L7163"';
@@ -1219,19 +906,18 @@ function church_admin_sms_settings()
 		echo'>8600</option>';
 		echo'<option value="3422"';
 		if( $l=='3422') echo' selected="selected" ';
-		echo'>3422</option></select></td></tr>';
-		/**************************************
-		 * Donor Receipt email settings
-		 *****************************************/
-		$template=get_option('church_admin_receipt_email_template');
-		$from_name=$from_email='';
-		$from_name = get_option('church_admin_receipt_email_from_name');
-		$from_email = get_option('church_admin_receipt_email_from_email');
-		echo'<table class="form-table"><thead><tr><th colspan=2><h2>'.esc_html( __('Donation receipt email settings','church-admin' ) ).'</th></tr><thead><tbody>';
-		echo '<tr><th scope="row">'.esc_html( __('Email from name','church-admin' ) ).'</th><td><input type="text" name="church_admin_receipt_email_from_name" value="'.esc_html( $from_name).'" /></td></tr>';
-		echo '<tr><th scope="row">'.esc_html( __('Email from email','church-admin' ) ).'</th><td><input type="text" name="church_admin_receipt_email_from_email" value="'.esc_html( $from_email).'" /></td></tr>';
-		echo '<tr><th scope="row">'.esc_html( __('Email template before amounts','church-admin' ) ).'</th><td><textarea name="church_admin_receipt_email_template"  cols=80 rows=10>'.esc_textarea( $template ).'</textarea></td></tr>';
-		echo'</table>';
+		echo'>3422</option></select></div>';
+	
+		/***********************
+		 *  Gender Settings 
+		 ************************/
+		$genders = get_option('church_admin_gender');
+		unset($genders[0]);
+		unset($genders[1]);
+		if(!empty($genders)){$extra=implode(', ',$genders);}else{$extra='';}
+		echo'<h2>'.esc_html(__('Gender Settings','church-admin')).'</h2>';
+		echo'<p>'.esc_html(__('Church Admin uses the Biblically normative genders of "Male" and "Female", some churches have asked to be able to add to the list of genders, so you can add other options with comma separation','church-admin')).'</p>';
+		echo'<div class="church-admin-form-group"><label>'.esc_html(__('Other options','church-admin')).'</label><input class="church-admin-form-control" type="text" name="extra_genders" value="'.esc_attr($extra).'"></div>';
 
 		echo'<p><input type="hidden" name="save-general-settings" value="save"><input class="button-primary" type="submit" value="'.esc_attr(__('Save','church-admin')).'"></p></form>';
 
@@ -1409,13 +1095,13 @@ function church_admin_debug_log()
 	if(file_exists( $debug_path) )
 	{
 		$filesize=filesize( $debug_path);
-		//translators: %1$s is a file path
+		/* translators: %s is a file path */
 		echo'<p>'.esc_html(sprintf(__('Debug path: %1$s','church-admin'),$debug_path)).'</p>';
 		echo'<p><a class="button-secondary" href="'.wp_nonce_url('admin.php?page=church_admin/index.php&amp;section=settings&action=clear-debug','clear-debug').'">'.esc_html( __('Clear Debug Log','church-admin' ) ).'</a></p>';
 	
 		$filesize=filesize( $debug_path);
 		$size=size_format( $filesize, $decimals = 2 );
-		//translators: %1$s is file size
+		/* translators: %s is a file size */
 		echo'<p>'.esc_html(sprintf(__('Debug file is currently %1$s','church-admin' ) ,$size)).'</p>';
 	
 		if( $filesize<2097152)
@@ -1450,7 +1136,7 @@ function church_admin_send_debug_to_support()
 	$filesize=@filesize( $debug_path);
 	$size=size_format( $filesize, $decimals = 2 );
 	echo'<h2>'.esc_html( __("Send debug log to support",'church-admin' ) ).'</h2>';
-	//translators: %1$s is a file size
+	/* translators: %s is a file size */
 	echo'<p>'.esc_html(sprintf(__('Debug file is currently %1$s','church-admin' ) ,$size)).'</p>';
 	if( $filesize>2097152)  {echo '<p>'.esc_html( __("Debug log is too big",'church-admin' ) ).'</p>';return;}
 	if( $filesize<500)  {echo '<p>'.esc_html( __("Debug log is too small to send (not enough debug data). Please repeat the task you are wanting to report a bug for and refresh this page.",'church-admin' ) ).'</p>';return;}
@@ -1514,7 +1200,7 @@ function church_admin_global_communications_settings()
 	echo'<p style="color:red">'.esc_html( __('Use with caution as overrides individuals settings','church-admin' ) ).'</p>';
 	if(!current_user_can('manage_options') )
 	{
-		echo '<div class="notice notice-danger"><h2>'.esc_html( __('Only site administrators can change global email settings')).'</h2></div>';
+		echo '<div class="notice notice-danger"><h2>'.esc_html( __('Only site administrators can change global email settings','church-admin')).'</h2></div>';
 		return;
 	}
 	$results=$wpdb->get_results('SELECT people_id FROM '.$wpdb->prefix.'church_admin_people WHERE email IS NOT NULL AND gdpr_reason IS NOT NULL');

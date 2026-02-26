@@ -458,7 +458,7 @@ function church_admin_shortcode_generator()
     }
     else{
         $js=$description='';
-        //translators: %1$s is a number
+        /* translators: %s is an number */
         $out.='<p><strong>'.esc_html( sprintf( __( 'There are %1$s shortcodes to choose from. Some will display a list of various optional options.','church-admin' ) ,count($shortcodes))).'</strong></p>'."\r\n";
         $out.='<form action="" method="POST">'."\r\n";
         $out.='<div ><label>'.esc_html( __('Choose shortcode','church-admin' ) ).'</label>'."\r\n";
@@ -689,8 +689,8 @@ function church_admin_shortcode_generator()
         }
         //style
         $out.='<div class="church-admin-form-group shortcode-option" id="style" ><h3>'.esc_html( __('Calendar Style','church-admin' ) ).'</h3>';
-        $out.='<p><input type="radio"  name="style" value="table" /><label> '.esc_html(__('Table Style') ).'</label></p>';
-        $out.='<p><input type="radio"  name="style" checked="checked" value="new" /><label> '.esc_html(__('New Style') ).'</label></p>';
+        $out.='<p><input type="radio"  name="style" value="table" /><label> '.esc_html(__('Table Style','church-admin') ).'</label></p>';
+        $out.='<p><input type="radio"  name="style" checked="checked" value="new" /><label> '.esc_html(__('New Style','church-admin') ).'</label></p>';
         $out.='</div>'."\r\n";
         //show age
         $out.='<div class="church-admin-form-group shortcode-option" id="show_age" ><h3>'.esc_html( __('Show age','church-admin' ) ).'</h3>';

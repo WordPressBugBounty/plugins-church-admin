@@ -673,7 +673,8 @@ function ca_podcast_file_add( $file_name=NULL)
     //translators: %1$s is a file name
     echo'<h2>'.esc_html(sprintf(__('Add File - %1$s','church-admin' ) ,$file_name)).'</h2>';
     if(!empty( $_POST['save_file'] )  )
-    {//process form
+    {
+        //process form
         
         if( $sanitizedFilename!=$file_name)
         {
@@ -692,6 +693,10 @@ function ca_podcast_file_add( $file_name=NULL)
 		
             //from 3.6.20 use WordPress native function
             $audiometadata=wp_read_audio_metadata( $path.$sanitizedFilename );
+            if(empty($audiometadata)){
+                echo'<div class="notice notice-danger">'.esc_html(__('File not recognised as an mp3','church-admin') ).'</div>';
+                return;
+            }
             $length=!empty( $audiometadata['length_formatted'] )?$audiometadata['length_formatted']:null;
 
 
@@ -724,6 +729,17 @@ function ca_podcast_file_add( $file_name=NULL)
             $sqlsafe['pub_date'].=' 12:00:00';    
         }
         if(!empty( $_POST['private'] ) )  {$private="1";}else{$private="0";}
+
+        $servicesArray= get_option('church_admin_services');
+        if(empty($servicesArray)){$servicesArray=array();}
+        if(!empty($form['service_name'])){
+            if(!in_array($form['service_name'],$servicesArray)){
+                $servicesArray[]=$form['service_name'];
+                $sqlsafe['service_id'] = array_key_last($servicesArray);
+                update_option('church_admin_services',$servicesArray);
+            }
+
+        }
 
         if ( empty( $id) )$id=$wpdb->get_var('SELECT file_id FROM '.$wpdb->prefix.'church_admin_sermon_files WHERE file_name="'.esc_sql($sanitizedFilename).'"' );
         if(!empty( $id) )
@@ -781,9 +797,8 @@ function ca_podcast_file_add( $file_name=NULL)
           echo '<p><a class="button-secondary" href="'.wp_nonce_url('admin.php?page=church_admin/index.php&amp;action=check-media-files&amp;sermon=podcast','check-media-files').'">'.esc_html( __('Add Already Uploaded Files','church-admin' ) ).'</a></p>';
         echo'<p><a class="button-secondary"  href="'.wp_nonce_url("admin.php?page=church_admin/index.php&amp;action=list_sermon_series&amp;section=podcast",'list_sermon_series').'">'.esc_html( __('List Sermon Series','church-admin' ) ).'</a></p>';
         ca_podcast_list_files();
-    }//end process form
-    else
-    {//form
+
+    }else{//form
 
     	
         echo '<form action="" method="POST" id="churchAdminForm" enctype="multipart/form-data">';
@@ -817,18 +832,17 @@ function ca_podcast_file_add( $file_name=NULL)
         }
         //service
         $service_id= !empty($current_data->service_id) ? (int)$current_data->service_id : null;
-        $service_res=$wpdb->get_results('SELECT CONCAT_WS(" ",service_name,service_time) AS service_name,service_id FROM '.$wpdb->prefix.'church_admin_services ORDER BY service_id DESC');
-        if( $service_res)
-        {
+        $services= get_option('church_admin_services');
+        if(!empty($services)){
             echo'<div class="church-admin-form-group"><label>'.esc_html( __('Service','church-admin' ) ).'</label><select class="church-admin-form-control" name="service_id">';
-            
-            foreach( $service_res AS $service_row)
-            {
-                echo '<option value="'.(int)$service_row->service_id.'" '.selected($service_id,$service_row->service_id, FALSE).'>'.esc_html( $service_row->service_name).'</option>';
-
+            foreach($services AS $id=>$details){
+                echo'<option value="'.(int)$id.'" '.selected($id,$service_id,FALSE).'>'.esc_html($details).'</option>';
             }
-            echo '</select></div>';
+            echo'</select></div>';
         }
+        echo'<div class="church-admin-form-group"><label>'.esc_html( __('Add Service','church-admin' ) ).'</label><input type="text" class="church-admin-form-control" name="service_name"></div>';
+            
+        
         echo'<div class="church-admin-form-group"><label>Speaker</label>';
         echo church_admin_autocomplete('speaker','friends','to', NULL);
         echo'</div>';
@@ -1026,7 +1040,7 @@ function church_admin_podcast_readings( $passages)
 				case "lithuanian":
   					$url='https://api.preachingcentral.com/bible.php?passage='.$passage.'&version='.$version;
 
-  					$ch = curl_init( $url);
+  					$ch = curl_init( esc_url($url));
   					curl_setopt( $ch,CURLOPT_FAILONERROR,true);
   					curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
   					$out='<p>';
@@ -1160,21 +1174,17 @@ function church_admin_edit_sermon( $file_id)
         {
             $errors['content']=__('You need to upload an audio file or enter an audio or video url','church-admin');
         }
-        /****************************************
-         * Handle if Google share url in audio_url
-         ***************************************/
+       
         if(!empty( $form['audio_url'] ) )
         {
-            $sqlsafe['audio_url']=$form['audio_url'];
+            $sqlsafe['audio_url']=esc_sql($form['audio_url']);
             $audioURL=$form['audio_url'];
-            church_admin_debug('URL: '.$sqlsafe['audio_url']);
-           
-            $mimeType=church_admin_getRemoteMimeType( $sqlsafe['audio_url'] );
             
-            $dot_and_ext = substr($sqlsafe['audio_url'] ,-4);
-            church_admin_debug($dot_and_ext);
+            $mimeType=church_admin_getRemoteMimeType( $sqlsafe['audio_url'] );//doesn't work for all servers
+            
+            $ext = substr($form['audio_url'],-4);
 
-            if( $mimeType!='audio/mpeg' && $dot_and_ext!='.mp3' ) {$errors['audio_url']=__('External file is not an mp3','church-admin');}
+            if( $mimeType!='audio/mpeg' && $ext!='.mp3')$errors['audio_url']=__('External file is not an mp3','church-admin');
             
             $length=!empty($form['external_duration'])?$form['external_duration']: NULL;
 
@@ -1226,13 +1236,29 @@ function church_admin_edit_sermon( $file_id)
             $length=!empty( $audiometadata['length_formatted'] )?$audiometadata['length_formatted']:null;
 		}
         if(empty($file_name))$ile_name=null;
+        
+
+        $servicesArray= get_option('church_admin_services');
+        if(empty($servicesArray)){$servicesArray=array();}
+        if(!empty($form['service_name'])){
+            if(!in_array($form['service_name'],$servicesArray)){
+                $servicesArray[]=$form['service_name'];
+                $sqlsafe['service_id'] = array_key_last($servicesArray);
+                update_option('church_admin_services',$servicesArray);
+            }
+
+        }
+
+
+    
         /******************************
         *   Abort if there are errors
         ******************************/
         if(!empty( $errors) )  {
             church_admin_debug("There were errors \r\n".print_r( $errors,TRUE) );
-            echo wp_kses_post('<p>'.implode('<br>',$errors).'</p>');
+            echo '<div class="notice notice-danger">'.wp_kses_post('<p>'.implode('<br>',$errors)).'</p></div>';
             church_admin_sermon_form( $data,$errors);
+            return;
         }
         else
         {//save sermon
@@ -1313,19 +1339,19 @@ function church_admin_edit_sermon( $file_id)
             if(empty($file_name)){$file_name=null;}
 
             //church_admin_debug("SQLSAFE data\r\n".print_r( $sqlsafe,TRUE) );
-            if ( empty( $file_id) )$file_id=$wpdb->get_var('SELECT file_id FROM '.$wpdb->prefix.'church_admin_sermon_files WHERE external_file="'.$sqlsafe['audio_url'].'" AND length="'.$length.'" AND private="'.$private.'" AND file_name="'.$file_name.'" AND file_title="'.$sqlsafe['file_title'].'" AND file_description="'.$sqlsafe['file_description'].'" AND service_id="'.$sqlsafe['service_id'].'" AND series_id="'.$sqlsafe['series_id'].'" AND speaker="'.$speaker.'"');
+            if ( empty( $file_id) )$file_id=$wpdb->get_var('SELECT file_id FROM '.$wpdb->prefix.'church_admin_sermon_files WHERE external_file="'.esc_sql($form['audio_url']).'" AND length="'.$length.'" AND private="'.$private.'" AND file_name="'.$file_name.'" AND file_title="'.$sqlsafe['file_title'].'" AND file_description="'.$sqlsafe['file_description'].'" AND service_id="'.$sqlsafe['service_id'].'" AND series_id="'.$sqlsafe['series_id'].'" AND speaker="'.$speaker.'"');
             //church_admin_debug( $wpdb->last_query);
             if(!empty( $file_id) )
             {//update
                 
-                $sql='UPDATE '.$wpdb->prefix.'church_admin_sermon_files SET embed_code="'.esc_sql( $embed_code ).'",external_file="'.$sqlsafe['audio_url'].'", video_url="'.$sqlsafe['video_url'].'",transcript="'.$transcript.'",file_subtitle="'.$sqlsafe['file_subtitle'].'",pub_date="'.$sqlsafe['pub_date'].'",length="'.$length.'", private="'.$private.'",last_modified="'.date("Y-m-d H:i:s" ).'",file_name="'.esc_sql($file_name).'" , file_title="'.$sqlsafe['file_title'].'" , file_description="'.$sqlsafe['file_description'].'" , service_id="'.$sqlsafe['service_id'].'",series_id="'.$sqlsafe['series_id'].'" , speaker="'.$speaker.'", bible_passages="'.$passages.'",bible_texts="'.$sqlsafe['passages'].'",file_slug="'.esc_sql(sanitize_title( $form['file_title'] ) ).'" WHERE file_id="'.esc_sql( $file_id).'"';
+                $sql='UPDATE '.$wpdb->prefix.'church_admin_sermon_files SET embed_code="'.esc_sql( $embed_code ).'",external_file="'.esc_sql($form['audio_url']).'", video_url="'.esc_sql($form['video_url']).'",transcript="'.$transcript.'",file_subtitle="'.$sqlsafe['file_subtitle'].'",pub_date="'.$sqlsafe['pub_date'].'",length="'.$length.'", private="'.$private.'",last_modified="'.date("Y-m-d H:i:s" ).'",file_name="'.esc_sql($file_name).'" , file_title="'.$sqlsafe['file_title'].'" , file_description="'.$sqlsafe['file_description'].'" , service_id="'.$sqlsafe['service_id'].'",series_id="'.$sqlsafe['series_id'].'" , speaker="'.$speaker.'", bible_passages="'.$passages.'",bible_texts="'.$sqlsafe['passages'].'",file_slug="'.esc_sql(sanitize_title( $form['file_title'] ) ).'" WHERE file_id="'.esc_sql( $file_id).'"';
 
                 $wpdb->query( $sql);
                 //church_admin_debug("DB Update \r\n".$wpdb->last_query);
             }//end update
             else
             {//insert
-                $sql='INSERT INTO '.$wpdb->prefix.'church_admin_sermon_files (file_name,file_title,file_subtitle,file_description,private,length,service_id,series_id,speaker,pub_date,last_modified,transcript,video_url,external_file,bible_passages,bible_texts,file_slug,embed_code)VALUES("'.esc_sql($file_name).'","'.$sqlsafe['file_title'].'","'.$sqlsafe['file_subtitle'].'","'.$sqlsafe['file_description'].'" ,"'.$private.'","'.$length.'","'.$sqlsafe['service_id'].'","'.$sqlsafe['series_id'].'","'.$speaker.'" ,"'.$sqlsafe['pub_date'].'","'.date("Y-m-d H:i:s" ).'","'.$transcript.'","'.$sqlsafe['video_url'].'","'.$sqlsafe['audio_url'].'","'.$passages.'","'.$sqlsafe['passages'].'","'.esc_sql(sanitize_title( $form['file_title'] ) ).'","'.esc_sql( $embed_code ).'")';
+                $sql='INSERT INTO '.$wpdb->prefix.'church_admin_sermon_files (file_name,file_title,file_subtitle,file_description,private,length,service_id,series_id,speaker,pub_date,last_modified,transcript,video_url,external_file,bible_passages,bible_texts,file_slug,embed_code)VALUES("'.esc_sql($file_name).'","'.$sqlsafe['file_title'].'","'.$sqlsafe['file_subtitle'].'","'.$sqlsafe['file_description'].'" ,"'.$private.'","'.$length.'","'.$sqlsafe['service_id'].'","'.$sqlsafe['series_id'].'","'.$speaker.'" ,"'.$sqlsafe['pub_date'].'","'.date("Y-m-d H:i:s" ).'","'.$transcript.'","'.esc_sql($sqlsafe['video_url']).'","'.esc_sql($form['audio_url']).'","'.$passages.'","'.$sqlsafe['passages'].'","'.esc_sql(sanitize_title( $form['file_title'] ) ).'","'.esc_sql( $embed_code ).'")';
                 $wpdb->query( $sql);
                 //church_admin_debug("DB Insert \r\n".$wpdb->last_query);
                 $file_id=$wpdb->insert_id;
@@ -1423,19 +1449,23 @@ function church_admin_sermon_form( $current_data,$errors)
     }
     echo'<div class="church-admin-form-group"><label>'.esc_html( __('Create a new sermon series','church-admin' ) ).'</label><input class="church-admin-form-control" type="text" name="sermon_series" /></div>';
     //service
-    $service_id = !empty($current_data->service_id) ? (int)$current_data->service_id : null;
-    $service_res=$wpdb->get_results('SELECT CONCAT_WS(" ",service_name,service_time) AS service_name,service_id FROM '.$wpdb->prefix.'church_admin_services ORDER BY service_id DESC');
-    if( $service_res)
-    {
-        echo'<div class="church-admin-form-group"><label>'.esc_html( __('Service','church-admin' ) ).'</label><select class="church-admin-form-control" name="service_id">';
-        
-        foreach( $service_res AS $service_row)
-        {
-                echo '<option value="'.(int) $service_row->service_id.'" '.selected($service_row->service_id,$service_id,false).'>'.esc_html( $service_row->service_name).'</option>';
-
-        }
-       echo '</select></div>';
-    }
+     //service
+     $service_id= !empty($current_data->service_id) ? (int)$current_data->service_id : null;
+     $services= get_option('church_admin_services');
+     if(!empty($services)){
+         echo'<div class="church-admin-form-group"><label>'.esc_html( __('Service','church-admin' ) ).'</label><select class="church-admin-form-control" name="service_id">';
+         foreach($services AS $id=>$details){
+             echo'<option value="'.(int)$id.'" '.selected($id,$service_id,FALSE).'>'.esc_html($details).'</option>';
+         }
+         echo'</select></div>';
+         echo'<div class="church-admin-form-group"><label>'.esc_html( __('Or Add Service','church-admin' ) ).'</label>';
+     
+     }else{
+        echo'<div class="church-admin-form-group"><label>'.esc_html( __('Add Service','church-admin' ) ).'</label>';
+     
+     }
+     echo'<input type="text" class="church-admin-form-control" name="service_name"></div>';
+       
     echo'<div class="church-admin-form-group"><label>'.esc_html( __('Speaker','church-admin' ) ).'</label>';
     $s=array();
     $speaker=NULL;
@@ -1878,7 +1908,8 @@ function ca_podcast_xml()
                 $names=!empty( $row->speaker)?church_admin_get_people( $row->speaker):__('Preacher','church-admin');
                 $subtitle=!empty( $row->file_subtitle)?$row->file_subtitle:$row->file_subtitle;
                 //end get speakers
-                $service=$wpdb->get_var('SELECT CONCAT_WS(" ",service_name,service_time) FROM '.$wpdb->prefix.'church_admin_services WHERE service_id="'.esc_sql( $row->service_id).'"');
+                $services = get_option('church_admin_services');
+                $service =!empty($services[$row->service_id]) ? $services[$row->service_id] : '';
                 $output .= '<item>';
                 $output .= '<title>'.htmlspecialchars( $row->file_title, ENT_XML1, 'UTF-8').'</title>';
                 $output .= '<itunes:title>'.htmlspecialchars( $row->file_title, ENT_XML1, 'UTF-8').'</itunes:title>';

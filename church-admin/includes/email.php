@@ -43,7 +43,7 @@ function church_admin_test_email( $email=NULL)
         
         if(wp_mail( $to, $subject,$message,$headers) )
         {
-			//translators: %1$s is an email
+			/* translators: %s is an email */
             echo '<p>'.  esc_html(sprintf(__('Email sent to %1$s  successfully','church-admin'),$to)).'</p>';
         }
         else
@@ -53,7 +53,7 @@ function church_admin_test_email( $email=NULL)
                 church_admin_debug("**********\r\n Send error\r\n ".print_r( $phpmailer->ErrorInfo,TRUE)."\r\n");
                 //church_admin_debug($phpmailer);
 
-				//translators: %1$s is an email
+				/* translators: %s is an email */
                 echo '<p>'. sprintf(__('Failed to send to %1$s','church-admin'),$to).' '.$phpmailer->ErrorInfo.'</p>';
             }
         }
@@ -329,7 +329,7 @@ function church_admin_send_email( $email_id=NULL)
 		$recipients=array();
 		if( $results)
 		{
-			//translators: %1$s is a number
+			/* translators: %s is a number */
 			echo '<p>'.esc_html(sprintf(__('Preparing sending to %1$s recipients','church-admin'),$wpdb->num_rows)).'</p>';
 			foreach( $results AS $row)
 			{
@@ -360,7 +360,7 @@ function church_admin_send_email( $email_id=NULL)
 				foreach($recipients AS $ke=>$details){
 					$send_message = str_replace('[NAME]',$details['first_name'],$message);
 					$values[] = '("'.esc_sql($schedule).'","'.esc_sql($details['email']).'","'.esc_sql($from_email).'","'.esc_sql($from_name).'","'.esc_sql($reply_email).'","'.esc_sql($reply_name).'","'.esc_sql($subject).'","'.esc_sql($send_message).'")';
-					//translators: %1$s is an email
+					/* translators: %s is an email */
 					echo'<p>'.esc_html(sprintf(__('Scheduled to %1$s','church-admin'),$details['email'])).'</p>';
 
 				}
@@ -650,6 +650,6 @@ function church_admin_clear_email_queue(){
 	global $wpdb;
 	$count=$wpdb->get_var('SELECT COUNT(*) FROM '.$wpdb->prefix.'church_admin_email');
 	$wpdb->query('TRUNCATE TABLE '.$wpdb->prefix.'church_admin_email');
-	//translators: %1$s is an number
+	/* translators: %s is an number */
     echo'<div class="notice notice-success"><h2>'.esc_html(sprintf(__('%1$s emails cleared from queue','church-admin'),$count)).'</h2></div>';
 }

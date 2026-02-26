@@ -36,13 +36,13 @@ function church_admin_block_assets()
 	||has_block('church-admin/calendar-list',$post)
 	
 	||has_block('church-admin/register',$post)
-	||has_block('church-admin/giving',$post)
+
 	||has_block('church-admin/graph',$post)
-	||has_block('church-admin/member-map',$post)
+	
 
 	||has_block( 'church-admin/recent',$post)
 	||has_block('church-admin/sermon-podcast',$post)
-	||has_block('church-admin/service-booking',$post)
+
 	||has_block('church-admin/sermons',$post)
 	||has_block( 'church-admin/sermon-series',$post)
 	||has_block( 'church-admin/video-embed',$post)
@@ -106,17 +106,7 @@ function church_admin_block_assets()
 			
 		}
 		
-		if(has_block('church-admin/member-map',$post) )
-		{	$api_key=get_option('church_admin_google_api_key');
-			if(!empty($api_key))
-			{
-				$src = 'https://maps.googleapis.com/maps/api/js';
-				$key='?key='.$api_key;
-				wp_enqueue_script( 'church_admin_google_maps_api',$src.$key, array() ,FALSE);
-				wp_enqueue_script('church_admin_map_script', plugins_url('includes/google_maps.js',dirname(__FILE__) ), array( 'jquery' ) ,FALSE);
-
-			}
-		}
+		
 		if(has_block('church-admin/sermon-podcast',$post) )
 		{
 			church_admin_debug("Line 108");
@@ -179,7 +169,7 @@ function church_admin_block_editor_assets()
 	/**************************
 	 * Add data for dropdowns
 	 **************************/
-	$seriesArray=array(array('value'=>null,'label'=>esc_html( __('All series')) ));
+	$seriesArray=array(array('value'=>null,'label'=>esc_html( __('All series','church-admin')) ));
 	$series = $wpdb->get_results('SELECT * FROM '.$wpdb->prefix.'church_admin_sermon_series ORDER BY series_name ASC');
 	
 
@@ -529,6 +519,7 @@ function church_admin_block_video( $attributes ) {
     $out.='<div class="'.esc_attr($container).'"><div style="position:relative;padding-top:56.25%"><iframe class="ca-video" style="position:absolute;top:0;left:0;width:100%;height:100%;" src="'.esc_url($embed['embed']).'" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div></div>';
     $views=church_admin_youtube_views_api( esc_attr($embed['id']) );
     if(!empty( $views)&& !empty( $attribute['show_views'] ) ){
+		/* translators: %s: Number of views */
 		$out.='<p>'.esc_html( sprintf(__('%1$s views','church-admin' ) ,$views) ).'</p>';
 	}
     $out.='</div>';
@@ -999,52 +990,5 @@ function church_admin_block_series( $attributes)
 		$out.='</div>';	
 		return $out;
 }
-function church_admin_block_member_map( $attributes)
-{
-	global $wpdb;
-	$member_type_id=1;
-	if(!empty( $attributes['member_type_id'] ) )$member_type_id=implode(",",church_admin_get_member_type_ids( $attributes['member_type_id'] ) );
-	$out='';
-	$out='<div class="alignwide church-admin-shortcode-output ';
-	if(!empty( $attributes['colorscheme'] ) )  {
 
-		switch( $attributes['colorscheme'] )
-		{
-			case 'white':
-				$out.='ca-background ';
-			break;
-			case 'bluegrey':
-			default: 
-				$out.=' ca-dark-mode-blue-grey ';
-			break;
-		}
-	}
-    elseif(!empty( $attributes['background'] ) )$out.=' ca-background ';
-	$out.='">';
-	if(is_user_logged_in() )
-	{
-		wp_enqueue_script('church_admin_google_maps_api');
-		wp_enqueue_script('church_admin_map');
-		
-	    $service=$wpdb->get_row('SELECT lat,lng  FROM '.$wpdb->prefix.'church_admin_sites WHERE lat!="" AND lng!="" ORDER BY site_id ASC LIMIT 1');
-    	$out.='<div class="church-admin-member-map">';
-		
-		$out.='<script type="text/javascript">var xml_url="'.site_url().'/?church_admin_download=address-xml&member_type_id='.esc_html( $attributes['member_type_id'] ).'&address-xml='.wp_create_nonce('address-xml').'";'."\r\n";
-    	$out.=' var lat='.esc_html( $service->lat).';'."\r\n";
-    	$out.=' var lng='.esc_html( $service->lng).';'."\r\n";
-		$out.=' var zoom='.esc_html( $attributes['zoom'] ).';'."\r\n";
-		$out.=' var translation=["'.esc_html( __('Small Groups','church-admin' ) ).'","'.esc_html( __('Unattached','church-admin' ) ).'","'.esc_html( __('In a group','church-admin' ) ).'","'.esc_html( __('Group','church-admin' ) ).'"];'."\r\n";
-		$out.='jQuery(document).ready(function()  {'."\r\n";
-		$out.='console.log("Ready to lead");'."\r\n";
-    	$out.='load(lat,lng,xml_url,zoom,translation);});</script>';
-		$out.='<div id="church-admin-member-map" style="width:'.esc_attr($attributes['width']).';height:'.esc_attr($attributes['height']).'">No map shown on editor screen sorry!</div>';
-    	$out.='<div id="groups" ><p><img src="https://maps.google.com/mapfiles/kml/paddle/blu-circle.png" />'.esc_html( __('Small Group','church-admin' ) ).'<br><img src="https://maps.google.com/mapfiles/kml/paddle/red-circle.png" />'.esc_html( __('Not in a small group','church-admin' ) ).'<br><img src="https://maps.google.com/mapfiles/kml/paddle/grn-circle.png" />'.esc_html( __('In a small Group','church-admin' ) ).'</p></div>';
-    	$out.='</div>';
-	}
-	else {
-		$out.='<h3>'.esc_html( __('You need to be logged in to view the map','church-admin' ) ).'</h3>'.wp_login_form(array('echo'=>false) );
-	}
-	$out.='</div>';
-    return $out;
-}
 

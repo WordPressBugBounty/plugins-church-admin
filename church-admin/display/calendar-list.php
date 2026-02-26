@@ -112,7 +112,7 @@ function church_admin_calendar_list( $days=28,$category=NULL,$fac_ids=NULL)
                                 'link_title'=>$row->link_title,
 								'location'=>$row->location,
 								'bgcolor'=>$row->bgcolor,
-								'textcolor'=>$row->text_color,
+								'textcolor'=>$row->textcolor,
 								
 							);
 			}

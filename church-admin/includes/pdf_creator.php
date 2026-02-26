@@ -513,7 +513,7 @@ function church_admin_address_pdf_v1( $member_type_id=0,$loggedin=1,$showDOB=TRU
 				$text=array();
 				foreach( $date_of_birth AS $name=>$dob)
 				{
-                    //translators: %1$s is name %2$s os a date
+                    /* translators: 1: is name 2: date */
 					$content=strip_tags(sprintf(__('Date of birth for %1$s: %2$s','church-admin' ) ,$name,$doba0));
 					if( $dob!=end( $date_of_birth) )
 					$width=$pdf->GetStringWidth( $content);
@@ -1377,11 +1377,11 @@ function church_admin_photo_permissions_pdf($people_type_ids)
         //Title
         $pdf->AddPage('P',get_option('church_admin_pdf_size') );
         $pdf->SetFont('DejaVu','B',16);
-        //translators: %1$s is a title for the PDF
+        /* translators: %s is a title for the PDF */
         $PDFtitle = strip_tags( sprintf(__('Photo permission for %1$s','church-admin'),implode(', ',$title)));
         $pdf->Cell(0,10,$PDFtitle,0,2,'C');
         $pdf->SetFont('DejaVu','B',12);
-        //translators: %1$s is a date
+        /* translators: %s is a date */
         $PDFdate = strip_tags( sprintf( __('Produced %1$s','church-admin'),wp_date(get_option('date_format'))));
         $pdf->Cell(0,10,$PDFdate,0,2,'C');
     if(!empty($results)){
@@ -1392,7 +1392,7 @@ function church_admin_photo_permissions_pdf($people_type_ids)
             if($x>=5){
                 $pdf->AddPage('P',get_option('church_admin_pdf_size') );
                 $pdf->SetFont('DejaVu','B',16);
-                //translators: %1$s is the title of the PDF
+                /* translators: %s is the title of the PDF */
                 $PDFtitle = strip_tags( sprintf(__('Photo permission for %1$s','church-admin'),implode(', ',$title)));
                 $pdf->Cell(0,10,$PDFtitle,0,2,'C');
                 $pdf->SetFont('DejaVu','B',12);
@@ -1605,7 +1605,7 @@ function church_admin_weekly_calendar_pdf($facilities_id,$cat_id,$start_date){
         //Title
         $pdf->AddPage('P',get_option('church_admin_pdf_size') );
         $pdf->SetFont('DejaVu','B',12);
-        //translators: %1$s is  a date and %2$s is the facility name
+        /* translators: 1: date and 2: is the facility name */
         $PDFtitle = strip_tags( sprintf(__('Weekly Calendar w/c %1$s for %2$s','church-admin'),mysql2date(get_option('date_format'),$start_date),$what));
         $pdf->Cell(0,10,$PDFtitle,0,2,'C');
         $pdf->SetFont('DejaVu','B',12);
@@ -1773,7 +1773,7 @@ function church_admin_monthly_calendar_pdf($start_date, $facilities_id,$cat_id)
         }
     }
  
-    //translators: %1$s is month, %2$s is year
+    /* translators: 1: is month 2: is year */
     $title = sprintf(__('Calendar %1$s %2$s','church-admin'), $monthname,$thisyear);
 
 

@@ -4,17 +4,17 @@ Donate link: https://pay.sumup.io/b2c/QEEPP89C
 Tags: church, sermons, membership,schedule,  calendar
 Requires at least: 5.0
 Requires PHP: 7.0
-Tested up to: 6.7
-Stable tag: 5.0.23
+Tested up to: 6.9
+Stable tag: 5.0.30
 Elementor tested up to: 3.25.0
 License: GNU General Public License (GPL) version 2 
 
 Organise and communicate church life, with associated Android and iOS app for your congregation.
 == Description ==
 
-This plugin is for church wordpress sites and has an smartphone app too - it adds an easy to use address directory and you can email and sms different groups of people.
+This plugin is for church wordpress sites to give you a membership database, church calendar and sermon podcasting tools. There is a premium version that adds many more modules like service scheduling, event ticketing and a church app.
 <a href="http://churchadminplugin.com/#email-list">Sign up</a> for our email list to get a detailed PDF manual
-<a href="http://demo.churchadminplugin.com">Demo site</a>
+
 <a href="https://www.churchadminplugin.com">Plugin site</a>
 
 Compatible with Elementor and provides Elementor widgets, tested to v3.25
@@ -60,6 +60,21 @@ You can report any security bugs found in the source code of the site-reviews pl
 
 
 == Changelog ==
+= 5.0.30 =
+* Fix menu page look
+= 5.0.29 =
+* Fix SSRF vulnerability for external audio file in sermon uploads.
+= 5.0.28 =
+* Settings Updates
+= 5.0.27 =
+* Fixed image upload in directory section
+= 5.0.26 =
+* Ability to add service in Media upload section
+= 5.0.25 =
+* Remove giving download which is premium only.
+= 5.0.24 =
+* Removed delay on table calendar popups
+* Fixed Broken Address List Gutenberg Block
 = 5.0.23 =
 * Fix podcast shortcode
 = 5.0.22 =

@@ -22,14 +22,16 @@ function church_admin_install_premium_plugin() {
 		$result = church_admin_install_plugin( $plugin_info );
 
 		if ( $result['success'] ) {
-			echo '<div class="notice notice-success"><h2>'.__('Success','church-admin').'</h2><p>' . esc_html($result['message']).'</p>';
+			echo '<div class="notice notice-success"><h2>';
+			echo esc_html(__('Success','church-admin') );
+			echo '</h2><p>' . esc_html($result['message']).'</p>';
             echo'<p>'.esc_html(__('You have  installed & activated the premium version. Please deactivate this free version of "Church Admin" to use the premium version.','church-admin') ).'</p>';
             echo'<p><a class="button-primary" href="'.esc_url(wp_nonce_url(admin_url().'plugins.php?action=deactivate&plugin=church-admin/church-admin.php','deactivate-plugin_church-admin/church-admin.php')).'">'.esc_html(__('Deactivate now','church-admin')).'</a></p>';    
             echo '</div>';
             
            
 		} else {
-			echo '<div class="notice notice-warning"><h2>'.__('Error','church-admin').'</h2><p>' . esc_html($result['message']).'</p></div>';
+			echo '<div class="notice notice-warning"><h2>'.esc_html( __('Error','church-admin') ).'</h2><p>' . esc_html($result['message']).'</p></div>';
 		}
 	}
 	exit;

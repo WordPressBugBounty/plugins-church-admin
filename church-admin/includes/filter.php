@@ -652,6 +652,7 @@ function church_admin_filter_count( $type)
 	$sql= church_admin_build_filter_sql( church_admin_sanitize($_POST['data']),$type);
 	church_admin_debug( $sql);
 	$result=$wpdb->get_results( $sql);
+	church_admin_debug($result);
 	$count=$wpdb->num_rows;
 	if ( empty( $count) )$count='0';
 	return '<strong>'.esc_html(sprintf(__('%1$s people','church-admin' ) ,$count)).'</strong>';

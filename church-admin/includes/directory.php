@@ -875,6 +875,7 @@ function church_admin_address_form( $data,$error)
 
     }else
     {
+		$nonce = wp_create_nonce('image-upload');
    $out.='<script>
 	jQuery(document).ready(function( $) {
 	$(".household-frontend-button").click(function()  { $("#file-chooser").trigger("click"); });
@@ -886,6 +887,7 @@ function church_admin_address_form( $data,$error)
 	var data = new FormData();
 	jQuery.each(jQuery("#file-chooser")[0].files, function(i, file) {
     data.append("file-"+i, file);
+	data.append("_ajax_nonce","'.esc_attr($nonce).'");
 	});
 	$.ajax({
         		url: "'.admin_url().'admin-ajax.php?action=church_admin_image_upload",
@@ -1036,7 +1038,6 @@ function church_admin_new_display_person( $people_id)
     <div class="ca-group"><!--groups--></div>
     <div class="ca-classes><span class="ca-dashicons dashicons dashicons-welcome-learn-more"></span><!--classes--></div>
     <div class="ca-att"><span class="ca-dashicons dashicons dashicons-chart-line"></span><!--attendance--></div>
-    <div class="ca-giving"><span class="ca-dashicons dashicons dashicons-money-alt"></span><!--giving--></div>
     </div>';
     $person=$wpdb->get_row('SELECT * FROM '.$wpdb->prefix.'church_admin_people WHERE people_id="'.(int)$people_id.'"');
     $output=$person_template;

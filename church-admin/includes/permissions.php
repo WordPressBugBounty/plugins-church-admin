@@ -8,7 +8,7 @@ function church_admin_permissions()
 	global $wpdb;
 	if(!current_user_can('manage_options') )
 	{
-		echo '<div class="notice notice-danger"><h2>'.esc_html( __('Only site administrators can change options')).'</h2></div>';
+		echo '<div class="notice notice-danger"><h2>'.esc_html( __('Only site administrators can change options','church-admin')).'</h2></div>';
 		return;
 	}
 	$check=$wpdb->get_var('SELECT COUNT(user_id) FROM '.$wpdb->prefix.'church_admin_people');
@@ -142,11 +142,7 @@ function church_admin_permissions()
 					if(!empty( $service) )$user_permissions['Service']=$service;
 				}
 				
-				if(!empty( $_POST['Giving'] ) )
-				{
-					$giving=church_admin_get_user_id( church_admin_sanitize($_POST['Giving'] ) );
-					if(!empty( $giving) )$user_permissions['Giving']=$giving;
-				}
+			
 
 				if(!empty( $_POST['Units'] ) )
 				{
@@ -219,12 +215,12 @@ function church_admin_permissions()
 			if ( empty( $user_permissions['Service'] ) ) $user_permissions['Service'] = '';
 			if ( empty( $user_permissions['Prayer Requests'] ) ) $user_permissions['Prayer Requests'] = '';
 			if ( empty( $user_permissions['Kidswork'] ) ) $user_permissions['Kidswork'] = '';
-			if ( empty( $user_permissions['Giving'] ) ) $user_permissions['Giving'] = '';
+			
 			if ( empty( $user_permissions['Units'] ) ) $user_permissions['Units'] = '';
 			if ( empty( $user_permissions['Sessions'] ) ) $user_permissions['Sessions'] = '';
 			echo'<form action="admin.php?page=church_admin/index.php&section=settings&action=permissions" method="post">';
 			wp_nonce_field('permissions');
-		//church_admin_autocomplete( $name='people',$first_id='friends',$second_id='to',$current_data=array(),$user_id=FALSE)
+			//church_admin_autocomplete( $name='people',$first_id='friends',$second_id='to',$current_data=array(),$user_id=FALSE)
 			echo'<table class="form-table"><tbody>';
 			echo'<tr><th scope="row" >'.esc_html( __('Delete All user permissions','church-admin' ) ).'</th><td><input type="checkbox" class="delete_all_permissions" value="yes" name="delete_all" />'.esc_html( __("Don't forget to save!",'church-admin' ) ).'</td></tr>';
 			echo'<tr><th scope="row" >'.esc_html( __('Attendance','church-admin' ) ).'</th><td>';
@@ -256,60 +252,14 @@ function church_admin_permissions()
 			echo'<tr><th scope="row" >'.esc_html( __('Directory','church-admin' ) ).'</th><td>';
 			echo church_admin_autocomplete('Directory','auto-Directory','dir',$user_permissions['Directory'],TRUE);
 			echo '</td></tr>';
-			echo'<tr><th scope="row" >'.esc_html( __('Events','church-admin' ) ).'</th><td>';
-			echo church_admin_autocomplete('Events','auto-events','eve',$user_permissions['Events'],TRUE);
-			echo '</td></tr>';
-			echo'<tr><th scope="row" >'.esc_html( __('Follow Up Funnels','church-admin' ) ).'</th><td>';
-			echo church_admin_autocomplete('Funnel','auto-funnel','funn',$user_permissions['Funnel'],TRUE);
-			echo '</td></tr>';
-			echo'<tr><th scope="row" >'.esc_html( __('Spiritual Gifts','church-admin' ) ).'</th><td>';
-			echo church_admin_autocomplete('Gifts','auto-gifts','gif',$user_permissions['Gifts'],TRUE);
-			echo '</td></tr>';
-			echo'<tr><th scope="row" >'.esc_html( __('Giving','church-admin' ) ).'</th><td>';
-			echo church_admin_autocomplete('Giving','auto-giving','giv',$user_permissions['Giving'],TRUE);
-			echo '</td></tr>';
-			echo'<tr><th scope="row" >'.esc_html( __('Groups','church-admin' ) ).'</th><td>';
-			echo church_admin_autocomplete('Groups','auto-small-groups','sg',$user_permissions['Groups'],TRUE);
-			echo '</td></tr>';
-			echo'<tr><th scope="row" >'.esc_html( __('Inventory','church-admin' ) ).'</th><td>';
-			echo church_admin_autocomplete('Inventory','auto-inventory','inv',$user_permissions['Inventory'],TRUE);
-			echo '</td></tr>';
-			echo'<tr><th scope="row" >'.esc_html( __('Kidswork','church-admin' ) ).'</th><td>';
-			echo church_admin_autocomplete('Kidswork','auto-kidswork','ki',$user_permissions['Kidswork'],TRUE);
-			echo '</td></tr>';
+			
 
-
-			echo'<tr><th scope="row" >'.esc_html( __('Ministries','church-admin' ) ).'</th><td>';
-			echo church_admin_autocomplete('Ministries','auto-ministries','mi',$user_permissions['Ministries'],TRUE);
-			echo '</td></tr>';
-			echo'<tr><th scope="row" >'.esc_html( __('Pastoral','church-admin' ) ).'</th><td>';
-			echo church_admin_autocomplete('Pastoral','auto-pastoral','pa',$user_permissions['Pastoral'],TRUE);
-			echo '</td></tr>';
-			echo'<tr><th scope="row" >'.esc_html( __('Prayer Requests','church-admin' ) ).'</th><td>';
-			echo church_admin_autocomplete('Prayer_Requests','auto-prayer-chain','pr',$user_permissions['Prayer Requests'],TRUE);
-			echo '</td></tr>';
-			echo'<tr><th scope="row" >'.esc_html( __('Push Messaging','church-admin' ) ).'</th><td>';
-			echo church_admin_autocomplete('Push','auto-prayer-chain','pr',$user_permissions['Push'],TRUE);
-			echo '</td></tr>';
 			
 
 			echo'<tr><th scope="row" >'.esc_html( __('Sermons','church-admin' ) ).'</th><td>';
 			echo church_admin_autocomplete('Sermons','auto-sermons','ser',$user_permissions['Sermons'],TRUE);
 			echo '</td></tr>';
 
-			echo'<tr><th scope="row" >'.esc_html( __('Service','church-admin' ) ).'</th><td>';
-			echo church_admin_autocomplete('Service','auto-service','ser',$user_permissions['Service'],TRUE);
-			echo '</td></tr>';
-
-			echo'<tr><th scope="row" >'.esc_html( __('Sessions','church-admin' ) ).'</th><td>';
-			echo church_admin_autocomplete('Sessions','auto-sessions','ses',$user_permissions['Sessions'],TRUE);
-			echo '</td></tr>';
-
-			
-
-			echo'<tr><th scope="row" >'.esc_html( __('Units','church-admin' ) ).'</th><td>';
-			echo church_admin_autocomplete('Units','auto-units','un',$user_permissions['Units'],TRUE);
-			echo '</td></tr>';
 
 			echo'<tr><th scope="row" >&nbsp;</th><td><input type="hidden" name="save" value="yes" /><input type="submit" value="'.esc_html( __('Save','church-admin' ) ).'" class="button-primary" /></td></tr></tbody></table>';
 
